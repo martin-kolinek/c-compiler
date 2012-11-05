@@ -15,14 +15,18 @@ tokens {
 } 
 @lexer::header {package grammar.generated;}
 
-program: block* EOF;
+program: external_declaration* EOF;
 
-block: '{' statement* '}';
+//sadly this is required because otherwise we get an error from antlr
+external_declaration: decl_specs declarator (block | ( '=' initializer))?;
+
+block: '{' in_block* '}';
+
+in_block: declaration | statement;
 
 statement:
   block |
-  expression ';' |
-  declaration ';' |
+  expression? ';' |
   if_stat | switch_stat | while_stat | for_stat | dowhile_stat;
 
 expression: 
@@ -35,7 +39,7 @@ const_expression: constant |
   const_arithmetic_expression;
   //@TODO: Address constants
   
-const_arithmetic_expression: '5 + 5'; //@TODO: const arithmetic expressions
+const_arithmetic_expression: '5 + 5'; //@TODO: const arithmetic expressions - toto by sme nemali robit v gramatike
 
 assignment_expression: rvalue '='^ expression;
 
@@ -46,8 +50,6 @@ constant: INT | FLOAT | STRING | CHAR;
 sizeof: SIZEOF ( ID | '(' ID ')' );
 
 //** CONTROL STATEMENTS START **//
-
-
 
 if_stat: IF '(' expression ')' statement 
   ( (ELSE)=> ELSE statement
@@ -68,7 +70,9 @@ dowhile_stat: DO statement WHILE '(' expression ')' ';';
 
 //** DECLARATION START **//
 
-declaration: decl_specs init_declarator;
+declaration: decl_specs init_declarator ';';
+
+function_definition: decl_specs declarator block;
 
 decl_specs: declaration_specifier decl_specs | ID declaration_specifier*;
 
