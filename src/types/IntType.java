@@ -10,4 +10,9 @@ public class IntType implements Type {
 		return new IntConstant(4);
 	}
 
+	@Override
+	public String getStringRepresentation() {
+		return "i32";
+	}
+
 }
