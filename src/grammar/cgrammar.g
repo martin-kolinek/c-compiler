@@ -6,7 +6,9 @@ options {
 }
 
 @header {
-    package grammar;
-}
-@lexer::header {package grammar;}
+    package grammar.generated;
+} 
+@lexer::header {package grammar.generated;}
+
 rule: 'a';
+
