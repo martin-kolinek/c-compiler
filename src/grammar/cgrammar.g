@@ -22,8 +22,10 @@ external_declaration: decl_specs declarator (block | ( '=' initializer))?;
 
 block: '{' in_block* '}';
 
-in_block: declaration | statement;
-
+in_block: 
+  (ID ';') => statement | //tu bude treba osetrit take, ze ten ID je typ  
+  declaration;
+   
 statement:
   block |
   expression? ';' |
@@ -32,20 +34,38 @@ statement:
 //expressions by JMK
 
 expression: 
-  assignment_expression |
-  //rvalue | //naco nam je rvalue? JMK
-  //constant |
-  primary_expression;
+  assignment_expression (',' assignment_expression)* ;
+
+assignment_expression: 
+  unary_expression assignment_op assignment_expression |
+  conditional_expression;
+  
+assignment_op: '=' | '*=' | '/=' | '%=' | '+=' | '-=' | '<<=' | '>>=' | '&=' | '^=' | '|=';
+
+conditional_expression: 
+  logical_or_expression ('?' expression ':' conditional_expression);
+
+logical_or_expression:
+  logical_and_expression ('||' logical_and_expression)*;
+  
+logical_and_expression  : 
+  inclusive_or_expression ('&&' inclusive_or_expression)*;
+
+inclusive_or_expression : exclusive_or_expression ('|' exclusive_or_expression)*
+  ;
+
+exclusive_or_expression : and_expression  ('^' and_expression)*
+  ;
+  
+and_expression  : equality_expression ('&' equality_expression)*
+  ;
+
+equality_expression: primary_expression; //TODO
 
 primary_expression:
   ID |
-  const_expression | //constant |
-//  STRING | // JMK - string je pod const_expression
+  constant |
   '(' expression ')';
-
-const_expression: constant |
-  sizeof |
-  const_arithmetic_expression;
   //@TODO: Address constants
   
 postfix_expression:
@@ -73,7 +93,7 @@ argument_expression_list2:
 unary_expression:
   //primary_expression postfix_expression2* | 
  // '(' type_name ')' '{' initializer_list '}' postfix_expression2*  |
- // '(' type_name ')' '{' initializer_list ',' '}' postfix_expression2* | 
+ // '(' type_name ')' '{' in| itializer_list ',' '}' postfix_expression2* | 
 //  postfix_expression  | //JMK --bude to chybat?
   '++' unary_expression |
   '--' unary_expression |
@@ -90,15 +110,11 @@ cast_expression:
   unary_expression  |
   '(' type_name ')' cast_expression;
   
+
+  
 //unary_operator: OPERATOR;
  
 //END expressions 
-  
-const_arithmetic_expression: '5 + 5'; //@TODO: const arithmetic expressions - toto by sme nemali robit v gramatike
-
-assignment_expression: rvalue '='^ expression;
-
-rvalue: ID;
 
 constant: INT | FLOAT | STRING | CHAR; //chceme mat string ako constant? nechceme ho nahodou vediet adresovat a zliepat atd. ?
 
@@ -111,7 +127,7 @@ if_stat: IF '(' expression ')' statement
     | ( ) // nothing
   );
 
-switch_stat: SWITCH '(' expression ')' '{' (CASE const_expression ':' statement*)* (DEFAULT ':' statement*)? '}';
+switch_stat: SWITCH '(' expression ')' '{' (CASE conditional_expression ':' statement*)* (DEFAULT ':' statement*)? '}';
 
 while_stat: WHILE '(' expression ')' statement;
 
@@ -124,17 +140,31 @@ jmp_stat: BREAK ';' | CONTINUE ';' | RETURN expression? ';';
 
 //** DECLARATION START **//
 
-declaration: decl_specs init_declarator ';';
+declaration: decl_specs (init_declarator (',' init_declarator)* )? ';';
 
 function_definition: decl_specs declarator block;
 
 decl_specs: declaration_specifier decl_specs | ID declaration_specifier*;
 
+spec_qual_list: spec_qual spec_qual_list | ID spec_qual*;
+
+spec_qual: type_specifier | type_qualifier;
+
 declaration_specifier: storage_class_specifier | type_specifier | type_qualifier | function_specifier;
 
 storage_class_specifier : STATIC | EXTERN | REGISTER | AUTO | TYPEDEF;
 
-type_specifier: primitive_type | STRUCT ID | ENUM ID;
+type_specifier: primitive_type | struct_specifier | enum_specifier;
+
+struct_specifier: STRUCT ID? '{' struct_declaration* '}'
+  | STRUCT ID;
+
+struct_declaration: spec_qual_list declarator (',' declarator)* ';';
+
+enum_specifier: ENUM ID? '{' enumerator (',' enumerator)* ','? '}' 
+  | ENUM ID;
+
+enumerator: ID ('=' conditional_expression)?;
 
 type_qualifier: RESTRICT | VOLATILE | CONST;
 
@@ -155,11 +185,11 @@ declarator_suffix: param_declarator_suffix |
 
 parameter_list: parameter_declaration (',' parameter_declaration )* (',' '...')? | '...';
 
-parameter_declaration: declaration_specifier+ param_declarator;
+parameter_declaration: decl_specs param_declarator;
 
-param_declarator: param_declarator_suffix | direct_param_declarator param_declarator_suffix?;
+param_declarator: pointer* direct_param_declarator;
 
-direct_param_declarator: pointer* simple_param_declarator; 
+direct_param_declarator: param_declarator_suffix | simple_param_declarator param_declarator_suffix?; 
 
 simple_param_declarator: ID | '(' param_declarator ')';
 
@@ -176,14 +206,12 @@ initialization: (designator '=')? initializer;
 
 designator: '.' ID | '[' assignment_expression ']';
 
+//to ci je to naozaj iba typ osetrime semantickymi pravidlami
+type_name: parameter_declaration; 
+
 //** DECLARATION END **// 
 
 //** PRIMITIVE TYPES START **//
-
-
-type_name: primitive_type //JMK kvoli expression
-  //| iny typ
-         ;
 
 primitive_type: LONG | INT_T | DOUBLE | FLOAT_T | VOID | CHAR_T | SHORT | SIGNED | UNSIGNED | BOOL;
 
