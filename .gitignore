@@ -1,4 +1,5 @@
 /bin
 .metadata
 /src/grammar/generated
+/src/grammar/output
 *.tokens
