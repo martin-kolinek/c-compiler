@@ -9,6 +9,7 @@ import expression.unop.UnaryOperator;
 import symbols.SymbolTable;
 import transformers.ExpressionModifier;
 import types.PointerType;
+import types.PrimitiveType;
 import types.Type;
 import types.TypeClass;
 
@@ -25,9 +26,36 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 	public void visit(BinaryExpression e) {
 		Type lt = mapping.getExpressionType(e.left);
 		Type rt = mapping.getExpressionType(e.right);
-		int nrpts = 0;
-		if(TypeClass.isPointer(lt))nrpts++;
-		if(TypeClass.isPointer(rt))nrpts++;
+		checkOperandTypes(e, lt, rt);
+		Type retType = AutomaticConversions.getHigherType(lt, rt);
+		e.left=AutomaticConversions.autoCast(e.left, retType, mapping);
+		e.right=AutomaticConversions.autoCast(e.right, retType, mapping);
+		switch(e.operator){
+		case BAND:
+		case BOR:
+		case BSLEFT:
+		case BSRIGHT:
+		case BXOR:
+		case MOD:
+		case MINUS:
+		case PLUS:
+		case AND:
+		case OR:
+		case DIV:
+		case MULT:
+			mapping.setType(e, retType);
+			break;
+		case EQ:
+		case NEQ:
+		case LT:
+		case LET:
+		case GT:
+		case GET:
+			mapping.setType(e, PrimitiveType.INT);
+		}
+	}
+
+	private void checkOperandTypes(BinaryExpression e, Type lt, Type rt) {
 		switch(e.operator) {
 		case BAND:
 		case BOR:
@@ -37,7 +65,7 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 		case MOD:
 			if(!TypeClass.isInteger(lt) || !TypeClass.isInteger(rt))
 				throw new SemanticException("Only integral types allowed");
-			
+			break;
 		case ABAND:
 		case ABOR:
 		case ABSLEFT:
@@ -49,7 +77,26 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 		case AMULT:
 		case APLUS:
 		case ASSIG:
-			if()
+			assert false; //these should have been converted to AssignmentExpression
+			break;
+		case AND:
+		case OR:
+		case EQ:
+		case NEQ:
+		case MINUS:
+		case PLUS:
+		case LT:
+		case LET:
+		case GT:
+		case GET:
+			if(!TypeClass.isScalar(lt) || !TypeClass.isScalar(rt))
+				throw new SemanticException("Expected scalar type");
+			break;
+		case DIV:
+		case MULT:
+			if(!TypeClass.isArithmethic(lt) || !TypeClass.isArithmethic(rt))
+				throw new SemanticException("Expected arithmethic types");
+			break;
 		}
 	}
 
