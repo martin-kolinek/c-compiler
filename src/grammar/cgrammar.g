@@ -202,7 +202,6 @@ conditional_expression returns [Expression ret] :
 //tu treba semantickymi pravidlami skontrolovat, ze ak je tam assignment operator, 
 //tak conditional expression musi byt unary - ale to nam asi vypadne z toho, ze nalavo od 
 //priradovacieho operatora musi byt vec do ktorej sa da priradit
-//TODO
 assignment_expression returns [Expression ret] 
   : e=conditional_expression {$ret=$e.ret;}
     (o=assignment_operator e2=assignment_expression{
@@ -210,12 +209,13 @@ assignment_expression returns [Expression ret]
     })? 
   ;
 
-//TODO
 expression returns [Expression ret] 
-  : assignment_expression (',' assignment_expression)*  
+  : e=assignment_expression {$ret = $e.ret;} 
+    (',' e2=assignment_expression {
+      $ret = new BinaryExpression($ret, BinaryOperator.COMMA, $e2.ret);
+    })*  
   ;
 
-//TODO
 assignment_operator returns [BinaryOperator ret] : 
   '='  {$ret=BinaryOperator.ASSIG;}| 
   '*='  {$ret=BinaryOperator.AMULT;}|
