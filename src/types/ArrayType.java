@@ -9,13 +9,13 @@ public class ArrayType implements Type {
 		elementType=t;
 	}
 	
-	private Expression size;
+	public Expression size;
 	
 	public Expression getSizeExpression() {
 		return size;
 	}
 	
-	private Type elementType;
+	public Type elementType;
 	
 	public Type getElementType() {
 		return elementType;

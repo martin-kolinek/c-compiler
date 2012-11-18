@@ -10,6 +10,7 @@ import expression.MemberAccessExpression;
 import expression.MemberDereferenceExpression;
 import expression.SizeofExpression;
 import expression.SizeofType;
+import expression.TernaryExpression;
 import expression.binop.BinaryExpression;
 import expression.constant.CharConstantExpression;
 import expression.constant.FloatConstantExpression;
@@ -19,7 +20,11 @@ import expression.unop.UnaryExpression;
 
 public class ExpressionTransformer implements ExpressionVisitor {
 
-	ExpressionModifierFactory modFac;
+	public ExpressionTransformer(ExpressionModifierFactory mod) {
+		modFac=mod;
+	}
+	
+	private ExpressionModifierFactory modFac;
 	
 	@Override
 	public void visit(BinaryExpression binaryExpression) {
@@ -94,6 +99,13 @@ public class ExpressionTransformer implements ExpressionVisitor {
 		for(int i=0; i<functionCallExpression.args.size(); ++i) {
 			functionCallExpression.args.set(i, descend(functionCallExpression.args.get(i)));
 		}
+	}
+
+	@Override
+	public void visit(TernaryExpression e) {
+		e.condition=descend(e.condition);
+		e.ontrue=descend(e.ontrue);
+		e.onfalse=descend(e.onfalse);
 	}
 
 }

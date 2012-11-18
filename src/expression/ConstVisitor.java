@@ -104,4 +104,11 @@ public class ConstVisitor implements ExpressionVisitor {
 		this.constant = false;
 	}
 
+	@Override
+	public void visit(TernaryExpression e) {
+		e.condition.accept(this);
+		e.ontrue.accept(this);
+		e.onfalse.accept(this);
+	}
+
 }

@@ -3,6 +3,14 @@ package statements;
 import expression.Expression;
 
 public class WhileStatement extends Statement {
+
+	public WhileStatement(){
+	}
+	
+	public WhileStatement(Expression cond, Statement b) {
+		condition=cond;
+		body=b;
+	}
 	
 	public Expression condition;
 	public Statement body;

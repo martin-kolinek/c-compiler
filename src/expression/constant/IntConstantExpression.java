@@ -5,6 +5,13 @@ import expression.ExpressionVisitor;
 
 public class IntConstantExpression implements Expression{
 	
+	public IntConstantExpression(){
+	}
+	
+	public IntConstantExpression(int val) {
+		value=val;
+	}
+	
 	public int value;
 
 	@Override

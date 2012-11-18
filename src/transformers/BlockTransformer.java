@@ -1,18 +1,21 @@
-package statements;
+package transformers;
 
+import java.util.ArrayList;
+
+import statements.*;
+import toplevel.EmptyInBlockVisitor;
 import toplevel.InBlock;
 
 public class BlockTransformer implements StatementVisitor {
 
-	private BlockModifierFactory mod;
+	private BlockModifierFactory modFac;
 	
 	public BlockTransformer(BlockModifierFactory mod) {
-		this.mod = mod;
+		this.modFac = mod;
 	}
 	
 	private void descend(Statement st) {
-		BlockTransformer tf = new BlockTransformer(mod);
-		st.accept(tf);
+		st.accept(this);
 	}
 	
 	@Override
@@ -69,14 +72,18 @@ public class BlockTransformer implements StatementVisitor {
 
 	@Override
 	public void visit(BlockStatement blockStatement) {
-		BlockModifier m = mod.createModifier();
+		BlockModifier m = modFac.createModifier();
 		for(InBlock ib : blockStatement.inBlock) {
+			ib.accept(new EmptyInBlockVisitor() {
+				@Override
+				public void visit(Statement i) {
+					descend(i);
+				}
+			});
 			ib.accept(m);
 		}
-		blockStatement.inBlock.clear();
-		for(InBlock ib : m.getModified()) {
-			blockStatement.inBlock.add(ib);
-		}
+		blockStatement.inBlock=new ArrayList<InBlock>(m.getModified());
+		modFac.popModifierStack();
 	}
 
 }

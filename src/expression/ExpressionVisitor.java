@@ -6,18 +6,19 @@ import expression.constant.*;
 
 public interface ExpressionVisitor {
 
-	void visit(BinaryExpression binaryExpression);
-	void visit(UnaryExpression unaryExpression);
-	void visit(CastExpression castExpression);
-	void visit(SizeofType sizeofType);
-	void visit(SizeofExpression sizeofExpression);
-	void visit(MemberAccessExpression memberAccessExpression);
-	void visit(MemberDereferenceExpression memberDereferenceExpression);
-	void visit(IndexingExpression indexingExpression);
-	void visit(IDExpression idExpression);
-	void visit(IntConstantExpression intConstantExpression);
-	void visit(FloatConstantExpression floatConstantExpression);
-	void visit(StringConstantExpression stringConstantExpression);
-	void visit(CharConstantExpression charConstantExpression);
-	void visit(FunctionCallExpression functionCallExpression);
+	void visit(BinaryExpression e);
+	void visit(UnaryExpression e);
+	void visit(CastExpression e);
+	void visit(SizeofType e);
+	void visit(SizeofExpression e);
+	void visit(MemberAccessExpression e);
+	void visit(MemberDereferenceExpression e);
+	void visit(IndexingExpression e);
+	void visit(IDExpression e);
+	void visit(IntConstantExpression e);
+	void visit(FloatConstantExpression e);
+	void visit(StringConstantExpression e);
+	void visit(CharConstantExpression e);
+	void visit(FunctionCallExpression e);
+	void visit(TernaryExpression e);
 }

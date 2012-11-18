@@ -6,7 +6,7 @@ public class PointerType implements Type {
 		pointedToType=t;
 	}
 	
-	public final Type pointedToType;
+	public Type pointedToType;
 
 	@Override
 	public void accept(TypeVisitor v) {

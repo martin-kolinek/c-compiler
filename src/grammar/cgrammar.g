@@ -19,6 +19,7 @@ tokens {
     import expression.*;
     import expression.binop.*;
     import expression.unop.*;
+    import expression.binop.*;
     import expression.constant.*;
     import statements.*;
     import toplevel.*;
@@ -32,10 +33,20 @@ $ret = new Program();
   : (ed=external_declaration {$ret.declarations.add($ed.ret);})* EOF;
 
 primary_expression returns [Expression ret]
+@init{
+  $ret=null;
+}
   : ID {$ret = new IDExpression($ID.getText());} |
-  con=constant {$ret = $con.ret;} |
-  (ID {$ret = new FunctionCallExpression(); ((FunctionCallExpression)$ret).name=$ID.getText();})? '(' exp=expression ')' 
-  {if ($ret instanceof FunctionCallExpression){((FunctionCallExpression)$ret).args=$exp.ret;} else{$ret=$exp.ret;}} //not sure this works
+  con=constant {$ret = $con.ret;} | 
+  (ID {$ret = new FunctionCallExpression($ID.getText());})? 
+    '(' exp=expression ')' {
+      if ($ret != null){
+        ((FunctionCallExpression)$ret).addExp($exp.ret);
+      }
+      else {
+        $ret=$exp.ret;
+      }
+    } 
   ;
 
 postfix_expression returns [Expression ret]
@@ -104,7 +115,7 @@ additive_operator returns [BinaryOperator ret] :
 
 shift_expression  returns [Expression ret]:
   a=additive_expression {$ret=$a.ret;}
-   (o=shift_operator a=additive_expression{
+   (o=shift_operator a2=additive_expression{
     $ret=new BinaryExpression($ret,$o.ret,$a2.ret);
    })*
   ;
@@ -143,41 +154,41 @@ equality_operator returns [BinaryOperator ret] :
 
 and_expression  returns [Expression ret]:
  e=equality_expression {$ret=$e.ret;}
- ('&'{o=BinaryOperator.BAND;} 
+ ('&' 
  e2=equality_expression{
-  $ret=new BinaryExpression($ret,$o.ret,$e2.ret);
+  $ret=new BinaryExpression($ret,BinaryOperator.BAND,$e2.ret);
  })*
   ;
 
 exclusive_or_expression returns [Expression ret]:
  a=and_expression  {$ret=$a.ret;}
- ('^'{o=BinaryOperator.BXOR;}
+ ('^'
  a2=and_expression{
-    $ret=new BinaryExpression($ret,$o.ret,$a2.ret);
+    $ret=new BinaryExpression($ret,BinaryOperator.BXOR,$a2.ret);
   })*
   ;
 
 inclusive_or_expression returns [Expression ret]:
  e=exclusive_or_expression 
- ('|' {o=BinaryOperator.BOR;}
+ ('|' 
  e2=exclusive_or_expression{
-  $ret=new BinaryExpression($ret,$o.ret,$e2.ret);
+  $ret=new BinaryExpression($ret,BinaryOperator.BOR,$e2.ret);
  })*
   ;
 
 logical_and_expression  returns [Expression ret]:
  e=inclusive_or_expression 
- ('&&' {o=BinaryOperator.AND;}
+ ('&&' 
  e2=inclusive_or_expression{
-  $ret=new BinaryExpression($ret,$o.ret,$e2.ret);
+  $ret=new BinaryExpression($ret,BinaryOperator.AND,$e2.ret);
  })*
   ;
 
 logical_or_expression returns [Expression ret]:
  e=logical_and_expression
- ('||' {o=BinaryOperator.OR;}
+ ('||' 
  e2=logical_and_expression{
-  $ret=new BinaryExpression($ret,$o.ret,$e2.ret);
+  $ret=new BinaryExpression($ret,BinaryOperator.OR,$e2.ret);
  })*
   ;
 
@@ -185,7 +196,7 @@ logical_or_expression returns [Expression ret]:
 conditional_expression returns [Expression ret] :
  cond=logical_or_expression  
  ('?' ontrue=expression ':'  onfalse=conditional_expression)?
- {$ret=new IfStatement(); $ret.cond=$cond.ret; $ret.ontrue=$ontrue.ret;$ret.onfalse=$onfalse.ret;}
+ {$ret=new TernaryExpression($cond.ret, $ontrue.ret, $onfalse.ret);}
   ;
 
 //tu treba semantickymi pravidlami skontrolovat, ze ak je tam assignment operator, 
@@ -200,7 +211,8 @@ assignment_expression returns [Expression ret]
   ;
 
 //TODO
-expression returns [Expression ret] : assignment_expression (',' assignment_expression)*  
+expression returns [Expression ret] 
+  : assignment_expression (',' assignment_expression)*  
   ;
 
 //TODO
