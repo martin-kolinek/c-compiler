@@ -41,7 +41,7 @@ primary_expression returns [Expression ret]
   (ID {$ret = new FunctionCallExpression($ID.getText());})? 
     '(' exp=expression ')' {
       if ($ret != null){
-        ((FunctionCallExpression)$ret).argCommaExpression = $exp.ret;
+        ((FunctionCallExpression)$ret).args = $exp.ret.expressions;
       }
       else {
         $ret=$exp.ret;
