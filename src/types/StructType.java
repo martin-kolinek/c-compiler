@@ -21,7 +21,7 @@ public class StructType implements Type {
 		return null;
 	}
 	
-	public final List<ResolvedDeclaration> members;
+	public List<ResolvedDeclaration> members;
 	public final String tag;
 	
 	@Override
