@@ -39,6 +39,8 @@ declaration: ID+ i=ID ('=' expression)? -> ^(DECL ID+) ^('=' $i expression)?;
 
 
 
+WHILE : 'while';
+
 ID  : ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
     ;
 

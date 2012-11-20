@@ -4,7 +4,7 @@ options {
   language = Java;
   tokenVocab = cgrammar;
   ASTLabelType = CommonTree;
-}
+} 
 
 @header {
     package grammar.generated;
