@@ -38,8 +38,41 @@ constant: INT | FLOAT | STRING | CHAR;
 declaration: ID+ i=ID ('=' expression)? -> ^(DECL ID+) ^('=' $i expression)?;
 
 
+// KEYWORDS START
 
-WHILE : 'while';
+STATIC : 'static';
+
+EXTERN : 'extern';
+
+REGISTER: 'register';
+
+AUTO: 'auto';
+
+TYPEDEF: 'typedef';
+
+VOLATILE: 'volatile';
+
+CONST: 'const';
+
+RESTRICT: 'restrict';
+
+INLINE: 'inline';
+
+STRICT: 'strict';
+
+IF: 'if';
+
+ELSE: 'else';
+
+FOR: 'for';
+
+DO: 'do';
+
+WHILE: 'while';
+
+SWITCH: 'switch';
+
+// KEYWORDS END
 
 ID  : ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
     ;
