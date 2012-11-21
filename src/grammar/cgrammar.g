@@ -22,12 +22,20 @@ block: '{' statement* '}' -> ^(BLOCK statement*);
 statement:
   block |
   expression ';'! |
-  declaration ';'! ;
+  declaration ';'! |
+  if_stat | switch_stat | while_stat | for_stat | dowhile_stat;
 
 expression: 
   assignment_expression |
   rvalue |
   constant;
+  
+const_expression: constant |
+  sizeof |
+  const_arithmetic_expression;
+  //@TODO: Address constants
+  
+const_arithmetic_expression: '5 + 5'; //@TODO: const arithmetic expressions
 
 assignment_expression: rvalue '='^ expression;
 
@@ -37,8 +45,24 @@ constant: INT | FLOAT | STRING | CHAR;
 
 declaration: ID+ i=ID ('=' expression)? -> ^(DECL ID+) ^('=' $i expression)?;
 
+sizeof: SIZEOF ( ID | '(' ID ')' );
 
-// KEYWORDS START
+//** CONTROL STATEMENTS START **//
+
+if_stat: IF '(' expression ')' statement (ELSE statement)?;
+
+switch_stat: SWITCH '(' expression ')' '{' (CASE const_expression ':' statement*)+ (DEFAULT ':' statement*)? '}';
+
+while_stat: WHILE '(' expression ')' statement;
+
+for_stat: FOR '(' expression ';' expression ';' expression ')' statement;
+
+dowhile_stat: DO statement WHILE '(' expression ')' ';';
+
+//** CONTROL STATEMENTS END **//
+
+
+//** KEYWORDS START **//
 
 STATIC : 'static';
 
@@ -72,7 +96,13 @@ WHILE: 'while';
 
 SWITCH: 'switch';
 
-// KEYWORDS END
+CASE: 'case';
+
+SIZEOF: 'sizeof';
+
+DEFAULT: 'default';
+
+//** KEYWORDS END **//
 
 ID  : ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
     ;
