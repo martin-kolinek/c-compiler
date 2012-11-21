@@ -47,7 +47,12 @@ sizeof: SIZEOF ( ID | '(' ID ')' );
 
 //** CONTROL STATEMENTS START **//
 
-if_stat: IF '(' expression ')' statement (ELSE statement)?;
+
+
+if_stat: IF '(' expression ')' statement 
+  ( (ELSE)=> ELSE statement
+    | ( ) // nothing
+  );
 
 switch_stat: SWITCH '(' expression ')' '{' (CASE const_expression ':' statement*)+ (DEFAULT ':' statement*)? '}';
 
