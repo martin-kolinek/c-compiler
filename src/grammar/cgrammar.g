@@ -43,8 +43,6 @@ rvalue: ID;
 
 constant: INT | FLOAT | STRING | CHAR;
 
-declaration: ID+ i=ID ('=' expression)? -> ^(DECL ID+) ^('=' $i expression)?;
-
 sizeof: SIZEOF ( ID | '(' ID ')' );
 
 //** CONTROL STATEMENTS START **//
@@ -61,6 +59,41 @@ dowhile_stat: DO statement WHILE '(' expression ')' ';';
 
 //** CONTROL STATEMENTS END **//
 
+//** DECLARATION START **//
+
+declaration: variable_declaration | function_declaration;
+
+variable_declaration: var_declaration_specifier+ init_declarator;
+
+var_declaration_specifier: storage_class_specifier | type_specifier | type_qualifier;
+
+storage_class_specifier : STATIC | EXTERN | REGISTER | AUTO;
+
+type_specifier: ID | STRUCT ID | ENUM ID;
+
+type_qualifier: RESTRICT | VOLATILE | CONST;
+
+function_specifier: INLINE;
+
+init_declarator: declarator ( '=' initializer)?;
+
+declarator: pointer* non_pointer_declarator;
+
+pointer: '*' type_qualifier*;
+
+non_pointer_declarator : direct_declarator ('[' assignment_expression ']')?;
+
+direct_declarator: ID | '(' declarator ')' ;
+
+function_declaration: type_specifier pointer* ID '(' ')';
+
+fun_declaration_specifier: function_specifier | type_specifier;
+
+fun_declarator: pointer? ID '(' ')';
+
+initializer: INT;
+
+//** DECLARATION END **/
 
 //** KEYWORDS START **//
 
@@ -101,6 +134,10 @@ CASE: 'case';
 SIZEOF: 'sizeof';
 
 DEFAULT: 'default';
+
+ENUM: 'enum';
+
+STRUCT: 'struct';
 
 //** KEYWORDS END **//
 
@@ -159,5 +196,4 @@ fragment
 UNICODE_ESC
     :   '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
     ;
-
 
