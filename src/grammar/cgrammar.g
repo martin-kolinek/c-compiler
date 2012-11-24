@@ -17,12 +17,12 @@ tokens {
 
 program: block* EOF;
 
-block: '{' statement* '}' -> ^(BLOCK statement*);
+block: '{' statement* '}';
 
 statement:
   block |
-  expression ';'! |
-  declaration ';'! |
+  expression ';' |
+  declaration ';' |
   if_stat | switch_stat | while_stat | for_stat | dowhile_stat;
 
 expression: 
@@ -66,15 +66,15 @@ dowhile_stat: DO statement WHILE '(' expression ')' ';';
 
 //** DECLARATION START **//
 
-declaration: variable_declaration | function_declaration;
+declaration: decl_specs init_declarator;
 
-variable_declaration: var_declaration_specifier+ init_declarator;
+decl_specs: declaration_specifier decl_specs | ID declaration_specifier*;
 
-var_declaration_specifier: storage_class_specifier | type_specifier | type_qualifier;
+declaration_specifier: storage_class_specifier | type_specifier | type_qualifier | function_specifier;
 
 storage_class_specifier : STATIC | EXTERN | REGISTER | AUTO;
 
-type_specifier: ID | STRUCT ID | ENUM ID;
+type_specifier: primitive_type | STRUCT ID | ENUM ID;
 
 type_qualifier: RESTRICT | VOLATILE | CONST;
 
@@ -82,23 +82,67 @@ function_specifier: INLINE;
 
 init_declarator: declarator ( '=' initializer)?;
 
-declarator: pointer* non_pointer_declarator;
+declarator: pointer* direct_declarator;
 
 pointer: '*' type_qualifier*;
 
-non_pointer_declarator : direct_declarator ('[' assignment_expression ']')?;
+direct_declarator: simple_declarator declarator_suffix?;
 
-direct_declarator: ID | '(' declarator ')' ;
+simple_declarator: ID | '(' declarator ')';
 
-function_declaration: type_specifier pointer* ID '(' ')';
+declarator_suffix: param_declarator_suffix |
+  '(' parameter_list ')';
 
-fun_declaration_specifier: function_specifier | type_specifier;
+parameter_list: parameter_declaration (',' parameter_declaration )* (',' '...')? | '...';
 
-fun_declarator: pointer? ID '(' ')';
+parameter_declaration: declaration_specifier+ param_declarator;
 
-initializer: INT;
+param_declarator: param_declarator_suffix | direct_param_declarator param_declarator_suffix?;
 
-//** DECLARATION END **/
+direct_param_declarator: pointer* simple_param_declarator; 
+
+simple_param_declarator: ID | '(' param_declarator ')';
+
+param_declarator_suffix: 
+  '[' STATIC? type_qualifier* assignment_expression ']' |
+  '[' type_qualifier+ STATIC assignment_expression ']' |
+  '[' type_qualifier* '*' ']' ;
+
+initializer: assignment_expression | '{' initializer_list ','? '}';
+
+initializer_list: initialization (',' initialization)*;
+
+initialization: (designator '=')? initializer;
+
+designator: '.' ID | '[' assignment_expression ']';
+
+//** DECLARATION END **// 
+
+//** PRIMITIVE TYPES START **//
+
+primitive_type: LONG | INT_T | DOUBLE | FLOAT_T | VOID | CHAR_T | SHORT | SIGNED | UNSIGNED | BOOL;
+
+LONG: 'long';
+
+INT_T: 'int';
+
+DOUBLE: 'double';
+
+FLOAT_T: 'float';
+
+VOID: 'void';
+
+CHAR_T: 'char';
+
+SHORT: 'short';
+
+SIGNED: 'signed';
+
+UNSIGNED: 'unsigned';
+
+BOOL: '_Bool';
+
+//** PRIMITIVE TYPES END **//
 
 //** KEYWORDS START **//
 
