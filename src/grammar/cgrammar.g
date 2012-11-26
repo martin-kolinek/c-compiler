@@ -27,7 +27,7 @@ in_block: declaration | statement;
 statement:
   block |
   expression? ';' |
-  if_stat | switch_stat | while_stat | for_stat | dowhile_stat;
+  if_stat | switch_stat | while_stat | for_stat | dowhile_stat | jmp_stat;
 
 expression: 
   assignment_expression |
@@ -56,7 +56,7 @@ if_stat: IF '(' expression ')' statement
     | ( ) // nothing
   );
 
-switch_stat: SWITCH '(' expression ')' '{' (CASE const_expression ':' statement*)+ (DEFAULT ':' statement*)? '}';
+switch_stat: SWITCH '(' expression ')' '{' (CASE const_expression ':' statement*)* (DEFAULT ':' statement*)? '}';
 
 while_stat: WHILE '(' expression ')' statement;
 
@@ -64,6 +64,7 @@ for_stat: FOR '(' expression ';' expression ';' expression ')' statement;
 
 dowhile_stat: DO statement WHILE '(' expression ')' ';';
 
+jmp_stat: BREAK ';' | CONTINUE ';' | RETURN expression? ';';
 //** CONTROL STATEMENTS END **//
 
 //** DECLARATION START **//
@@ -191,6 +192,12 @@ DEFAULT: 'default';
 ENUM: 'enum';
 
 STRUCT: 'struct';
+
+BREAK: 'break';
+
+CONTINUE: 'continue';
+
+RETURN: 'return';
 
 //** KEYWORDS END **//
 
