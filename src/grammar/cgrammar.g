@@ -76,7 +76,7 @@ decl_specs: declaration_specifier decl_specs | ID declaration_specifier*;
 
 declaration_specifier: storage_class_specifier | type_specifier | type_qualifier | function_specifier;
 
-storage_class_specifier : STATIC | EXTERN | REGISTER | AUTO;
+storage_class_specifier : STATIC | EXTERN | REGISTER | AUTO | TYPEDEF;
 
 type_specifier: primitive_type | STRUCT ID | ENUM ID;
 
