@@ -1,10 +1,10 @@
 package types;
 
-public class IntType implements Type {
+public class LongType implements Type {
 
 	@Override
 	public String getStringRepresentation() {
-		return "i32";
+		return "i64";
 	}
 
 }

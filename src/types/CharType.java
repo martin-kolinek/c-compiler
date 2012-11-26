@@ -1,10 +1,10 @@
 package types;
 
-public class IntType implements Type {
+public class CharType implements Type {
 
 	@Override
 	public String getStringRepresentation() {
-		return "i32";
+		return "i8";
 	}
 
 }
