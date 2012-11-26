@@ -197,14 +197,43 @@ STRUCT: 'struct';
 ID  : ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
     ;
 
-INT : '0'..'9'+
+INT : '1'..'9' ('0'..'9')* INT_SUFFIX?
+    | '0' ('0'..'7')* INT_SUFFIX?
+    | HEXA_PREFIX HEXA_SYMBOL+ INT_SUFFIX?
     ;
 
+fragment
+HEXA_SYMBOL :'0'..'9' | 'a'..'f' | 'A'..'F';
+
+fragment
+HEXA_PREFIX : '0x' | '0X';
+
+fragment
+INT_SUFFIX : U_SUFFIX L_SUFFIX? | L_SUFFIX U_SUFFIX?;
+
+fragment
+U_SUFFIX: 'u' | 'U';
+
+fragment
+L_SUFFIX: 'l' | 'L' | 'LL' | 'll';
+
 FLOAT
-    :   ('0'..'9')+ '.' ('0'..'9')* EXPONENT?
-    |   '.' ('0'..'9')+ EXPONENT?
-    |   ('0'..'9')+ EXPONENT
-    ;
+    :   ('0'..'9')+ '.' ('0'..'9')* EXPONENT? FLOAT_SUFFIX?
+    |   '.' ('0'..'9')+ EXPONENT? FLOAT_SUFFIX?
+    |   ('0'..'9')+ EXPONENT FLOAT_SUFFIX?
+    |   HEXA_PREFIX HEXA_FRAC BIN_EXP? FLOAT_SUFFIX?;
+
+fragment
+HEXA_FRAC:
+    HEXA_SYMBOL+ '.' HEXA_SYMBOL* |
+    '.' HEXA_SYMBOL+ |
+    HEXA_SYMBOL+;
+
+fragment
+BIN_EXP:('p'|'P') ('+'|'-')? ('0'..'9')+ ;
+
+fragment
+FLOAT_SUFFIX : 'f' | 'F' | 'l' | 'L';
 
 COMMENT
     :   '//' ~('\n'|'\r')* '\r'? '\n' {$channel=HIDDEN;}
@@ -233,9 +262,10 @@ HEX_DIGIT : ('0'..'9'|'a'..'f'|'A'..'F') ;
 
 fragment
 ESC_SEQ
-    :   '\\' ('b'|'t'|'n'|'f'|'r'|'\"'|'\''|'\\')
+    :   '\\' ('b'|'t'|'n'|'f'|'r'|'v'|'a'|'\"'|'\''|'\\')
     |   UNICODE_ESC
     |   OCTAL_ESC
+    |   HEXA_ESC
     ;
 
 fragment
@@ -244,6 +274,10 @@ OCTAL_ESC
     |   '\\' ('0'..'7') ('0'..'7')
     |   '\\' ('0'..'7')
     ;
+    
+fragment
+HEXA_ESC
+    :   '\\x' HEXA_SYMBOL+;
 
 fragment
 UNICODE_ESC
