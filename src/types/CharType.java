@@ -3,8 +3,7 @@ package types;
 public class CharType implements Type {
 
 	@Override
-	public String getStringRepresentation() {
-		return "i8";
+	public void accept(TypeVisitor v) {
+		v.visit(this);
 	}
-
 }

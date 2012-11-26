@@ -3,8 +3,8 @@ package types;
 public class LongType implements Type {
 
 	@Override
-	public String getStringRepresentation() {
-		return "i64";
+	public void accept(TypeVisitor v) {
+		v.visit(this); 
 	}
-
+	
 }

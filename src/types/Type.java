@@ -1,5 +1,5 @@
 package types;
 
 public interface Type {
-	String getStringRepresentation();
+	void accept(TypeVisitor v);
 }
