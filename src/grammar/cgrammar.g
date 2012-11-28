@@ -62,8 +62,10 @@ postfix_expression2: //JMK - odstranenie lavej rekurzie
   '--';  
   
 argument_expression_list:
-  assignment_expression |
-  argument_expression_list ',' assignment_expression ;  
+  assignment_expression argument_expression_list2* ;
+
+argument_expression_list2:  
+  ',' assignment_expression ;  
   
 
 
