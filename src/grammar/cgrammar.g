@@ -49,19 +49,17 @@ const_expression: constant |
   //@TODO: Address constants
   
 postfix_expression:
-  primary_expression postfix_expression2 | 
-  '(' type_name ')' '{' initializer_list '}' postfix_expression2  |
-  '(' type_name ')' '{' initializer_list ',' '}' postfix_expression2 ;
+  primary_expression postfix_expression2* | 
+  '(' type_name ')' '{' initializer_list '}' postfix_expression2*  |
+  '(' type_name ')' '{' initializer_list ',' '}' postfix_expression2* ;
   
 postfix_expression2: //JMK - odstranenie lavej rekurzie
-  |
-  '[' expression ']' postfix_expression2 |
-  '(' argument_expression_list ')' postfix_expression2 |
-  '.' ID postfix_expression2  |
-  '->' ID  postfix_expression2  |
-  '++' postfix_expression2  |
-  '--' postfix_expression2  |
-  ;  
+  '[' expression ']' |
+  '(' argument_expression_list ')' |
+  '.' ID |
+  '->' ID  |
+  '++' |
+  '--';  
   
 argument_expression_list:
   assignment_expression |
