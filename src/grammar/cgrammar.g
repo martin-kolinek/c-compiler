@@ -29,15 +29,66 @@ statement:
   expression? ';' |
   if_stat | switch_stat | while_stat | for_stat | dowhile_stat | jmp_stat;
 
+//expressions by JMK
+
 expression: 
   assignment_expression |
-  rvalue |
-  constant;
-  
+  //rvalue | //naco nam je rvalue? JMK
+  //constant |
+  primary_expression;
+
+primary_expression:
+  ID |
+  const_expression | //constant |
+  STRING |
+  '(' expression ')';
+
 const_expression: constant |
   sizeof |
   const_arithmetic_expression;
   //@TODO: Address constants
+  
+postfix_expression:
+  primary_expression postfix_expression2 | 
+  '(' type_name ')' '{' initializer_list '}' postfix_expression2  |
+  '(' type_name ')' '{' initializer_list ',' '}' postfix_expression2 ;
+  
+postfix_expression2: //JMK - odstranenie lavej rekurzie
+  |
+  '[' expression ']' postfix_expression2 |
+  '(' argument_expression_list ')' postfix_expression2 |
+  '.' ID postfix_expression2  |
+  '->' ID  postfix_expression2  |
+  '++' postfix_expression2  |
+  '--' postfix_expression2  |
+  ;  
+  
+argument_expression_list:
+  assignment_expression |
+  argument_expression_list ',' assignment_expression ;  
+  
+
+
+unary_expression:
+  postfix_expression  |
+  '++' unary_expression |
+  '--' unary_expression |
+  '&' cast_expression | 
+  '*' cast_expression | 
+  '+' cast_expression | 
+  '-' cast_expression | 
+  '~' cast_expression | 
+  '!' cast_expression |
+  sizeof unary_expression |
+  sizeof '(' type_name ')';
+
+cast_expression:
+  unary_expression  |
+  '(' type_name ')' cast_expression;
+  
+//unary_operator: OPERATOR;
+ 
+//END expressions 
   
 const_arithmetic_expression: '5 + 5'; //@TODO: const arithmetic expressions - toto by sme nemali robit v gramatike
 
@@ -125,6 +176,11 @@ designator: '.' ID | '[' assignment_expression ']';
 
 //** PRIMITIVE TYPES START **//
 
+
+type_name: primitive_type //JMK kvoli expression
+  //| iny typ
+         ;
+
 primitive_type: LONG | INT_T | DOUBLE | FLOAT_T | VOID | CHAR_T | SHORT | SIGNED | UNSIGNED | BOOL;
 
 LONG: 'long';
@@ -200,6 +256,9 @@ CONTINUE: 'continue';
 RETURN: 'return';
 
 //** KEYWORDS END **//
+
+/*OPERATOR  : '&' | '*' | '+' | '-' | '~' | '!'
+          ;*///JMK - takto to nepojde, lebo kazdy operator vyzaduje generovanie ineho kodu
 
 ID  : ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
     ;
