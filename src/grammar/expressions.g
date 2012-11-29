@@ -15,7 +15,7 @@ tokens {
 } 
 @lexer::header {package grammar.generated;}
 
-expression: ; //JMK - doplnim
+//expression: ; //JMK - doplnim
 
 primary_expression:
   identifier  |
@@ -28,7 +28,7 @@ postfix_expression:  primary_expression postfix_expression_s*|
   '(' type_name ')' '{' initializer_list ','? '}'
   ;
 
-argument_expression_list: assignment_expression |
+argument_expression_list:// assignment_expression |
   assignment_expression ',' argument_expression_list
   ;
 
@@ -44,8 +44,8 @@ postfix_expression_s: '[' expression ']'  |
 unary_expression  :
   primary_expression postfix_expression_s*  |
   '(' type_name ')' '{' initializer_list ','? '}' |
-  '++' unary_expression |
-  '--' unary_expression |
+  //'++' unary_expression |
+  //'--' unary_expression |
   sizeof  '++' unary_expression |
   sizeof  '--' unary_expression |
   sizeof  primary_expression postfix_expression_s*  |
@@ -114,10 +114,35 @@ inclusive_or_expression : exclusive_or_expression ('|' exclusive_or_expression)*
 logical_and_expression  : inclusive_or_expression '&&' inclusive_or_expression
   ;
 
+logical_or_expression : logical_and_expression  ('||' logical_and_expression)*
+  ;
 
+conditional_expression  : logical_or_expression ('?' expression ':'  logical_or_expression)*
+  ;
 
+assignment_expression :// conditional_expression  |
+  unary_expression  assignment_expression2*
+  ;
+
+expression  : assignment_expression (',' assignment_expression)*  
+  ;
+
+assignment_expression2  : '=' conditional_expression  |
+  '*='  conditional_expression  |
+  '/='  conditional_expression  |
+  '%='  conditional_expression  |
+  '+='  conditional_expression  |
+  '-='  conditional_expression  |
+  '<<=' conditional_expression  |
+  '>>=' conditional_expression  |
+  '&='  conditional_expression  |
+  '^='  conditional_expression  |
+  '|='  conditional_expression
+  ;
 
 identifier: ID;
+
+//constant_expression : conditional_expression  ;
 
 constant_expression : constant  |
 //  wide_string literal |
@@ -141,7 +166,7 @@ designator: '.' ID | '[' assignment_expression ']';
 
 initializer: assignment_expression | '{' initializer_list ','? '}';
 
-assignment_expression: rvalue '='^ expression;
+//assignment_expression: rvalue '='^ expression;
 
 rvalue: ID;
 
