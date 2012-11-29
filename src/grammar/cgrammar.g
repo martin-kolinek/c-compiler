@@ -3,6 +3,7 @@ grammar cgrammar;
 options {
   language = Java;
   output = AST;
+  backtrack=true;
 }
 
 tokens {
@@ -169,16 +170,32 @@ initializer: assignment_expression | '{' initializer_list ','? '}';
 
 //assignment_expression: rvalue '='^ expression;
 
-rvalue: ID;
+rvalue  : ID;
 
-constant: INT | FLOAT | STRING | CHAR;
+constant  : INT | FLOAT | STRING | CHAR;
 
-type_name: primitive_type |
+/*type_name : //primitive_type |
   identifier//JMK kvoli expression
   //| iny typ
          ;
+*/
 
+type_name :  spec_qual_list (abstract_declarator)?
+  ;
 
+abstract_declarator :  pointer direct_abstract_declarator?  |
+  direct_abstract_declarator
+  ;
+
+direct_abstract_declarator  : ('(' abstract_declarator ')') direct_abstract_declarator2*  |
+  direct_abstract_declarator2+
+  ;
+direct_abstract_declarator2 : '[' type_qualifier?  assignment_expression? ']'  |
+  '[' STATIC type_qualifier?  assignment_expression ']' |
+  '[' type_qualifier STATIC assignment_expression ']' |
+  '[' '*' ']' |
+  '(' parameter_list? ')'
+  ;
 
 
 
