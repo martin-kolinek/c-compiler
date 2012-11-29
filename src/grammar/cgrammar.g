@@ -100,7 +100,7 @@ assignment_expression: rvalue '='^ expression;
 
 rvalue: ID;
 
-constant: INT | FLOAT | STRING | CHAR;
+constant: INT | FLOAT | STRING | CHAR; //chceme mat string ako constant? nechceme ho nahodou vediet adresovat a zliepat atd. ?
 
 sizeof: SIZEOF ( ID | '(' ID ')' );
 
