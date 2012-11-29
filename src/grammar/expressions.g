@@ -4,4 +4,192 @@ options {
   language = Java;
 }
 
-rule: ;
+expression: ; //JMK - doplnim
+
+primary_expression:
+  identifier  |
+  constant  |
+//  string-literal  | //JMK - spada pod constant
+  '(' expression ')'  
+  ;
+
+identifier: ID;
+
+constant: INT | FLOAT | STRING | CHAR;
+
+type_name: primitive_type //JMK kvoli expression
+  //| iny typ
+         ;
+
+primitive_type: LONG | INT_T | DOUBLE | FLOAT_T | VOID | CHAR_T | SHORT | SIGNED | UNSIGNED | BOOL;
+
+LONG: 'long';
+
+INT_T: 'int';
+
+DOUBLE: 'double';
+
+FLOAT_T: 'float';
+
+VOID: 'void';
+
+CHAR_T: 'char';
+
+SHORT: 'short';
+
+SIGNED: 'signed';
+
+UNSIGNED: 'unsigned';
+
+BOOL: '_Bool';
+
+//** PRIMITIVE TYPES END **//
+
+//** KEYWORDS START **//
+
+STATIC : 'static';
+
+EXTERN : 'extern';
+
+REGISTER: 'register';
+
+AUTO: 'auto';
+
+TYPEDEF: 'typedef';
+
+VOLATILE: 'volatile';
+
+CONST: 'const';
+
+RESTRICT: 'restrict';
+
+INLINE: 'inline';
+
+STRICT: 'strict';
+
+IF: 'if';
+
+ELSE: 'else';
+
+FOR: 'for';
+
+DO: 'do';
+
+WHILE: 'while';
+
+SWITCH: 'switch';
+
+CASE: 'case';
+
+SIZEOF: 'sizeof';
+
+DEFAULT: 'default';
+
+ENUM: 'enum';
+
+STRUCT: 'struct';
+
+BREAK: 'break';
+
+CONTINUE: 'continue';
+
+RETURN: 'return';
+
+//** KEYWORDS END **//
+
+/*OPERATOR  : '&' | '*' | '+' | '-' | '~' | '!'
+          ;*///JMK - takto to nepojde, lebo kazdy operator vyzaduje generovanie ineho kodu
+
+ID  : ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
+    ;
+
+INT : '1'..'9' ('0'..'9')* INT_SUFFIX?
+    | '0' ('0'..'7')* INT_SUFFIX?
+    | HEXA_PREFIX HEXA_SYMBOL+ INT_SUFFIX?
+    ;
+
+fragment
+HEXA_SYMBOL :'0'..'9' | 'a'..'f' | 'A'..'F';
+
+fragment
+HEXA_PREFIX : '0x' | '0X';
+
+fragment
+INT_SUFFIX : U_SUFFIX L_SUFFIX? | L_SUFFIX U_SUFFIX?;
+
+fragment
+U_SUFFIX: 'u' | 'U';
+
+fragment
+L_SUFFIX: 'l' | 'L' | 'LL' | 'll';
+
+FLOAT
+    :   ('0'..'9')+ '.' ('0'..'9')* EXPONENT? FLOAT_SUFFIX?
+    |   '.' ('0'..'9')+ EXPONENT? FLOAT_SUFFIX?
+    |   ('0'..'9')+ EXPONENT FLOAT_SUFFIX?
+    |   HEXA_PREFIX HEXA_FRAC BIN_EXP? FLOAT_SUFFIX?;
+
+fragment
+HEXA_FRAC:
+    HEXA_SYMBOL+ '.' HEXA_SYMBOL* |
+    '.' HEXA_SYMBOL+ |
+    HEXA_SYMBOL+;
+
+fragment
+BIN_EXP:('p'|'P') ('+'|'-')? ('0'..'9')+ ;
+
+fragment
+FLOAT_SUFFIX : 'f' | 'F' | 'l' | 'L';
+
+COMMENT
+    :   '//' ~('\n'|'\r')* '\r'? '\n' {$channel=HIDDEN;}
+    |   '/*' ( options {greedy=false;} : . )* '*/' {$channel=HIDDEN;}
+    ;
+
+WS  :   ( ' '
+        | '\t'
+        | '\r'
+        | '\n'
+        ) {$channel=HIDDEN;}
+    ;
+
+STRING
+    :  '"' ( ESC_SEQ | ~('\\'|'"') )* '"'
+    ;
+
+CHAR:  '\'' ( ESC_SEQ | ~('\''|'\\') ) '\''
+    ;
+
+fragment
+EXPONENT : ('e'|'E') ('+'|'-')? ('0'..'9')+ ;
+
+fragment
+HEX_DIGIT : ('0'..'9'|'a'..'f'|'A'..'F') ;
+
+fragment
+ESC_SEQ
+    :   '\\' ('b'|'t'|'n'|'f'|'r'|'v'|'a'|'\"'|'\''|'\\')
+    |   UNICODE_ESC
+    |   OCTAL_ESC
+    |   HEXA_ESC
+    ;
+
+fragment
+OCTAL_ESC
+    :   '\\' ('0'..'3') ('0'..'7') ('0'..'7')
+    |   '\\' ('0'..'7') ('0'..'7')
+    |   '\\' ('0'..'7')
+    ;
+    
+fragment
+HEXA_ESC
+    :   '\\x' HEXA_SYMBOL+;
+
+fragment
+UNICODE_ESC
+    :   '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+    ;
+
+
+
+
