@@ -42,12 +42,24 @@ postfix_expression_s: '[' expression ']'  |
   ;
 
 unary_expression  :
-  primary_expression postfix_expression_s*|
-  '(' type_name ')' '{' initializer_list ','? '}'
+  primary_expression postfix_expression_s*  |
+  '(' type_name ')' '{' initializer_list ','? '}' |
   '++' unary_expression |
   '--' unary_expression |
-  sizeof '(' type_name ')'  
+  sizeof  '++' unary_expression |
+  sizeof  '--' unary_expression |
+  sizeof  primary_expression postfix_expression_s*  |
+  sizeof '(' type_name ')' ('{' initializer_list ','? '}')?
+  '&' unary_expression |
+  '*' unary_expression |
+  '+' unary_expression |
+  '-' unary_expression |
+  '~' unary_expression |
+  '!' unary_expression
   ;
+
+//unary_expression2  : '(' type_name ')' ('{' initializer_list ','? '}')?;
+
 /*unary-operator cast-expression
 sizeof unary-expression
 sizeof ( type-name )*/
