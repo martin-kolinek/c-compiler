@@ -8,13 +8,24 @@ expression: ; //JMK - doplnim
 
 primary_expression:
   identifier  |
-  constant  |
+  constant_expression  |
 //  string-literal  | //JMK - spada pod constant
   '(' expression ')'  
   ;
 
 identifier: ID;
 
+constant_expression : constant  |
+//  wide_string literal |
+  wide_char_literal
+  ;
+
+wide_char_literal :
+  ;//@TODO + wide_string literal
+
+
+
+/*odtialto su skopirovane veci*/
 constant: INT | FLOAT | STRING | CHAR;
 
 type_name: primitive_type //JMK kvoli expression
