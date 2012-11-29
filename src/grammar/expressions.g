@@ -78,6 +78,24 @@ additive_expression2  :  '+' multiplicative_expression |
   '-' multiplicative_expression 
   ;
 
+shift_expression  : additive_expression shift_expression2*
+ ;
+
+shift_expression2 : '<<' additive_expression  |
+  '>>' additive_expression
+  ;
+
+relational_expression : shift_expression  relational_expression2*
+ ;
+
+relational_expression2  : '<' shift_expression  |
+  '>' shift_expression  |
+  '<=' shift_expression |
+  '>=' shift_expression
+  ;
+
+
+
 //unary_expression2  : '(' type_name ')' ('{' initializer_list ','? '}')?;
 
 /*unary-operator cast-expression
