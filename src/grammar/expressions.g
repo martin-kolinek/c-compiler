@@ -2,7 +2,18 @@ grammar expressions;
 
 options {
   language = Java;
+  output = AST;
 }
+
+tokens {
+  BLOCK;
+  DECL;
+}
+
+@header {
+    package grammar.generated;
+} 
+@lexer::header {package grammar.generated;}
 
 expression: ; //JMK - doplnim
 
@@ -13,6 +24,35 @@ primary_expression:
   '(' expression ')'  
   ;
 
+postfix_expression:  primary_expression postfix_expression_s*|
+  '(' type_name ')' '{' initializer_list ','? '}'
+  ;
+
+argument_expression_list: assignment_expression |
+  assignment_expression ',' argument_expression_list
+  ;
+
+
+postfix_expression_s: '[' expression ']'  |
+  '(' argument_expression_list ')'  |
+  '.' identifier  |
+  '->' identifier |
+  '++'  |
+  '--'
+  ;
+
+unary_expression  :
+  primary_expression postfix_expression_s*|
+  '(' type_name ')' '{' initializer_list ','? '}'
+  '++' unary_expression |
+  '--' unary_expression |
+  sizeof '(' type_name ')'  
+  ;
+/*unary-operator cast-expression
+sizeof unary-expression
+sizeof ( type-name )*/
+
+
 identifier: ID;
 
 constant_expression : constant  |
@@ -20,12 +60,27 @@ constant_expression : constant  |
   wide_char_literal
   ;
 
-wide_char_literal :
+wide_char_literal : 'L' CHAR
   ;//@TODO + wide_string literal
 
 
 
 /*odtialto su skopirovane veci*/
+
+sizeof: SIZEOF ( ID | '(' ID ')' );
+
+initializer_list: initialization (',' initialization)*;
+
+initialization: (designator '=')? initializer;
+
+designator: '.' ID | '[' assignment_expression ']';
+
+initializer: assignment_expression | '{' initializer_list ','? '}';
+
+assignment_expression: rvalue '='^ expression;
+
+rvalue: ID;
+
 constant: INT | FLOAT | STRING | CHAR;
 
 type_name: primitive_type //JMK kvoli expression
