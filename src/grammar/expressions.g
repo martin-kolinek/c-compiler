@@ -94,13 +94,27 @@ relational_expression2  : '<' shift_expression  |
   '>=' shift_expression
   ;
 
+equality_expression : relational_expression equality_expression2*
+  ;
+
+equality_expression2  : '==' relational_expression  |
+  '!=' relational_expression
+  ;
 
 
-//unary_expression2  : '(' type_name ')' ('{' initializer_list ','? '}')?;
+and_expression  : equality_expression ('&' equality_expression)*
+  ;
 
-/*unary-operator cast-expression
-sizeof unary-expression
-sizeof ( type-name )*/
+exclusive_or_expression : and_expression  ('^' and_expression)*
+  ;
+
+inclusive_or_expression : exclusive_or_expression ('|' exclusive_or_expression)*
+  ;
+
+logical_and_expression  : inclusive_or_expression '&&' inclusive_or_expression
+  ;
+
+
 
 
 identifier: ID;
