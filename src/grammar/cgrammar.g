@@ -17,6 +17,173 @@ tokens {
 
 program: external_declaration* EOF;
 
+
+primary_expression:
+  identifier  |
+  constant_expression  |
+//  string-literal  | //JMK - spada pod constant
+  '(' expression ')'  
+  ;
+
+postfix_expression:  primary_expression postfix_expression_s*|
+  '(' type_name ')' '{' initializer_list ','? '}'
+  ;
+
+argument_expression_list:// assignment_expression |
+  assignment_expression ',' argument_expression_list
+  ;
+
+
+postfix_expression_s: '[' expression ']'  |
+  '(' argument_expression_list ')'  |
+  '.' identifier  |
+  '->' identifier |
+  '++'  |
+  '--'
+  ;
+
+unary_expression  :
+  primary_expression postfix_expression_s*  |
+  '(' type_name ')' '{' initializer_list ','? '}' |
+  '++' unary_expression |
+  '--' unary_expression |
+  sizeof  '++' unary_expression |
+  sizeof  '--' unary_expression |
+  sizeof  primary_expression postfix_expression_s*  |
+  sizeof '(' type_name ')' ('{' initializer_list ','? '}')?
+  '&' cast_expression |
+  '*' cast_expression |
+  '+' cast_expression |
+  '-' cast_expression |
+  '~' cast_expression |
+  '!' cast_expression
+  ;
+
+cast_expression : ('(' type_name ')')? unary_expression
+  ;
+  
+multiplicative_expression :
+  cast_expression multiplicative_expression_2*
+  ;
+
+multiplicative_expression_2 :
+  ('/' ('(' type_name ')')* unary_expression) |
+  ('%' ('(' type_name ')')* unary_expression)  |
+  ('*' ('(' type_name ')')* unary_expression)
+  ;
+
+additive_expression : multiplicative_expression additive_expression2*
+  ;
+
+additive_expression2  :  '+' multiplicative_expression |
+  '-' multiplicative_expression 
+  ;
+
+shift_expression  : additive_expression shift_expression2*
+ ;
+
+shift_expression2 : '<<' additive_expression  |
+  '>>' additive_expression
+  ;
+
+relational_expression : shift_expression  relational_expression2*
+ ;
+
+relational_expression2  : '<' shift_expression  |
+  '>' shift_expression  |
+  '<=' shift_expression |
+  '>=' shift_expression
+  ;
+
+equality_expression : relational_expression equality_expression2*
+  ;
+
+equality_expression2  : '==' relational_expression  |
+  '!=' relational_expression
+  ;
+
+
+and_expression  : equality_expression ('&' equality_expression)*
+  ;
+
+exclusive_or_expression : and_expression  ('^' and_expression)*
+  ;
+
+inclusive_or_expression : exclusive_or_expression ('|' exclusive_or_expression)*
+  ;
+
+logical_and_expression  : inclusive_or_expression '&&' inclusive_or_expression
+  ;
+
+logical_or_expression : logical_and_expression  ('||' logical_and_expression)*
+  ;
+
+conditional_expression  : logical_or_expression ('?' expression ':'  logical_or_expression)*
+  ;
+
+assignment_expression : conditional_expression  assignment_expression2* //TODO conditional expression musi byt unary ak za nou ide assigmant expression2
+  ;
+
+expression  : assignment_expression (',' assignment_expression)*  
+  ;
+
+assignment_expression2  : '=' conditional_expression  | 
+  '*='  conditional_expression  |
+  '/='  conditional_expression  |
+  '%='  conditional_expression  |
+  '+='  conditional_expression  |
+  '-='  conditional_expression  |
+  '<<=' conditional_expression  |
+  '>>=' conditional_expression  |
+  '&='  conditional_expression  |
+  '^='  conditional_expression  |
+  '|='  conditional_expression
+  ;
+
+identifier: ID;
+
+//constant_expression : conditional_expression  ;
+
+constant_expression : constant  |
+  //conditional_expression  | //moze sa optimalizovat
+//  wide_string literal |
+  wide_char_literal
+  ;
+
+wide_char_literal : 'L' CHAR
+  ;//@TODO + wide_string literal
+
+
+
+/*odtialto su skopirovane veci*/
+
+sizeof: SIZEOF ( ID | '(' ID ')' );
+
+initializer_list: initialization (',' initialization)*;
+
+initialization: (designator '=')? initializer;
+
+designator: '.' ID | '[' assignment_expression ']';
+
+initializer: assignment_expression | '{' initializer_list ','? '}';
+
+//assignment_expression: rvalue '='^ expression;
+
+rvalue: ID;
+
+constant: INT | FLOAT | STRING | CHAR;
+
+type_name: primitive_type //JMK kvoli expression
+  //| iny typ
+         ;
+
+
+
+
+
+
+
+
 //sadly this is required because otherwise we get an error from antlr
 external_declaration: decl_specs declarator (block | ( '=' initializer))?;
 
@@ -33,7 +200,7 @@ statement:
 
 //expressions by JMK
 
-expression: 
+/*expression: 
   assignment_expression (',' assignment_expression)* ;
 
 assignment_expression: 
@@ -119,7 +286,7 @@ cast_expression:
 constant: INT | FLOAT | STRING | CHAR; //chceme mat string ako constant? nechceme ho nahodou vediet adresovat a zliepat atd. ?
 
 sizeof: SIZEOF ( ID | '(' ID ')' );
-
+*/
 //** CONTROL STATEMENTS START **//
 
 if_stat: IF '(' expression ')' statement 
@@ -197,7 +364,7 @@ param_declarator_suffix:
   '[' STATIC? type_qualifier* assignment_expression ']' |
   '[' type_qualifier+ STATIC assignment_expression ']' |
   '[' type_qualifier* '*' ']' ;
-
+/*
 initializer: assignment_expression | '{' initializer_list ','? '}';
 
 initializer_list: initialization (',' initialization)*;
@@ -208,7 +375,7 @@ designator: '.' ID | '[' assignment_expression ']';
 
 //to ci je to naozaj iba typ osetrime semantickymi pravidlami
 type_name: parameter_declaration; 
-
+*/
 //** DECLARATION END **// 
 
 //** PRIMITIVE TYPES START **//
