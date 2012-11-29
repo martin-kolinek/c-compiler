@@ -71,7 +71,12 @@ multiplicative_expression_2 :
   ('*' ('(' type_name ')') unary_expression)
   ;
 
+additive_expression : multiplicative_expression additive_expression2*
+  ;
 
+additive_expression2  :  '+' multiplicative_expression |
+  '-' multiplicative_expression 
+  ;
 
 //unary_expression2  : '(' type_name ')' ('{' initializer_list ','? '}')?;
 
