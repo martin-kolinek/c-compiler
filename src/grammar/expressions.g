@@ -66,9 +66,9 @@ multiplicative_expression :
   ;
 
 multiplicative_expression_2 :
-  ('/' ('(' type_name ')') unary_expression) |
+  ('/' ('(' type_name ')')* unary_expression) |
   ('%' ('(' type_name ')')* unary_expression)  |
-  ('*' ('(' type_name ')') unary_expression)
+  ('*' ('(' type_name ')')* unary_expression)
   ;
 
 additive_expression : multiplicative_expression additive_expression2*
