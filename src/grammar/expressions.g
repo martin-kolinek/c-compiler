@@ -120,14 +120,13 @@ logical_or_expression : logical_and_expression  ('||' logical_and_expression)*
 conditional_expression  : logical_or_expression ('?' expression ':'  logical_or_expression)*
   ;
 
-assignment_expression :// conditional_expression  |
-  unary_expression  assignment_expression2*
+assignment_expression : conditional_expression  assignment_expression2* //TODO conditional expression musi byt unary ak za nou ide assigmant expression2
   ;
 
 expression  : assignment_expression (',' assignment_expression)*  
   ;
 
-assignment_expression2  : '=' conditional_expression  |
+assignment_expression2  : '=' conditional_expression  | 
   '*='  conditional_expression  |
   '/='  conditional_expression  |
   '%='  conditional_expression  |
@@ -145,6 +144,7 @@ identifier: ID;
 //constant_expression : conditional_expression  ;
 
 constant_expression : constant  |
+  //conditional_expression  | //moze sa optimalizovat
 //  wide_string literal |
   wide_char_literal
   ;
