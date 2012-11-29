@@ -50,8 +50,8 @@ const_expression: constant |
   
 postfix_expression:
   primary_expression postfix_expression2* | 
-  '(' type_name ')' '{' initializer_list '}' postfix_expression2* |
-  '(' type_name ')' '{' initializer_list ',' '}' postfix_expression2* ;
+  '(' type_name ')' '{' initializer_list '}' postfix_expression2* ;
+  //'(' type_name ')' '{' initializer_list ',' '}' postfix_expression2* ; //JMK nie som si isty, ci tam tu ciarku netreba respektovat, tj. ze to nie je chyba
   
 postfix_expression2: //JMK - odstranenie lavej rekurzie
   '[' expression ']' |
@@ -74,7 +74,7 @@ unary_expression:
   //primary_expression postfix_expression2* | 
  // '(' type_name ')' '{' initializer_list '}' postfix_expression2*  |
  // '(' type_name ')' '{' initializer_list ',' '}' postfix_expression2* | 
-  //postfix_expression  | //JMK --bude to chybat?
+//  postfix_expression  | //JMK --bude to chybat?
   '++' unary_expression |
   '--' unary_expression |
   '&' cast_expression | 
