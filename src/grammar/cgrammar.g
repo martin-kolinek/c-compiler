@@ -17,25 +17,24 @@ tokens {
 
 program: external_declaration* EOF;
 
-
 primary_expression:
-  identifier  |
-  constant_expression  |
-//  string-literal  | //JMK - spada pod constant
-  '(' expression ')'  
-  ;
-
-postfix_expression:  primary_expression postfix_expression_s*|
+  identifier |
+  constant |
+  '(' expression ')' |
   '(' type_name ')' '{' initializer_list ','? '}'
   ;
 
-argument_expression_list:// assignment_expression |
-  assignment_expression ',' argument_expression_list
+postfix_expression:  
+  primary_expression postfix_expression_s*
+  ;
+
+argument_expression_list:
+  assignment_expression (',' assignment_expression)*
   ;
 
 
 postfix_expression_s: '[' expression ']'  |
-  '(' argument_expression_list ')'  |
+  '(' argument_expression_list? ')'  |
   '.' identifier  |
   '->' identifier |
   '++'  |
@@ -43,64 +42,55 @@ postfix_expression_s: '[' expression ']'  |
   ;
 
 unary_expression  :
-  primary_expression postfix_expression_s*  |
-  '(' type_name ')' '{' initializer_list ','? '}' |
-  '++' unary_expression |
-  '--' unary_expression |
-  sizeof  '++' unary_expression |
-  sizeof  '--' unary_expression |
-  sizeof  primary_expression postfix_expression_s*  |
-  sizeof '(' type_name ')' ('{' initializer_list ','? '}')?
-  '&' cast_expression |
-  '*' cast_expression |
-  '+' cast_expression |
-  '-' cast_expression |
-  '~' cast_expression |
-  '!' cast_expression
-  ;
-
-cast_expression : ('(' type_name ')')? unary_expression
-  ;
+  postfix_expression |
+  '(' type_name ')' unary_expression |
+  '++' unary_expression | //toto treba semanticky osetrit, ze ta unary expression nesmie byt cast
+  '--' unary_expression | //toto treba semanticky osetrit, ze ta unary expression nesmie byt cast
+  SIZEOF '(' type_name ')' | //tu chyba druhy sizeof
+  unary_operator unary_expression ;
+  
+unary_operator :
+  '&' |
+  '*' |
+  '+' |
+  '-' |
+  '~' |
+  '!' ;
   
 multiplicative_expression :
-  cast_expression multiplicative_expression_2*
+  unary_expression (multiplicative_operator unary_expression)*
   ;
 
-multiplicative_expression_2 :
-  ('/' ('(' type_name ')')* unary_expression) |
-  ('%' ('(' type_name ')')* unary_expression)  |
-  ('*' ('(' type_name ')')* unary_expression)
+multiplicative_operator: '*' | '/' | '%';
+
+additive_expression : multiplicative_expression (additive_operator multiplicative_expression)*
   ;
 
-additive_expression : multiplicative_expression additive_expression2*
+additive_operator  :  '+' |
+  '-'  
   ;
 
-additive_expression2  :  '+' multiplicative_expression |
-  '-' multiplicative_expression 
-  ;
-
-shift_expression  : additive_expression shift_expression2*
+shift_expression  : additive_expression (shift_operator additive_expression)*
  ;
 
-shift_expression2 : '<<' additive_expression  |
-  '>>' additive_expression
+shift_operator : '<<' |
+  '>>' 
   ;
 
-relational_expression : shift_expression  relational_expression2*
+relational_expression : shift_expression (relational_operator shift_expression)*
  ;
 
-relational_expression2  : '<' shift_expression  |
-  '>' shift_expression  |
-  '<=' shift_expression |
-  '>=' shift_expression
+relational_operator  : 
+  '<' |
+  '>' |
+  '<='|
+  '>=' 
   ;
 
-equality_expression : relational_expression equality_expression2*
+equality_expression : relational_expression (equality_operator relational_expression)*
   ;
 
-equality_expression2  : '==' relational_expression  |
-  '!=' relational_expression
-  ;
+equality_operator  : '==' | '!=';
 
 
 and_expression  : equality_expression ('&' equality_expression)*
@@ -112,85 +102,46 @@ exclusive_or_expression : and_expression  ('^' and_expression)*
 inclusive_or_expression : exclusive_or_expression ('|' exclusive_or_expression)*
   ;
 
-logical_and_expression  : inclusive_or_expression '&&' inclusive_or_expression
+logical_and_expression  : inclusive_or_expression ('&&' inclusive_or_expression)*
   ;
 
 logical_or_expression : logical_and_expression  ('||' logical_and_expression)*
   ;
 
-conditional_expression  : logical_or_expression ('?' expression ':'  logical_or_expression)*
+conditional_expression  : logical_or_expression ('?' expression ':'  conditional_expression)?
   ;
 
-assignment_expression : conditional_expression  assignment_expression2* //TODO conditional expression musi byt unary ak za nou ide assigmant expression2
+assignment_expression : unary_expression (assignment_operator assignment_expression)? //TODO conditional expression musi byt unary ak za nou ide assigmant expression2
   ;
 
 expression  : assignment_expression (',' assignment_expression)*  
   ;
 
-assignment_expression2  : '=' conditional_expression  | 
-  '*='  conditional_expression  |
-  '/='  conditional_expression  |
-  '%='  conditional_expression  |
-  '+='  conditional_expression  |
-  '-='  conditional_expression  |
-  '<<=' conditional_expression  |
-  '>>=' conditional_expression  |
-  '&='  conditional_expression  |
-  '^='  conditional_expression  |
-  '|='  conditional_expression
+assignment_operator  : 
+  '='  | 
+  '*=' |
+  '/=' |
+  '%=' |
+  '+=' |
+  '-=' |
+  '<<='|
+  '>>='|
+  '&=' |
+  '^=' |
+  '|=' 
   ;
 
 identifier: ID;
 
-//constant_expression : conditional_expression  ;
-
-constant_expression : constant  |
-  //conditional_expression  | //moze sa optimalizovat
-//  wide_string literal |
-  wide_char_literal
-  ;
-
-wide_char_literal : 'L' CHAR
-  ;//@TODO + wide_string literal
-
-
-
-/*odtialto su skopirovane veci*/
-
-sizeof: SIZEOF ( ID | '(' ID ')' );
-
-initializer_list: initialization (',' initialization)*;
-
-initialization: (designator '=')? initializer;
-
-designator: '.' ID | '[' assignment_expression ']';
-
-initializer: assignment_expression | '{' initializer_list ','? '}';
-
-//assignment_expression: rvalue '='^ expression;
-
-rvalue: ID;
-
 constant: INT | FLOAT | STRING | CHAR;
-
-type_name: primitive_type //JMK kvoli expression
-  //| iny typ
-         ;
-
-
-
-
-
-
-
-
+         
 //sadly this is required because otherwise we get an error from antlr
 external_declaration: decl_specs declarator (block | ( '=' initializer))?;
 
 block: '{' in_block* '}';
 
 in_block: 
-  (ID ';') => statement | //tu bude treba osetrit take, ze ten ID je typ  
+  (ID ';') => statement | //toto je zle  
   declaration;
    
 statement:
@@ -198,95 +149,6 @@ statement:
   expression? ';' |
   if_stat | switch_stat | while_stat | for_stat | dowhile_stat | jmp_stat;
 
-//expressions by JMK
-
-/*expression: 
-  assignment_expression (',' assignment_expression)* ;
-
-assignment_expression: 
-  unary_expression assignment_op assignment_expression |
-  conditional_expression;
-  
-assignment_op: '=' | '*=' | '/=' | '%=' | '+=' | '-=' | '<<=' | '>>=' | '&=' | '^=' | '|=';
-
-conditional_expression: 
-  logical_or_expression ('?' expression ':' conditional_expression);
-
-logical_or_expression:
-  logical_and_expression ('||' logical_and_expression)*;
-  
-logical_and_expression  : 
-  inclusive_or_expression ('&&' inclusive_or_expression)*;
-
-inclusive_or_expression : exclusive_or_expression ('|' exclusive_or_expression)*
-  ;
-
-exclusive_or_expression : and_expression  ('^' and_expression)*
-  ;
-  
-and_expression  : equality_expression ('&' equality_expression)*
-  ;
-
-equality_expression: primary_expression; //TODO
-
-primary_expression:
-  ID |
-  constant |
-  '(' expression ')';
-  //@TODO: Address constants
-  
-postfix_expression:
-  primary_expression postfix_expression2* | 
-  '(' type_name ')' '{' initializer_list '}' postfix_expression2* ;
-  //'(' type_name ')' '{' initializer_list ',' '}' postfix_expression2* ; //JMK nie som si isty, ci tam tu ciarku netreba respektovat, tj. ze to nie je chyba
-  
-postfix_expression2: //JMK - odstranenie lavej rekurzie
-  '[' expression ']' |
-  '(' argument_expression_list ')'  |
-  '.' ID  |
-  '->' ID  | 
-  '++' |
-  '--' 
-  ;  
-  
-argument_expression_list:
-  assignment_expression argument_expression_list2* ;
-
-argument_expression_list2:  
-  ',' assignment_expression ;  
-  
-
-
-unary_expression:
-  //primary_expression postfix_expression2* | 
- // '(' type_name ')' '{' initializer_list '}' postfix_expression2*  |
- // '(' type_name ')' '{' in| itializer_list ',' '}' postfix_expression2* | 
-//  postfix_expression  | //JMK --bude to chybat?
-  '++' unary_expression |
-  '--' unary_expression |
-  '&' cast_expression | 
-  '*' cast_expression | 
-  '+' cast_expression | 
-  '-' cast_expression | 
-  '~' cast_expression | 
-  '!' cast_expression |
-  sizeof unary_expression |
-  sizeof '(' type_name ')';
-
-cast_expression:
-  unary_expression  |
-  '(' type_name ')' cast_expression;
-  
-
-  
-//unary_operator: OPERATOR;
- 
-//END expressions 
-
-constant: INT | FLOAT | STRING | CHAR; //chceme mat string ako constant? nechceme ho nahodou vediet adresovat a zliepat atd. ?
-
-sizeof: SIZEOF ( ID | '(' ID ')' );
-*/
 //** CONTROL STATEMENTS START **//
 
 if_stat: IF '(' expression ')' statement 
@@ -364,7 +226,7 @@ param_declarator_suffix:
   '[' STATIC? type_qualifier* assignment_expression ']' |
   '[' type_qualifier+ STATIC assignment_expression ']' |
   '[' type_qualifier* '*' ']' ;
-/*
+
 initializer: assignment_expression | '{' initializer_list ','? '}';
 
 initializer_list: initialization (',' initialization)*;
@@ -374,8 +236,10 @@ initialization: (designator '=')? initializer;
 designator: '.' ID | '[' assignment_expression ']';
 
 //to ci je to naozaj iba typ osetrime semantickymi pravidlami
-type_name: parameter_declaration; 
-*/
+type_name: LONG;// parameter_declaration; 
+
+type_name_right: parameter_declaration;
+
 //** DECLARATION END **// 
 
 //** PRIMITIVE TYPES START **//
