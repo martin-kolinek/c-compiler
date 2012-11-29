@@ -50,13 +50,28 @@ unary_expression  :
   sizeof  '--' unary_expression |
   sizeof  primary_expression postfix_expression_s*  |
   sizeof '(' type_name ')' ('{' initializer_list ','? '}')?
-  '&' unary_expression |
-  '*' unary_expression |
-  '+' unary_expression |
-  '-' unary_expression |
-  '~' unary_expression |
-  '!' unary_expression
+  '&' cast_expression |
+  '*' cast_expression |
+  '+' cast_expression |
+  '-' cast_expression |
+  '~' cast_expression |
+  '!' cast_expression
   ;
+
+cast_expression : ('(' type_name ')')? unary_expression
+  ;
+  
+multiplicative_expression :
+  cast_expression multiplicative_expression_2*
+  ;
+
+multiplicative_expression_2 :
+  ('/' ('(' type_name ')') unary_expression) |
+  ('%' ('(' type_name ')')* unary_expression)  |
+  ('*' ('(' type_name ')') unary_expression)
+  ;
+
+
 
 //unary_expression2  : '(' type_name ')' ('{' initializer_list ','? '}')?;
 
