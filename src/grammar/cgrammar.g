@@ -40,7 +40,7 @@ expression:
 primary_expression:
   ID |
   const_expression | //constant |
-  STRING |
+//  STRING | // JMK - string je pod const_expression
   '(' expression ')';
 
 const_expression: constant |
@@ -50,16 +50,17 @@ const_expression: constant |
   
 postfix_expression:
   primary_expression postfix_expression2* | 
-  '(' type_name ')' '{' initializer_list '}' postfix_expression2*  |
+  '(' type_name ')' '{' initializer_list '}' postfix_expression2* |
   '(' type_name ')' '{' initializer_list ',' '}' postfix_expression2* ;
   
 postfix_expression2: //JMK - odstranenie lavej rekurzie
   '[' expression ']' |
-  '(' argument_expression_list ')' |
-  '.' ID |
-  '->' ID  |
+  '(' argument_expression_list ')'  |
+  '.' ID  |
+  '->' ID  | 
   '++' |
-  '--';  
+  '--' 
+  ;  
   
 argument_expression_list:
   assignment_expression argument_expression_list2* ;
@@ -70,7 +71,10 @@ argument_expression_list2:
 
 
 unary_expression:
-  postfix_expression  |
+  //primary_expression postfix_expression2* | 
+ // '(' type_name ')' '{' initializer_list '}' postfix_expression2*  |
+ // '(' type_name ')' '{' initializer_list ',' '}' postfix_expression2* | 
+  //postfix_expression  | //JMK --bude to chybat?
   '++' unary_expression |
   '--' unary_expression |
   '&' cast_expression | 
