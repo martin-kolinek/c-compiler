@@ -173,7 +173,8 @@ rvalue: ID;
 
 constant: INT | FLOAT | STRING | CHAR;
 
-type_name: primitive_type //JMK kvoli expression
+type_name: primitive_type |
+  identifier//JMK kvoli expression
   //| iny typ
          ;
 
