@@ -146,14 +146,14 @@ external_declaration: decl_specs declarator (block | ( '=' initializer))?;
 block: '{' in_block* '}';
 
 in_block: 
-  (ID ';')=> ID ';' |
-  statement | 
+  (ID ';') => statement | //toto je zle  
   declaration;
    
 statement:
   block |
   expression? ';' |
   if_stat | switch_stat | while_stat | for_stat | dowhile_stat | jmp_stat;
+
 
 //** CONTROL STATEMENTS START **//
 
@@ -179,7 +179,7 @@ declaration: decl_specs (init_declarator (',' init_declarator)* )? ';';
 
 decl_specs: declaration_specifier ((declarator)=> () | decl_specs) | ID declaration_specifier*;
 
-spec_qual_list: spec_qual spec_qual_list | ID spec_qual*;
+spec_qual_list: spec_qual ((declarator) => () | spec_qual_list) | ID spec_qual*;
 
 spec_qual: type_specifier | type_qualifier;
 
