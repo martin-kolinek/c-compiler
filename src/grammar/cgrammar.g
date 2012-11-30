@@ -17,14 +17,13 @@ tokens {
 
 program: external_declaration* EOF;
 
-primary_expression:
-  identifier |
+primary_expression:  
+  ID |
   constant |
-  '(' expression ')' |
-  '(' type_name ')' '{' initializer_list ','? '}'
+  ID? '(' expression ')' 
   ;
 
-postfix_expression:  
+postfix_expression:
   primary_expression postfix_expression_s*
   ;
 
@@ -34,7 +33,6 @@ argument_expression_list:
 
 
 postfix_expression_s: '[' expression ']'  |
-  '(' argument_expression_list? ')'  |
   '.' identifier  |
   '->' identifier |
   '++'  |
@@ -42,13 +40,20 @@ postfix_expression_s: '[' expression ']'  |
   ;
 
 unary_expression  :
+  ('(' type_name ')' '{')=>  struct_literal |
+  ('(' type_name ')')=>  cast |
   postfix_expression |
-  '(' type_name ')' unary_expression |
   '++' unary_expression | //toto treba semanticky osetrit, ze ta unary expression nesmie byt cast
   '--' unary_expression | //toto treba semanticky osetrit, ze ta unary expression nesmie byt cast
-  SIZEOF '(' type_name ')' | //tu chyba druhy sizeof
+  SIZEOF sizeof_arg | 
   unary_operator unary_expression ;
   
+struct_literal : '(' type_name ')' unary_expression ;
+  
+cast : '(' type_name')' '{' initializer_list ','? '}' ;
+
+sizeof_arg : ('(' type_name ')') => '(' type_name ')' | unary_expression;
+
 unary_operator :
   '&' |
   '*' |
@@ -141,7 +146,8 @@ external_declaration: decl_specs declarator (block | ( '=' initializer))?;
 block: '{' in_block* '}';
 
 in_block: 
-  (ID ';') => statement | //toto je zle  
+  (ID ';')=> ID ';' |
+  statement | 
   declaration;
    
 statement:
@@ -171,9 +177,7 @@ jmp_stat: BREAK ';' | CONTINUE ';' | RETURN expression? ';';
 
 declaration: decl_specs (init_declarator (',' init_declarator)* )? ';';
 
-function_definition: decl_specs declarator block;
-
-decl_specs: declaration_specifier decl_specs | ID declaration_specifier*;
+decl_specs: declaration_specifier ((declarator)=> () | decl_specs) | ID declaration_specifier*;
 
 spec_qual_list: spec_qual spec_qual_list | ID spec_qual*;
 
@@ -205,12 +209,12 @@ declarator: pointer* direct_declarator;
 
 pointer: '*' type_qualifier*;
 
-direct_declarator: simple_declarator declarator_suffix?;
+direct_declarator: simple_declarator declarator_suffix*;
 
 simple_declarator: ID | '(' declarator ')';
 
 declarator_suffix: param_declarator_suffix |
-  '(' parameter_list ')';
+  '(' parameter_list? ')';
 
 parameter_list: parameter_declaration (',' parameter_declaration )* (',' '...')? | '...';
 
@@ -236,9 +240,7 @@ initialization: (designator '=')? initializer;
 designator: '.' ID | '[' assignment_expression ']';
 
 //to ci je to naozaj iba typ osetrime semantickymi pravidlami
-type_name: LONG;// parameter_declaration; 
-
-type_name_right: parameter_declaration;
+type_name: parameter_declaration;
 
 //** DECLARATION END **// 
 
