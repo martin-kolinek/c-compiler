@@ -48,9 +48,9 @@ unary_expression  :
   SIZEOF sizeof_arg | 
   unary_operator unary_expression ;
   
-struct_literal : '(' type_name ')' unary_expression ;
+struct_literal : '(' type_name ')' '{' initializer_list ','? '}' ;
   
-cast : '(' type_name')' '{' initializer_list ','? '}' ;
+cast : '(' type_name')' unary_expression ;
 
 sizeof_arg : ('(' type_name ')') => '(' type_name ')' | unary_expression;
 
@@ -116,7 +116,10 @@ logical_or_expression : logical_and_expression  ('||' logical_and_expression)*
 conditional_expression  : logical_or_expression ('?' expression ':'  conditional_expression)?
   ;
 
-assignment_expression : unary_expression (assignment_operator assignment_expression)? //TODO conditional expression musi byt unary ak za nou ide assigmant expression2
+//tu treba semantickymi pravidlami skontrolovat, ze ak je tam assignment operator, 
+//tak conditional expression musi byt unary - ale to nam asi vypadne z toho, ze nalavo od 
+//priradovacieho operatora musi byt vec do ktorej sa da priradit
+assignment_expression : conditional_expression (assignment_operator assignment_expression)? 
   ;
 
 expression  : assignment_expression (',' assignment_expression)*  
@@ -141,13 +144,15 @@ identifier: ID;
 constant: INT | FLOAT | STRING | CHAR;
          
 //sadly this is required because otherwise we get an error from antlr
-external_declaration: decl_specs declarator (block | ( '=' initializer))?;
+external_declaration: decl_specs ((declarator '{')=> declarator block | (declarator ('=' initializer)?)? ';');
 
 block: '{' in_block* '}';
 
-in_block: 
-  (ID ';') => statement | //toto je zle  
-  declaration;
+in_block:
+  (decl_specs declarator) => declaration |
+  (decl_specs ';') => declaration | 
+  statement ; //toto je zle  
+  
    
 statement:
   block |
@@ -166,7 +171,7 @@ switch_stat: SWITCH '(' expression ')' '{' (CASE conditional_expression ':' stat
 
 while_stat: WHILE '(' expression ')' statement;
 
-for_stat: FOR '(' expression ';' expression ';' expression ')' statement;
+for_stat: FOR '(' ((declaration) => declaration | ) expression? ';' expression? ';' expression? ')' statement;
 
 dowhile_stat: DO statement WHILE '(' expression ')' ';';
 
@@ -175,15 +180,17 @@ jmp_stat: BREAK ';' | CONTINUE ';' | RETURN expression? ';';
 
 //** DECLARATION START **//
 
-declaration: decl_specs (init_declarator (',' init_declarator)* )? ';';
+declaration: decl_specs (init_declarator (',' init_declarator)* )? ';' ; 
 
-decl_specs: declaration_specifier ((declarator)=> () | decl_specs) | ID declaration_specifier*;
+decl_specs: decl_spec_no_type* (ID | type_specifier) declaration_specifier*;
 
-spec_qual_list: spec_qual ((declarator) => () | spec_qual_list) | ID spec_qual*;
+spec_qual_list: type_qualifier* (ID | type_specifier) spec_qual*;
 
 spec_qual: type_specifier | type_qualifier;
 
 declaration_specifier: storage_class_specifier | type_specifier | type_qualifier | function_specifier;
+
+decl_spec_no_type: storage_class_specifier | type_qualifier | function_specifier;
 
 storage_class_specifier : STATIC | EXTERN | REGISTER | AUTO | TYPEDEF;
 
@@ -218,15 +225,16 @@ declarator_suffix: param_declarator_suffix |
 
 parameter_list: parameter_declaration (',' parameter_declaration )* (',' '...')? | '...';
 
-parameter_declaration: decl_specs param_declarator;
+parameter_declaration: decl_specs param_declarator?;
 
 param_declarator: pointer* direct_param_declarator;
 
-direct_param_declarator: param_declarator_suffix | simple_param_declarator param_declarator_suffix?; 
+direct_param_declarator: param_declarator_suffix+ | simple_param_declarator param_declarator_suffix*; 
 
 simple_param_declarator: ID | '(' param_declarator ')';
 
 param_declarator_suffix: 
+  '[' ']' |
   '[' STATIC? type_qualifier* assignment_expression ']' |
   '[' type_qualifier+ STATIC assignment_expression ']' |
   '[' type_qualifier* '*' ']' ;
