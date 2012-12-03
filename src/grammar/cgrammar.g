@@ -12,6 +12,9 @@ tokens {
 
 @header {
     package grammar.generated;
+    import declaration.specifiers.*;
+    import declaration.declarator.*;
+    import declaration.*;
 } 
 @lexer::header {package grammar.generated;}
 
@@ -182,19 +185,35 @@ jmp_stat: BREAK ';' | CONTINUE ';' | RETURN expression? ';';
 
 declaration: decl_specs (init_declarator (',' init_declarator)* )? ';' ; 
 
-decl_specs: decl_spec_no_type* (ID | type_specifier) declaration_specifier*;
+decl_specs returns [ArrayList<declaration.specifiers.DeclarationSpecifier> ret]
+@init {
+  $ret = new ArrayList<DeclarationSpecifier>();
+}
+: (s=decl_spec_no_type {$ret.add($s.ret);})* 
+    (i=ID {$ret.add(new IDDeclarationSpecifier($i.getText()));}
+      | ts=type_specifier {$ret.add($ts.ret);}) 
+    (ds=declaration_specifier {$ret.add($ds.ret);})*;
 
+///**/
+//
 spec_qual_list: type_qualifier* (ID | type_specifier) spec_qual*;
 
 spec_qual: type_specifier | type_qualifier;
 
-declaration_specifier: storage_class_specifier | type_specifier | type_qualifier | function_specifier;
+//TODO
+declaration_specifier returns [DeclarationSpecifier ret]: 
+  decl_spec_no_type | type_specifier;
 
-decl_spec_no_type: storage_class_specifier | type_qualifier | function_specifier;
+//TODO
+decl_spec_no_type returns [DeclarationSpecifier ret]: 
+  storage_class_specifier | 
+  type_qualifier | 
+  function_specifier;
 
 storage_class_specifier : STATIC | EXTERN | REGISTER | AUTO | TYPEDEF;
 
-type_specifier: primitive_type | struct_specifier | enum_specifier;
+//TODO
+type_specifier returns [DeclarationSpecifier ret]: primitive_type | struct_specifier | enum_specifier;
 
 struct_specifier: STRUCT ID? '{' struct_declaration* '}'
   | STRUCT ID;
