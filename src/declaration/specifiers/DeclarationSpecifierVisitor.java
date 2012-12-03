@@ -15,4 +15,8 @@ public interface DeclarationSpecifierVisitor {
 
 	void visit(IDDeclarationSpecifier idDeclarationSpecifier);
 
+	void visit(TypedefDeclarationSpecifier typedefDeclarationSpecifier);
+
+	void visit(InlineDeclarationSpecifier inlineDeclarationSpecifier);
+
 }

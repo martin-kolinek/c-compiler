@@ -3,10 +3,10 @@ package declaration.specifiers;
 import expression.Expression;
 
 public class Enumerator {
-	public Enumerator(String n, Expression e){
-		expression=e;
+	public Enumerator(String n){
+		expression=null;
 		name=n;
 	}
-	public final String name;
-	public final Expression expression;
+	public String name;
+	public Expression expression;
 }

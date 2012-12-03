@@ -5,8 +5,13 @@ import java.util.ArrayList;
 public class EnumSpecifier implements DeclarationSpecifier {
 	
 	public EnumSpecifier(String tag) {
-		enumerators = new ArrayList<Enumerator>();
+		enumerators = null;
 		this.tag=tag;
+	}
+	
+	public EnumSpecifier() {
+		tag=null;
+		enumerators = new ArrayList<Enumerator>();
 	}
 	
 	public String tag;

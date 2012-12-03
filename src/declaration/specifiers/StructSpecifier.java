@@ -8,6 +8,11 @@ public class StructSpecifier implements DeclarationSpecifier {
 
 	public StructSpecifier(String tag){
 		this.tag=tag;
+		memberDecls = null;
+	}
+	
+	public StructSpecifier() {
+		tag=null;
 		memberDecls = new ArrayList<Declaration>();
 	}
 	

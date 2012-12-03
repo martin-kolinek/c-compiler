@@ -15,6 +15,7 @@ tokens {
     import declaration.specifiers.*;
     import declaration.declarator.*;
     import declaration.*;
+    import expression.*;
 } 
 @lexer::header {package grammar.generated;}
 
@@ -116,7 +117,9 @@ logical_and_expression  : inclusive_or_expression ('&&' inclusive_or_expression)
 logical_or_expression : logical_and_expression  ('||' logical_and_expression)*
   ;
 
-conditional_expression  : logical_or_expression ('?' expression ':'  conditional_expression)?
+//TODO
+conditional_expression returns [Expression ret] 
+  : logical_or_expression ('?' expression ':'  conditional_expression)?
   ;
 
 //tu treba semantickymi pravidlami skontrolovat, ze ak je tam assignment operator, 
@@ -185,7 +188,7 @@ jmp_stat: BREAK ';' | CONTINUE ';' | RETURN expression? ';';
 
 declaration: decl_specs (init_declarator (',' init_declarator)* )? ';' ; 
 
-decl_specs returns [ArrayList<declaration.specifiers.DeclarationSpecifier> ret]
+decl_specs returns [ArrayList<DeclarationSpecifier> ret]
 @init {
   $ret = new ArrayList<DeclarationSpecifier>();
 }
@@ -196,42 +199,71 @@ decl_specs returns [ArrayList<declaration.specifiers.DeclarationSpecifier> ret]
 
 ///**/
 //
-spec_qual_list: type_qualifier* (ID | type_specifier) spec_qual*;
+spec_qual_list returns [ArrayList<DeclarationSpecifier> ret]
+@init{
+  $ret = new ArrayList<DeclarationSpecifier>();
+} 
+:(tq=type_qualifier {$ret.add($tq.ret);})* 
+  (ID {$ret.add(new IDDeclarationSpecifier($ID.getText()));} 
+  | ts=type_specifier {$ret.add($ts.ret);}) (sq=spec_qual {$ret.add($sq.ret);})*;
 
-spec_qual: type_specifier | type_qualifier;
+spec_qual returns [DeclarationSpecifier ret]: 
+    type_specifier {$ret = $type_specifier.ret;} 
+  | type_qualifier {$ret = $type_qualifier.ret;} ;
 
-//TODO
 declaration_specifier returns [DeclarationSpecifier ret]: 
-  decl_spec_no_type | type_specifier;
+  a=decl_spec_no_type {$ret = $a.ret;} | b=type_specifier {$ret = $b.ret;};
 
-//TODO
 decl_spec_no_type returns [DeclarationSpecifier ret]: 
-  storage_class_specifier | 
-  type_qualifier | 
-  function_specifier;
+  a=storage_class_specifier {$ret = $a.ret;} | 
+  b=type_qualifier {$ret=$b.ret;}| 
+  c=function_specifier {$ret=$c.ret;};
 
-storage_class_specifier : STATIC | EXTERN | REGISTER | AUTO | TYPEDEF;
+storage_class_specifier returns [DeclarationSpecifier ret] 
+  : STATIC {$ret = StorageClassSpecifier.STATIC;}
+  | EXTERN {$ret = StorageClassSpecifier.EXTERN;}
+  | REGISTER {$ret = StorageClassSpecifier.REGISTER;}
+  | AUTO {$ret = StorageClassSpecifier.AUTO;} 
+  | TYPEDEF {$ret = new TypedefDeclarationSpecifier();};
 
-//TODO
-type_specifier returns [DeclarationSpecifier ret]: primitive_type | struct_specifier | enum_specifier;
+type_specifier returns [DeclarationSpecifier ret]
+  : a=primitive_type {$ret=$a.ret;} 
+  | b=struct_specifier {$ret=$b.ret;}
+  | c=enum_specifier {$ret=$c.ret;};
 
-struct_specifier: STRUCT ID? '{' struct_declaration* '}'
-  | STRUCT ID;
+struct_specifier returns [StructSpecifier ret]
+  : STRUCT {$ret=new StructSpecifier(); } 
+    (ID {$ret.tag=$ID.getText();})? 
+    '{' (sd=struct_declaration {$ret.memberDecls.add($sd.ret);})* '}'
+  | STRUCT ID {$ret=new StructSpecifier($ID.getText());}; //mozno tu odlisit tieto dve moznosti na urovni typu StructSpecifieru
 
-struct_declaration: spec_qual_list declarator (',' declarator)* ';';
+struct_declaration returns [Declaration ret]
+@init {
+  $ret = new Declaration();
+}
+  : sq=spec_qual_list d1=declarator {$ret.declSpecs=$sq.ret; $ret.addDeclarator($d1.ret);} 
+    (',' d2=declarator {$ret.addDeclarator($d2.ret);})* ';';
 
-enum_specifier: ENUM ID? '{' enumerator (',' enumerator)* ','? '}' 
-  | ENUM ID;
+enum_specifier returns [EnumSpecifier ret]
+  : ENUM {$ret = new EnumSpecifier();} 
+    (ID {$ret.tag=$ID.getText();})? 
+    '{' e1=enumerator {$ret.enumerators.add($e1.ret);} (',' e2=enumerator {$ret.enumerators.add($e2.ret);})* ','? '}' 
+  | ENUM ID {$ret = new EnumSpecifier($ID.getText());};
 
-enumerator: ID ('=' conditional_expression)?;
+enumerator returns [Enumerator ret]
+  : ID {$ret = new Enumerator($ID.getText());} ('=' ce=conditional_expression {$ret.expression=$ce.ret;})?;
 
-type_qualifier returns [boolean ret]: RESTRICT {$ret=false;} | VOLATILE {$ret=false;} | CONST {$ret=true;};
+type_qualifier returns [DeclarationSpecifier ret]
+  : RESTRICT {$ret=TypeQualifier.RESTRICT;} 
+  | VOLATILE {$ret=TypeQualifier.VOLATILE;} 
+  | CONST {$ret=TypeQualifier.CONST;};
 
-function_specifier: INLINE;
+function_specifier returns [DeclarationSpecifier ret]: INLINE {$ret = new InlineDeclarationSpecifier();};
 
 init_declarator: declarator ( '=' initializer)?;
 
-declarator: pointer* direct_declarator;
+//TODO
+declarator returns [Declarator ret]: pointer* direct_declarator;
 
 pointer: '*' type_qualifier*;
 
@@ -273,7 +305,16 @@ type_name: parameter_declaration;
 
 //** PRIMITIVE TYPES START **//
 
-primitive_type: LONG | INT_T | DOUBLE | FLOAT_T | VOID | CHAR_T | SHORT | SIGNED | UNSIGNED | BOOL;
+primitive_type returns [DeclarationSpecifier ret]
+  : LONG {$ret = PrimitiveTypeSpecifier.LONG;} 
+  | INT_T {$ret = PrimitiveTypeSpecifier.INT;}
+  | DOUBLE {$ret = PrimitiveTypeSpecifier.DOUBLE;}
+  | FLOAT_T {$ret = PrimitiveTypeSpecifier.FLOAT;}
+  | VOID {$ret = PrimitiveTypeSpecifier.VOID;}
+  | CHAR_T {$ret = PrimitiveTypeSpecifier.CHAR;}
+  | SHORT {$ret = PrimitiveTypeSpecifier.SHORT;}
+  | SIGNED {$ret = PrimitiveTypeSpecifier.SIGNED;}
+  | UNSIGNED {$ret = PrimitiveTypeSpecifier.UNSIGNED;};
 
 LONG: 'long';
 
