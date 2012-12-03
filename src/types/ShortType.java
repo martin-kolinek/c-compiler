@@ -1,6 +1,6 @@
 package types;
 
-public class ShortType implements Type {
+public class ShortType extends Type {
 
 	@Override
 	public void accept(TypeVisitor v) {

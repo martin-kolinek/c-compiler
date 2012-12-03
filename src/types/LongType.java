@@ -1,6 +1,6 @@
 package types;
 
-public class LongType implements Type {
+public class LongType extends Type {
 
 	@Override
 	public void accept(TypeVisitor v) {

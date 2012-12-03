@@ -13,5 +13,7 @@ public interface TypeVisitor {
 	void visit(StructType structType);
 
 	void visit(ArrayType arrayType);
+
+	void visit(TypedefType typedefType);
 	
 }

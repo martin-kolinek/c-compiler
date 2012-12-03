@@ -1,6 +1,6 @@
 package types;
 
-public class CharType implements Type {
+public class CharType extends Type {
 
 	@Override
 	public void accept(TypeVisitor v) {

@@ -206,7 +206,7 @@ enum_specifier: ENUM ID? '{' enumerator (',' enumerator)* ','? '}'
 
 enumerator: ID ('=' conditional_expression)?;
 
-type_qualifier: RESTRICT | VOLATILE | CONST;
+type_qualifier returns [boolean ret]: RESTRICT {$ret=false;} | VOLATILE {$ret=false;} | CONST {$ret=true;};
 
 function_specifier: INLINE;
 
