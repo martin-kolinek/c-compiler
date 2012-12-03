@@ -13,4 +13,6 @@ public interface DeclarationSpecifierVisitor {
 
 	void visit(EnumSpecifier enumSpecifier);
 
+	void visit(IDDeclarationSpecifier idDeclarationSpecifier);
+
 }
