@@ -9,6 +9,7 @@ public class FunctionDeclarator implements Declarator {
 	public FunctionDeclarator(Declarator d){
 		parameters=new ArrayList<Declaration>();
 		declarator=d;
+		variadic = false;
 	}
 	
 	public Declarator declarator;
@@ -19,5 +20,8 @@ public class FunctionDeclarator implements Declarator {
 	public void accept(DeclaratorVisitor v) {
 		v.visit(this);
 	}
+	
+	//... v deklaracii funkcie
+	public boolean variadic; 
 
 }

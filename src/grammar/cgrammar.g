@@ -220,7 +220,11 @@ jmp_stat returns [Statement ret]
 
 //** DECLARATION START **//
 
-declaration returns [Declaration ret]: decl_specs (init_declarator (',' init_declarator)* )? ';' ; 
+declaration returns [Declaration ret]
+  : {$ret = new Declaration();} 
+    ds=decl_specs {$ret.declSpecs = $ds.ret;} 
+    (i1=init_declarator {$ret.declarators.add($i1.ret);} 
+      (',' i2=init_declarator {$ret.declarators.add($i2.ret);})* )? ';' ; 
 
 decl_specs returns [ArrayList<DeclarationSpecifier> ret]
 @init {
@@ -231,8 +235,6 @@ decl_specs returns [ArrayList<DeclarationSpecifier> ret]
       | ts=type_specifier {$ret.add($ts.ret);}) 
     (ds=declaration_specifier {$ret.add($ds.ret);})*;
 
-///**/
-//
 spec_qual_list returns [ArrayList<DeclarationSpecifier> ret]
 @init{
   $ret = new ArrayList<DeclarationSpecifier>();
@@ -300,27 +302,10 @@ init_declarator returns [InitDeclarator ret]
  
 declarator returns [Declarator ret]
 @init {
-  PointerDeclarator lastPtr = null;
-  $ret=null;
+  PointerUtil u = new PointerUtil();
 }
-  : (p=pointer 
-      {
-        //zabalime direct_declarator do pointerov
-        if($ret==null) {
-          $ret=lastPtr=new PointerDeclarator($p.ret);
-        } 
-        else {
-          PointerDeclarator tmp = new PointerDeclarator($p.ret);
-          lastPtr.declarator = tmp;
-          lastPtr=tmp;
-        }
-      })* 
-     dd=direct_declarator {
-        if(lastPtr==null)
-          $ret=$dd.ret;
-        else
-          lastPtr.declarator = $dd.ret;
-     };
+  : (p=pointer { u.addPointer($p.ret);})* 
+     dd=direct_declarator { $ret = u.getDecl($dd.ret);};
 
 pointer returns [ArrayList<TypeQualifier> ret]
 @init {
@@ -336,31 +321,48 @@ simple_declarator returns [Declarator ret]
   : ID {$ret = new IDDeclarator($ID.getText());} 
   | '(' d=declarator ')' {$ret=$d.ret;};
 
-//TODO
 declarator_suffix [Declarator decl] returns [Declarator ret]
-  : param_declarator_suffix[$decl] |
-  '(' parameter_list? ')';
+  : pd=param_declarator_suffix[$decl] {$ret=$pd.ret;} 
+  | '(' pl=parameter_list[$decl] {$ret=$pl.ret;} ')'
+  | '(' ')' {$ret = new FunctionDeclarator($decl);};
 
-parameter_list: parameter_declaration (',' parameter_declaration )* (',' '...')? | '...';
+parameter_list [Declarator decl] returns [Declarator ret]
+  : pd1=parameter_declaration {$ret=new FunctionDeclarator($decl); ((FunctionDeclarator)$ret).parameters.add($pd1.ret);} 
+      (',' pd2=parameter_declaration {((FunctionDeclarator)$ret).parameters.add($pd2.ret);})* 
+      (',' '...' {((FunctionDeclarator)$ret).variadic=true;})? 
+  | '...';
 
-parameter_declaration: decl_specs param_declarator?;
+parameter_declaration returns [Declaration ret]
+  : {$ret = new Declaration();} 
+      ds=decl_specs {$ret.declSpecs=$ds.ret;} 
+      (pd=param_declarator {$ret.declarators.add(new InitDeclarator($pd.ret));})?;
 
-param_declarator: pointer* direct_param_declarator;
+param_declarator returns [Declarator ret]
+@init {
+  PointerUtil u = new PointerUtil();
+}
+  : (p=pointer {u.addPointer($p.ret);})* 
+    d=direct_param_declarator {$ret=u.getDecl($d.ret);};
 
-//TODO
-direct_param_declarator: param_declarator_suffix[null]+ | simple_param_declarator param_declarator_suffix[null]*; 
+direct_param_declarator returns [Declarator ret]
+  : {$ret = null;} (d=param_declarator_suffix[$ret] {$ret = $d.ret;})+ 
+  | s=simple_param_declarator {$ret = $s.ret;} (d=param_declarator_suffix[$ret] {$ret=$d.ret;})*; 
 
-simple_param_declarator: ID | '(' param_declarator ')';
+simple_param_declarator returns [Declarator ret]
+  : ID {$ret = new IDDeclarator($ID.getText());}
+  | '(' p=param_declarator ')' {$ret = $p.ret;};
 
-//TODO
 param_declarator_suffix [Declarator decl] returns [Declarator ret] 
   : '[' ']' {$ret = new ArrayDeclarator($decl, false, false);} 
   | {$ret = new ArrayDeclarator($decl, false, false);} 
       '[' (STATIC {((ArrayDeclarator)$ret).stat=true;})? 
           (tq=type_qualifier {((ArrayDeclarator)$ret).qualifiers.add($tq.ret);})* 
           e=assignment_expression {((ArrayDeclarator)$ret).expression=$e.ret;} ']' 
-  | '[' type_qualifier+ STATIC assignment_expression ']' 
-  | '[' type_qualifier* '*' ']' ;
+  | {$ret = new ArrayDeclarator($decl, false, true);}
+      '[' (tq=type_qualifier {((ArrayDeclarator)$ret).qualifiers.add($tq.ret);})+ 
+          STATIC ae=assignment_expression {((ArrayDeclarator)$ret).expression=$ae.ret;} ']' 
+  | {$ret = new ArrayDeclarator($decl, true, false);} 
+      '[' (tq=type_qualifier {((ArrayDeclarator)$ret).qualifiers.add($tq.ret);})* '*' ']' ;
 
 initializer returns [Initializer ret]
   : e=assignment_expression {$ret = new ExpressionInitializer($e.ret);} 
