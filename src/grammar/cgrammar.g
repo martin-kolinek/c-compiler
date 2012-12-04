@@ -14,6 +14,7 @@ tokens {
     package grammar.generated;
     import declaration.specifiers.*;
     import declaration.declarator.*;
+    import declaration.initializer.*;
     import declaration.*;
     import expression.*;
     import statements.*;
@@ -125,7 +126,8 @@ conditional_expression returns [Expression ret]
 //tu treba semantickymi pravidlami skontrolovat, ze ak je tam assignment operator, 
 //tak conditional expression musi byt unary - ale to nam asi vypadne z toho, ze nalavo od 
 //priradovacieho operatora musi byt vec do ktorej sa da priradit
-assignment_expression : conditional_expression (assignment_operator assignment_expression)? 
+//TODO
+assignment_expression returns [Expression ret] : conditional_expression (assignment_operator assignment_expression)? 
   ;
 
 //TODO
@@ -292,8 +294,10 @@ type_qualifier returns [DeclarationSpecifier ret]
 
 function_specifier returns [DeclarationSpecifier ret]: INLINE {$ret = new InlineDeclarationSpecifier();};
 
-init_declarator: declarator ( '=' initializer)?;
-
+init_declarator returns [InitDeclarator ret]
+: d=declarator {$ret = new InitDeclarator($d.ret);} 
+    ( '=' i=initializer {$ret.initializer = $i.ret;})?;
+ 
 //TODO
 declarator returns [Declarator ret]: pointer* direct_declarator;
 
@@ -322,13 +326,27 @@ param_declarator_suffix:
   '[' type_qualifier+ STATIC assignment_expression ']' |
   '[' type_qualifier* '*' ']' ;
 
-initializer: assignment_expression | '{' initializer_list ','? '}';
+initializer returns [Initializer ret]
+  : e=assignment_expression {$ret = new ExpressionInitializer($e.ret);} 
+  | '{' il=initializer_list ','? '}' {$ret = $il.ret;};
 
-initializer_list: initialization (',' initialization)*;
+initializer_list returns [CompoundInitializer ret]
+@init{
+  $ret = new CompoundInitializer();
+}
+  : i1=initialization {$ret.initializers.add($i1.ret);} 
+      (',' i2=initialization {$ret.initializers.add($i2.ret);})*;
 
-initialization: (designator '=')? initializer;
+initialization returns [DesignatedInitializer ret]
+@init {
+  $ret=new DesignatedInitializer();
+}
+  : (d=designator '=' {$ret.designator = $d.ret;})? 
+      i=initializer {$ret.initializer=$i.ret;};
 
-designator: '.' ID | '[' assignment_expression ']';
+designator returns [Designator ret]
+  : '.' ID {$ret = new Designator($ID.getText());}  
+  | '[' e=assignment_expression ']' {$ret=new Designator($e.ret);} ;
 
 //to ci je to naozaj iba typ osetrime semantickymi pravidlami
 type_name: parameter_declaration;
