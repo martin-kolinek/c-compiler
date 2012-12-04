@@ -45,18 +45,17 @@ postfix_expression_s: '[' expression ']'  |
   ;
 
 unary_expression  :
-  ('(' type_name ')' '{')=>  struct_literal |
-  ('(' type_name ')')=>  cast |
+  ('(' type_name ')' unary_expression)=>  cast |
   postfix_expression |
   '++' unary_expression | //toto treba semanticky osetrit, ze ta unary expression nesmie byt cast
   '--' unary_expression | //toto treba semanticky osetrit, ze ta unary expression nesmie byt cast
   SIZEOF sizeof_arg | 
   unary_operator unary_expression ;
   
-struct_literal : '(' type_name ')' '{' initializer_list ','? '}' ;
-  
 cast : '(' type_name')' unary_expression ;
 
+//tu treba potom osetrit, ze ak type_name moze byt aj expression (napr. ID
+//alebo ID [ expreesion ], tak treba vyskusat aj to
 sizeof_arg : ('(' type_name ')') => '(' type_name ')' | unary_expression;
 
 unary_operator :
