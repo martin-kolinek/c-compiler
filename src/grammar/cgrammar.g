@@ -16,6 +16,7 @@ tokens {
     import declaration.declarator.*;
     import declaration.*;
     import expression.*;
+    import statements.*;
 } 
 @lexer::header {package grammar.generated;}
 
@@ -128,7 +129,8 @@ conditional_expression returns [Expression ret]
 assignment_expression : conditional_expression (assignment_operator assignment_expression)? 
   ;
 
-expression  : assignment_expression (',' assignment_expression)*  
+//TODO
+expression returns [Expression ret] : assignment_expression (',' assignment_expression)*  
   ;
 
 assignment_operator  : 
@@ -160,7 +162,7 @@ in_block:
   statement ; //toto je zle  
   
    
-statement:
+statement returns [Statement ret]:
   block |
   expression? ';' |
   if_stat | switch_stat | while_stat | for_stat | dowhile_stat | jmp_stat;
@@ -168,25 +170,56 @@ statement:
 
 //** CONTROL STATEMENTS START **//
 
-if_stat: IF '(' expression ')' statement 
-  ( (ELSE)=> ELSE statement
+if_stat returns [IfStatement ret]
+  : IF '(' cond=expression ')' ontrue=statement {$ret=new IfStatement(); $ret.cond=$cond.ret; $ret.ontrue=$ontrue.ret;} 
+  ( (ELSE)=> ELSE onfalse=statement {$ret.onfalse=$onfalse.ret;}
     | ( ) // nothing
   );
 
-switch_stat: SWITCH '(' expression ')' '{' (CASE conditional_expression ':' statement*)* (DEFAULT ':' statement*)? '}';
+switch_stat returns [SwitchStatement ret]
+  : SWITCH {$ret=new SwitchStatement();} 
+  '(' expr=expression {$ret.expr=$expr.ret;} ')' 
+  '{' (cc=case_clause {$ret.cases.add($cc.ret);})* 
+  (DEFAULT ':'  
+  (st=statement {$ret.def.add($st.ret);})* )? '}';
 
-while_stat: WHILE '(' expression ')' statement;
+case_clause returns [Case ret]
+  : CASE cond=conditional_expression ':' {$ret=new Case(); $ret.cond=$cond.ret;}
+  (st=statement {$ret.statements.add($st.ret);})*;
 
-for_stat: FOR '(' ((declaration) => declaration | ) expression? ';' expression? ';' expression? ')' statement;
+while_stat returns [WhileStatement ret]
+  : WHILE '(' cond=expression ')' body=statement 
+  {
+    $ret=new WhileStatement();
+    $ret.condition=$cond.ret; 
+    $ret.body=$body.ret; 
+  };
 
-dowhile_stat: DO statement WHILE '(' expression ')' ';';
+for_stat returns [ForStatement ret]
+  : FOR {$ret=new ForStatement();} 
+  '(' ((declaration) => decl=declaration {$ret.decl=$decl.ret;} | ) 
+  (init=expression {$ret.init=init.ret;})? ';' 
+  (cond=expression {$ret.cond=cond.ret;})? ';' 
+  (after=expression {$ret.after=after.ret;})? ')' 
+  body=statement {$ret.body=body.ret;};
 
-jmp_stat: BREAK ';' | CONTINUE ';' | RETURN expression? ';';
+dowhile_stat returns [DowhileStatement ret]
+  : DO body=statement WHILE '(' cond=expression ')' ';'
+  {
+    $ret=new DowhileStatement(); 
+    $ret.body=$body.ret; 
+    $ret.condition=$cond.ret; 
+  };
+
+jmp_stat returns [Statement ret]
+  : BREAK{$ret=new BreakStatement();} ';' 
+  | CONTINUE{$ret=new ContinueStatement();} ';' 
+  | RETURN{$ret=new ReturnStatement();} (e=expression {((ReturnStatement)$ret).exp=$e.ret;})? ';';
 //** CONTROL STATEMENTS END **//
 
 //** DECLARATION START **//
 
-declaration: decl_specs (init_declarator (',' init_declarator)* )? ';' ; 
+declaration returns [Declaration ret]: decl_specs (init_declarator (',' init_declarator)* )? ';' ; 
 
 decl_specs returns [ArrayList<DeclarationSpecifier> ret]
 @init {
