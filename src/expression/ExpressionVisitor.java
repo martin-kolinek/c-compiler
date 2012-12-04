@@ -4,5 +4,6 @@ import expression.binop.*;
 
 public interface ExpressionVisitor {
 
-	void visit(AdditionExpresion additionExpression);
+	void visit(BinaryExpression binaryExpression);
+	void visit();
 }
