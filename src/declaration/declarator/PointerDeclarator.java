@@ -6,12 +6,11 @@ import declaration.specifiers.TypeQualifier;
 
 public class PointerDeclarator implements Declarator {
 
-	public PointerDeclarator(Declarator d){
-		qualifiers=new ArrayList<TypeQualifier>();
-		declarator=d;
+	public PointerDeclarator(ArrayList<TypeQualifier> qual){
+		qualifiers=qual;
 	}
 	
-	Declarator declarator;
+	public Declarator declarator;
 	
 	public ArrayList<TypeQualifier> qualifiers;
 	

@@ -287,7 +287,7 @@ enum_specifier returns [EnumSpecifier ret]
 enumerator returns [Enumerator ret]
   : ID {$ret = new Enumerator($ID.getText());} ('=' ce=conditional_expression {$ret.expression=$ce.ret;})?;
 
-type_qualifier returns [DeclarationSpecifier ret]
+type_qualifier returns [TypeQualifier ret]
   : RESTRICT {$ret=TypeQualifier.RESTRICT;} 
   | VOLATILE {$ret=TypeQualifier.VOLATILE;} 
   | CONST {$ret=TypeQualifier.CONST;};
@@ -298,16 +298,47 @@ init_declarator returns [InitDeclarator ret]
 : d=declarator {$ret = new InitDeclarator($d.ret);} 
     ( '=' i=initializer {$ret.initializer = $i.ret;})?;
  
+declarator returns [Declarator ret]
+@init {
+  PointerDeclarator lastPtr = null;
+  $ret=null;
+}
+  : (p=pointer 
+      {
+        //zabalime direct_declarator do pointerov
+        if($ret==null) {
+          $ret=lastPtr=new PointerDeclarator($p.ret);
+        } 
+        else {
+          PointerDeclarator tmp = new PointerDeclarator($p.ret);
+          lastPtr.declarator = tmp;
+          lastPtr=tmp;
+        }
+      })* 
+     dd=direct_declarator {
+        if(lastPtr==null)
+          $ret=$dd.ret;
+        else
+          lastPtr.declarator = $dd.ret;
+     };
+
+pointer returns [ArrayList<TypeQualifier> ret]
+@init {
+  $ret = new ArrayList<TypeQualifier>();
+}
+  : '*' (t=type_qualifier {$ret.add($t.ret);})*;
+
+direct_declarator returns [Declarator ret]
+  : s=simple_declarator {$ret = $s.ret;} 
+    (d=declarator_suffix[$ret] {$ret = $d.ret;})*;
+
+simple_declarator returns [Declarator ret]
+  : ID {$ret = new IDDeclarator($ID.getText());} 
+  | '(' d=declarator ')' {$ret=$d.ret;};
+
 //TODO
-declarator returns [Declarator ret]: pointer* direct_declarator;
-
-pointer: '*' type_qualifier*;
-
-direct_declarator: simple_declarator declarator_suffix*;
-
-simple_declarator: ID | '(' declarator ')';
-
-declarator_suffix: param_declarator_suffix |
+declarator_suffix [Declarator decl] returns [Declarator ret]
+  : param_declarator_suffix |
   '(' parameter_list? ')';
 
 parameter_list: parameter_declaration (',' parameter_declaration )* (',' '...')? | '...';
