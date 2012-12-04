@@ -8,7 +8,7 @@ import expression.Expression;
 
 public class ArrayDeclarator implements Declarator {
 	
-	ArrayDeclarator(Declarator d,boolean ast, boolean st) {
+	public ArrayDeclarator(Declarator d,boolean ast, boolean st) {
 		stat=st;
 		asterisk=ast;
 		declarator=d;

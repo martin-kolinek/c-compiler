@@ -338,7 +338,7 @@ simple_declarator returns [Declarator ret]
 
 //TODO
 declarator_suffix [Declarator decl] returns [Declarator ret]
-  : param_declarator_suffix |
+  : param_declarator_suffix[$decl] |
   '(' parameter_list? ')';
 
 parameter_list: parameter_declaration (',' parameter_declaration )* (',' '...')? | '...';
@@ -347,15 +347,20 @@ parameter_declaration: decl_specs param_declarator?;
 
 param_declarator: pointer* direct_param_declarator;
 
-direct_param_declarator: param_declarator_suffix+ | simple_param_declarator param_declarator_suffix*; 
+//TODO
+direct_param_declarator: param_declarator_suffix[null]+ | simple_param_declarator param_declarator_suffix[null]*; 
 
 simple_param_declarator: ID | '(' param_declarator ')';
 
-param_declarator_suffix: 
-  '[' ']' |
-  '[' STATIC? type_qualifier* assignment_expression ']' |
-  '[' type_qualifier+ STATIC assignment_expression ']' |
-  '[' type_qualifier* '*' ']' ;
+//TODO
+param_declarator_suffix [Declarator decl] returns [Declarator ret] 
+  : '[' ']' {$ret = new ArrayDeclarator($decl, false, false);} 
+  | {$ret = new ArrayDeclarator($decl, false, false);} 
+      '[' (STATIC {((ArrayDeclarator)$ret).stat=true;})? 
+          (tq=type_qualifier {((ArrayDeclarator)$ret).qualifiers.add($tq.ret);})* 
+          e=assignment_expression {((ArrayDeclarator)$ret).expression=$e.ret;} ']' 
+  | '[' type_qualifier+ STATIC assignment_expression ']' 
+  | '[' type_qualifier* '*' ']' ;
 
 initializer returns [Initializer ret]
   : e=assignment_expression {$ret = new ExpressionInitializer($e.ret);} 
