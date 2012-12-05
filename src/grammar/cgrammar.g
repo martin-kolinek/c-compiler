@@ -59,15 +59,10 @@ postfix_expression returns [Expression ret]
     }
   ;
 
-argument_expression_list:
-  assignment_expression (',' assignment_expression)*
-  ;
-
-
 postfix_expression_s returns [Expression ret]
   : '[' expression ']'  |
-  '.' id=identifier {$ret=new MemberAccessExpression(); ((MemberAccessExpression)$ret).id=$id.ret;} | //s� tu zahrnut� aj volania �lensk�ch met�d? - clenske metody neexistuju v C
-  '->' id=identifier {$ret=new MemberDereferenceExpression(); ((MemberDereferenceExpression)$ret).id=$id.ret;} |
+  '.' id=ID {$ret=new MemberAccessExpression(); ((MemberAccessExpression)$ret).id=$id.getText();} | //s� tu zahrnut� aj volania �lensk�ch met�d? - clenske metody neexistuju v C
+  '->' id=ID {$ret=new MemberDereferenceExpression(); ((MemberDereferenceExpression)$ret).id=$id.getText();} |
   '++' {$ret=new UnaryExpression(); ((UnaryExpression)$ret).op=UnaryOperator.POST_INC;} |
   '--' {$ret=new UnaryExpression(); ((UnaryExpression)$ret).op=UnaryOperator.POST_DEC;} 
   ;
@@ -177,9 +172,6 @@ assignment_operator  :
   '^=' |
   '|=' 
   ;
-
-identifier returns [String ret]
-  : id=ID {$ret=$id.getText();};
 
 constant: INT | FLOAT | STRING | CHAR;
          
