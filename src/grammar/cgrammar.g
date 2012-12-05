@@ -24,14 +24,24 @@ tokens {
 
 program: external_declaration* EOF;
 
-primary_expression:  
-  ID |
+primary_expression returns [Expression ret]
+  : ID |
   constant |
   ID? '(' expression ')' 
   ;
 
 postfix_expression returns [Expression ret]
-  : primary_expression postfix_expression_s*
+  : exp=primary_expression postexp=postfix_expression_s* 
+  {
+    Expression pre_exp=$exp.ret;
+    Expression post_exp=$postexp.ret;
+    
+    //Exp++, Exp--;
+	    if (post_exp instanceof UnaryExpression){
+	      $ret=post_exp;
+	      ((UnaryExpression)$ret).exp=pre_exp;
+	    }
+    }
   ;
 
 argument_expression_list:
@@ -39,12 +49,12 @@ argument_expression_list:
   ;
 
 
-postfix_expression_s
+postfix_expression_s returns [Expression ret] //TOTO je divne spravene, no nenapadol mi lepsi sposob
   : '[' expression ']'  |
   '.' identifier  |
   '->' identifier |
-  '++'  |
-  '--'
+  '++' {$ret=new UnaryExpression(); ((UnaryExpression)$ret).op=UnaryOperator.POST_INC;} |
+  '--' {$ret=new UnaryExpression(); ((UnaryExpression)$ret).op=UnaryOperator.POST_DEC;} 
   ;
 
 unary_expression returns [Expression ret] 
