@@ -155,18 +155,20 @@ constant: INT | FLOAT | STRING | CHAR;
 //sadly this is required because otherwise we get an error from antlr
 external_declaration: decl_specs ((declarator '{')=> declarator block | (declarator ('=' initializer)?)? ';');
 
-block: '{' in_block* '}';
+block returns [BlockStatement ret]
+: '{' {$ret=new BlockStatement();} (ib=in_block {$ret.in_block.add($ib.ret);})* '}';
 
-in_block:
-  (decl_specs declarator) => declaration |
-  (decl_specs ';') => declaration | 
-  statement ; //toto je zle  
+in_block returns [Object ret]:
+  (decl_specs declarator) => decl=declaration {$ret=$decl.ret;} |
+  (decl_specs ';') => decl=declaration {$ret=$decl.ret;} | 
+  stat=statement {$ret=$stat.ret;} ; //toto je zle  
   
    
 statement returns [Statement ret]:
-  block |
-  expression? ';' |
-  if_stat | switch_stat | while_stat | for_stat | dowhile_stat | jmp_stat;
+  bl=block {$ret=$bl.ret;} |
+  {$ret=new OneexpressionStatement();} (exp=expression {((OneexpressionStatement)$ret).exp=$exp.ret;})? ';' |
+  ifs=if_stat {$ret=$ifs.ret;} | switchs=switch_stat {$ret=$switchs.ret;} | whiles=while_stat {$ret=$whiles.ret;} |
+  fors=for_stat {$ret=$fors.ret;} | dws=dowhile_stat {$ret=$dws.ret;} | jmps=jmp_stat {$ret=$jmps.ret;};
 
 
 //** CONTROL STATEMENTS START **//

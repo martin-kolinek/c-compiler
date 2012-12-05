@@ -18,4 +18,8 @@ public interface StatementVisitor {
 
 	void visit(IfStatement ifStatement);
 
+	void visit(OneexpressionStatement oneexpressionStatement);
+
+	void visit(BlockStatement blockStatement);
+
 }
