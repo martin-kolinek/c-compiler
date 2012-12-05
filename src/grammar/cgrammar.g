@@ -36,35 +36,16 @@ primary_expression returns [Expression ret]
   ;
 
 postfix_expression returns [Expression ret]
-  : exp=primary_expression postexp=postfix_expression_s* 
-  {
-    $ret=exp.ret;
-    /*Expression pre_exp=$exp.ret;
-    $ret=$postexp.ret;
-    
-    //Exp++, Exp--;
-	    if ($ret instanceof UnaryExpression){
-	      ((UnaryExpression)$ret).exp=pre_exp;
-	    }
-	    
-	    //object.attr;
-	    if ($ret instanceof MemberAccessExpression){
-        ((MemberAccessExpression)$ret).exp=pre_exp;
-	    }
-	    
-	    //pointer->attr;
-	    if ($ret instanceof MemberDereferenceExpression){
-        ((MemberDereferenceExpression)$ret).exp=pre_exp;
-      }*/
-    }
+  : exp=primary_expression {$ret = $exp.ret;} 
+    (postexp=postfix_expression_s[$ret] {$ret = $postexp.ret;} )* 
   ;
 
-postfix_expression_s returns [Expression ret]
+postfix_expression_s [Expression e] returns [Expression ret]
   : '[' expression ']'  |
-  '.' id=ID {$ret=new MemberAccessExpression(); ((MemberAccessExpression)$ret).id=$id.getText();} | //s� tu zahrnut� aj volania �lensk�ch met�d? - clenske metody neexistuju v C
-  '->' id=ID {$ret=new MemberDereferenceExpression(); ((MemberDereferenceExpression)$ret).id=$id.getText();} |
-  '++' {$ret=new UnaryExpression(); ((UnaryExpression)$ret).op=UnaryOperator.POST_INC;} |
-  '--' {$ret=new UnaryExpression(); ((UnaryExpression)$ret).op=UnaryOperator.POST_DEC;} 
+  '.' id=ID {$ret=new MemberAccessExpression($e, $id.getText());} | 
+  '->' id=ID {$ret=new MemberDereferenceExpression($e, $id.getText());} |
+  '++' {$ret=new UnaryExpression($e, UnaryOperator.POST_INC);} |
+  '--' {$ret=new UnaryExpression($e, UnaryOperator.POST_DEC);} 
   ;
 
 unary_expression returns [Expression ret] 
