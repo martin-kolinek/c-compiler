@@ -17,6 +17,7 @@ tokens {
     import declaration.initializer.*;
     import declaration.*;
     import expression.*;
+    import expression.unop.*;
     import statements.*;
 } 
 @lexer::header {package grammar.generated;}
@@ -29,8 +30,8 @@ primary_expression:
   ID? '(' expression ')' 
   ;
 
-postfix_expression:
-  primary_expression postfix_expression_s*
+postfix_expression returns [Expression ret]
+  : primary_expression postfix_expression_s*
   ;
 
 argument_expression_list:
@@ -38,20 +39,21 @@ argument_expression_list:
   ;
 
 
-postfix_expression_s: '[' expression ']'  |
+postfix_expression_s
+  : '[' expression ']'  |
   '.' identifier  |
   '->' identifier |
   '++'  |
   '--'
   ;
 
-unary_expression  :
-  ('(' type_name ')' unary_expression)=>  cast |
+unary_expression returns [Expression ret] 
+  : ('(' type_name ')' unary_expression)=>  cast |
   postfix_expression |
-  '++' unary_expression | //toto treba semanticky osetrit, ze ta unary expression nesmie byt cast
-  '--' unary_expression | //toto treba semanticky osetrit, ze ta unary expression nesmie byt cast
+  '++' exp=unary_expression {$ret=new UnaryExpression(); ((UnaryExpression)$ret).exp=$exp.ret; ((UnaryExpression)$ret).op=UnaryOperator.PRE_INC;} | //toto treba semanticky osetrit, ze ta unary expression nesmie byt cast
+  '--' exp=unary_expression {$ret=new UnaryExpression(); ((UnaryExpression)$ret).exp=$exp.ret; ((UnaryExpression)$ret).op=UnaryOperator.PRE_DEC;} | //toto treba semanticky osetrit, ze ta unary expression nesmie byt cast
   SIZEOF sizeof_arg | 
-  unary_operator unary_expression ;
+  op=unary_operator exp=unary_expression {$ret=new UnaryExpression();  ((UnaryExpression)$ret).exp=$exp.ret; ((UnaryExpression)$ret).op=$op.ret;} ;
   
 cast : '(' type_name')' unary_expression ;
 
@@ -59,13 +61,13 @@ cast : '(' type_name')' unary_expression ;
 //alebo ID [ expreesion ], tak treba vyskusat aj to
 sizeof_arg : ('(' type_name ')') => '(' type_name ')' | unary_expression;
 
-unary_operator :
-  '&' |
-  '*' |
-  '+' |
-  '-' |
-  '~' |
-  '!' ;
+unary_operator returns [UnaryOperator ret] :
+  '&' {$ret=UnaryOperator.ADDR;} |
+  '*' {$ret=UnaryOperator.PTR;}|
+  '+' {$ret=UnaryOperator.PLUS;}|
+  '-' {$ret=UnaryOperator.MINUS;}|
+  '~' {$ret=UnaryOperator.COMP;}|
+  '!' {$ret=UnaryOperator.NOT;};
   
 multiplicative_expression :
   unary_expression (multiplicative_operator unary_expression)*
