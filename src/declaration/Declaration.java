@@ -2,8 +2,9 @@ package declaration;
 
 import java.util.ArrayList;
 
-import block.InBlock;
-import block.InBlockVisitor;
+import toplevel.InBlock;
+import toplevel.InBlockVisitor;
+
 
 import declaration.declarator.Declarator;
 import declaration.specifiers.DeclarationSpecifier;
@@ -13,6 +14,10 @@ public class Declaration implements InBlock {
 	public Declaration() {
 		declSpecs=new ArrayList<DeclarationSpecifier>();
 		declarators=new ArrayList<InitDeclarator>();
+	}
+	public Declaration(ArrayList<DeclarationSpecifier> ds) {
+		declSpecs=ds;
+		declarators = new ArrayList<InitDeclarator>();
 	}
 	public ArrayList<DeclarationSpecifier> declSpecs;
 	public ArrayList<InitDeclarator> declarators;

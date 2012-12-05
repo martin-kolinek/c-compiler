@@ -2,7 +2,8 @@ package statements;
 
 import java.util.ArrayList;
 
-import block.InBlock;
+import toplevel.InBlock;
+
 
 public class BlockStatement extends Statement {
 	

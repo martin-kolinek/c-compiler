@@ -1,7 +1,7 @@
 package statements;
 
-import block.InBlock;
-import block.InBlockVisitor;
+import toplevel.InBlock;
+import toplevel.InBlockVisitor;
 
 public abstract class Statement implements InBlock {
 	public abstract void accept(StatementVisitor v);

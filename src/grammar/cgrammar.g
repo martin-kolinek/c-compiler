@@ -19,11 +19,15 @@ tokens {
     import expression.*;
     import expression.unop.*;
     import statements.*;
-    import block.*;
+    import toplevel.*;
 } 
 @lexer::header {package grammar.generated;}
 
-program: external_declaration* EOF;
+program returns [Program ret]
+@init {
+$ret = new Program();
+}
+  : (ed=external_declaration {$ret.declarations.add($ed.ret);})* EOF;
 
 primary_expression returns [Expression ret]
   : ID |
@@ -180,7 +184,18 @@ identifier returns [String ret]
 constant: INT | FLOAT | STRING | CHAR;
          
 //sadly this is required because otherwise we get an error from antlr
-external_declaration: decl_specs ((declarator '{')=> declarator block | (declarator ('=' initializer)?)? ';');
+external_declaration returns [InBlock ret]
+: ds=decl_specs 
+    ((declarator '{')=> d=declarator b=block {
+          $ret=new FunctionDefinition();
+          ((FunctionDefinition)$ret).declaration = new Declaration();
+          ((FunctionDefinition)$ret).declaration.declSpecs=$ds.ret;
+          ((FunctionDefinition)$ret).declaration.declarators.add(new InitDeclarator($d.ret));
+          ((FunctionDefinition)$ret).body=$b.ret; 
+        } 
+      | {$ret = new Declaration($ds.ret);} 
+        (i1=init_declarator {((Declaration)$ret).declarators.add($i1.ret);} 
+          ( ',' i2=init_declarator {((Declaration)$ret).declarators.add($i2.ret);})*)? ';');
 
 block returns [BlockStatement ret]
 : '{' {$ret=new BlockStatement();} (ib=in_block {$ret.inBlock.add($ib.ret);})* '}';
