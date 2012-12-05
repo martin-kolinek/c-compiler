@@ -33,14 +33,24 @@ primary_expression returns [Expression ret]
 postfix_expression returns [Expression ret]
   : exp=primary_expression postexp=postfix_expression_s* 
   {
-    Expression pre_exp=$exp.ret;
-    Expression post_exp=$postexp.ret;
+    $ret=exp.ret;
+    /*Expression pre_exp=$exp.ret;
+    $ret=$postexp.ret;
     
     //Exp++, Exp--;
-	    if (post_exp instanceof UnaryExpression){
-	      $ret=post_exp;
+	    if ($ret instanceof UnaryExpression){
 	      ((UnaryExpression)$ret).exp=pre_exp;
 	    }
+	    
+	    //object.attr;
+	    if ($ret instanceof MemberAccessExpression){
+        ((MemberAccessExpression)$ret).exp=pre_exp;
+	    }
+	    
+	    //pointer->attr;
+	    if ($ret instanceof MemberDereferenceExpression){
+        ((MemberDereferenceExpression)$ret).exp=pre_exp;
+      }*/
     }
   ;
 
@@ -49,27 +59,30 @@ argument_expression_list:
   ;
 
 
-postfix_expression_s returns [Expression ret] //TOTO je divne spravene, no nenapadol mi lepsi sposob
+postfix_expression_s returns [Expression ret]
   : '[' expression ']'  |
-  '.' identifier  |
-  '->' identifier |
+  '.' id=identifier {$ret=new MemberAccessExpression(); ((MemberAccessExpression)$ret).id=$id.ret;} | //sú tu zahrnuté aj volania èlenských metód?
+  '->' id=identifier {$ret=new MemberDereferenceExpression(); ((MemberDereferenceExpression)$ret).id=$id.ret;} |
   '++' {$ret=new UnaryExpression(); ((UnaryExpression)$ret).op=UnaryOperator.POST_INC;} |
   '--' {$ret=new UnaryExpression(); ((UnaryExpression)$ret).op=UnaryOperator.POST_DEC;} 
   ;
 
 unary_expression returns [Expression ret] 
-  : ('(' type_name ')' unary_expression)=>  cast |
-  postfix_expression |
+  : ('(' type_name ')' unary_expression)=>  c=cast {$ret=$c.ret;} |
+  pexp=postfix_expression {$ret=$pexp.ret;}|
   '++' exp=unary_expression {$ret=new UnaryExpression(); ((UnaryExpression)$ret).exp=$exp.ret; ((UnaryExpression)$ret).op=UnaryOperator.PRE_INC;} | //toto treba semanticky osetrit, ze ta unary expression nesmie byt cast
   '--' exp=unary_expression {$ret=new UnaryExpression(); ((UnaryExpression)$ret).exp=$exp.ret; ((UnaryExpression)$ret).op=UnaryOperator.PRE_DEC;} | //toto treba semanticky osetrit, ze ta unary expression nesmie byt cast
-  SIZEOF sizeof_arg | 
+  SIZEOF soexp=sizeof_arg {$ret=$soexp.ret;} | 
   op=unary_operator exp=unary_expression {$ret=new UnaryExpression();  ((UnaryExpression)$ret).exp=$exp.ret; ((UnaryExpression)$ret).op=$op.ret;} ;
   
-cast : '(' type_name')' unary_expression ;
+cast returns [CastExpression ret] 
+  : '(' td=type_name')' exp=unary_expression {$ret=new CastExpression(); $ret.typedecl=$td.ret; $ret.exp=$exp.ret;} ;
 
 //tu treba potom osetrit, ze ak type_name moze byt aj expression (napr. ID
 //alebo ID [ expreesion ], tak treba vyskusat aj to
-sizeof_arg : ('(' type_name ')') => '(' type_name ')' | unary_expression;
+sizeof_arg returns [Expression ret]
+  : ('(' type_name ')') => '(' td=type_name ')' {$ret=new SizeofType(); ((SizeofType)$ret).typedecl=$td.ret;} |
+   exp=unary_expression {$ret=new SizeofExpression(); ((SizeofExpression)$ret).exp=$exp.ret;};
 
 unary_operator returns [UnaryOperator ret] :
   '&' {$ret=UnaryOperator.ADDR;} |
@@ -160,7 +173,8 @@ assignment_operator  :
   '|=' 
   ;
 
-identifier: ID;
+identifier returns [String ret]
+  : id=ID {$ret=$id.getText();};
 
 constant: INT | FLOAT | STRING | CHAR;
          
@@ -401,7 +415,7 @@ designator returns [Designator ret]
   | '[' e=assignment_expression ']' {$ret=new Designator($e.ret);} ;
 
 //to ci je to naozaj iba typ osetrime semantickymi pravidlami
-type_name: parameter_declaration;
+type_name returns [Declaration ret]: decl=parameter_declaration {$ret=$decl.ret;};
 
 //** DECLARATION END **// 
 
