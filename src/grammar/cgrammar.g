@@ -158,7 +158,7 @@ external_declaration: decl_specs ((declarator '{')=> declarator block | (declara
 block returns [BlockStatement ret]
 : '{' {$ret=new BlockStatement();} (ib=in_block {$ret.in_block.add($ib.ret);})* '}';
 
-in_block returns [Object ret]:
+in_block returns [Object ret]: //@TODO: Momentálne vraciam objekt pretože nemám spoloèný interface pre declaration a statement...
   (decl_specs declarator) => decl=declaration {$ret=$decl.ret;} |
   (decl_specs ';') => decl=declaration {$ret=$decl.ret;} | 
   stat=statement {$ret=$stat.ret;} ; //toto je zle  
