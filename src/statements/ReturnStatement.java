@@ -2,7 +2,7 @@ package statements;
 
 import expression.Expression;
 
-public class ReturnStatement implements Statement {
+public class ReturnStatement extends Statement {
 	
 	public Expression exp;
 

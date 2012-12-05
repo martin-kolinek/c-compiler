@@ -19,6 +19,7 @@ tokens {
     import expression.*;
     import expression.unop.*;
     import statements.*;
+    import block.*;
 } 
 @lexer::header {package grammar.generated;}
 
@@ -61,7 +62,7 @@ argument_expression_list:
 
 postfix_expression_s returns [Expression ret]
   : '[' expression ']'  |
-  '.' id=identifier {$ret=new MemberAccessExpression(); ((MemberAccessExpression)$ret).id=$id.ret;} | //sú tu zahrnuté aj volania èlenskıch metód?
+  '.' id=identifier {$ret=new MemberAccessExpression(); ((MemberAccessExpression)$ret).id=$id.ret;} | //sï¿½ tu zahrnutï¿½ aj volania ï¿½lenskï¿½ch metï¿½d? - clenske metody neexistuju v C
   '->' id=identifier {$ret=new MemberDereferenceExpression(); ((MemberDereferenceExpression)$ret).id=$id.ret;} |
   '++' {$ret=new UnaryExpression(); ((UnaryExpression)$ret).op=UnaryOperator.POST_INC;} |
   '--' {$ret=new UnaryExpression(); ((UnaryExpression)$ret).op=UnaryOperator.POST_DEC;} 
@@ -182,12 +183,13 @@ constant: INT | FLOAT | STRING | CHAR;
 external_declaration: decl_specs ((declarator '{')=> declarator block | (declarator ('=' initializer)?)? ';');
 
 block returns [BlockStatement ret]
-: '{' {$ret=new BlockStatement();} (ib=in_block {$ret.in_block.add($ib.ret);})* '}';
+: '{' {$ret=new BlockStatement();} (ib=in_block {$ret.inBlock.add($ib.ret);})* '}';
 
-in_block returns [Object ret]: //@TODO: Momentálne vraciam objekt pretoe nemám spoloènı interface pre declaration a statement...
+//tu treba osetrit ak deklaracia moze byt aj statement (narp. ID alebo ID[expression])
+in_block returns [InBlock ret]: 
   (decl_specs declarator) => decl=declaration {$ret=$decl.ret;} |
   (decl_specs ';') => decl=declaration {$ret=$decl.ret;} | 
-  stat=statement {$ret=$stat.ret;} ; //toto je zle  
+  stat=statement {$ret=$stat.ret;} ; 
   
    
 statement returns [Statement ret]:

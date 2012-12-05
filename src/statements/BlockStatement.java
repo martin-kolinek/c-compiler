@@ -2,9 +2,11 @@ package statements;
 
 import java.util.ArrayList;
 
-public class BlockStatement implements Statement {
+import block.InBlock;
+
+public class BlockStatement extends Statement {
 	
-	public ArrayList<Object> in_block;
+	public ArrayList<InBlock> inBlock;
 
 	@Override
 	public void accept(StatementVisitor v) {

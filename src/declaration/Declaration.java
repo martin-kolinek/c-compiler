@@ -2,10 +2,13 @@ package declaration;
 
 import java.util.ArrayList;
 
+import block.InBlock;
+import block.InBlockVisitor;
+
 import declaration.declarator.Declarator;
 import declaration.specifiers.DeclarationSpecifier;
 
-public class Declaration {
+public class Declaration implements InBlock {
 
 	public Declaration() {
 		declSpecs=new ArrayList<DeclarationSpecifier>();
@@ -16,6 +19,11 @@ public class Declaration {
 	
 	public void addDeclarator(Declarator decl){
 		declarators.add(new InitDeclarator(decl));
+	}
+
+	@Override
+	public void accept(InBlockVisitor v) {
+		v.visit(this);
 	}
 
 }

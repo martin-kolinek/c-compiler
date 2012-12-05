@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import expression.Expression;
 
-public class SwitchStatement implements Statement {
+public class SwitchStatement extends Statement {
 	
 	public Expression expr;
 	public ArrayList<Case> cases;

@@ -3,7 +3,7 @@ package statements;
 import declaration.Declaration;
 import expression.Expression;
 
-public class ForStatement implements Statement{
+public class ForStatement extends Statement{
 	
 	// if (decl init; cond; after) body
 	public Declaration decl;

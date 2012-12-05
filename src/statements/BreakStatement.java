@@ -1,6 +1,6 @@
 package statements;
 
-public class BreakStatement implements Statement {
+public class BreakStatement extends Statement {
 	
 	@Override
 	public void accept(StatementVisitor v) {

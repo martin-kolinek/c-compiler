@@ -2,7 +2,7 @@ package statements;
 
 import expression.Expression;
 
-public class WhileStatement implements Statement {
+public class WhileStatement extends Statement {
 	
 	public Expression condition;
 	public Statement body;
