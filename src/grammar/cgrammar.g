@@ -41,7 +41,7 @@ postfix_expression returns [Expression ret]
   ;
 
 postfix_expression_s [Expression e] returns [Expression ret]
-  : '[' expression ']'  |
+  : '[' e2=expression ']' {$ret=new IndexingExpression($e, $e2.ret);} |
   '.' id=ID {$ret=new MemberAccessExpression($e, $id.getText());} | 
   '->' id=ID {$ret=new MemberDereferenceExpression($e, $id.getText());} |
   '++' {$ret=new UnaryExpression($e, UnaryOperator.POST_INC);} |

@@ -13,4 +13,5 @@ public interface ExpressionVisitor {
 	void visit(SizeofExpression sizeofExpression);
 	void visit(MemberAccessExpression memberAccessExpression);
 	void visit(MemberDereferenceExpression memberDereferenceExpression);
+	void visit(IndexingExpression indexingExpression);
 }
