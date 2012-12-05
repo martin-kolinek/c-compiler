@@ -30,7 +30,7 @@ $ret = new Program();
   : (ed=external_declaration {$ret.declarations.add($ed.ret);})* EOF;
 
 primary_expression returns [Expression ret]
-  : ID |
+  : ID {$ret = new IDExpression($ID.getText());} |
   constant |
   ID? '(' expression ')' 
   ;
