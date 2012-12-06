@@ -1,7 +1,5 @@
 package types;
 
-public abstract class Type {
-	public StorageClassSpecifier stClass;
-	public boolean constant;
-	public abstract void accept(TypeVisitor v);
+public interface Type {
+	void accept(TypeVisitor v);
 }

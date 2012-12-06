@@ -3,7 +3,7 @@ package types;
 import java.util.List;
 import declaration.Declaration;
 
-public class StructType extends Type {
+public class StructType implements Type {
 
 	public List<Declaration> members;
 	

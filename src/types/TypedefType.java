@@ -1,6 +1,6 @@
 package types;
 
-public class TypedefType extends Type {
+public class TypedefType implements Type {
 
 	public TypedefType(String id) {
 		//TODO

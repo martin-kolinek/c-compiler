@@ -2,7 +2,7 @@ package types;
 
 import expression.Expression;
 
-public class ArrayType extends Type {
+public class ArrayType implements Type {
 
 	private Expression size;
 	
