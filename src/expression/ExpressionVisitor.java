@@ -1,7 +1,8 @@
 package expression;
 
 import expression.binop.*;
-import expression.unop.UnaryExpression;
+import expression.unop.*;
+import expression.constant.*;
 
 public interface ExpressionVisitor {
 
@@ -15,4 +16,9 @@ public interface ExpressionVisitor {
 	void visit(MemberDereferenceExpression memberDereferenceExpression);
 	void visit(IndexingExpression indexingExpression);
 	void visit(IDExpression idExpression);
+	void visit(IntConstantExpression intConstantExpression);
+	void visit(FloatConstantExpression floatConstantExpression);
+	void visit(StringConstantExpression stringConstantExpression);
+	void visit(CharConstantExpression charConstantExpression);
+	void visit(FunctionCallExpression functionCallExpression);
 }

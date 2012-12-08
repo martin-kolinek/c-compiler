@@ -18,6 +18,7 @@ tokens {
     import declaration.*;
     import expression.*;
     import expression.unop.*;
+    import expression.constant.*;
     import statements.*;
     import toplevel.*;
 } 
@@ -31,8 +32,9 @@ $ret = new Program();
 
 primary_expression returns [Expression ret]
   : ID {$ret = new IDExpression($ID.getText());} |
-  constant |
-  ID? '(' expression ')' 
+  con=constant {$ret = $con.ret;} |
+  (ID {$ret = new FunctionCallExpression(); ((FunctionCallExpression)$ret).name=$ID.getText();})? '(' exp=expression ')' 
+  {if ($ret instanceof FunctionCallExpression){((FunctionCallExpression)$ret).args=$exp.ret;} else{$ret=$exp.ret;}} //not sure this works
   ;
 
 postfix_expression returns [Expression ret]
@@ -154,7 +156,11 @@ assignment_operator  :
   '|=' 
   ;
 
-constant: INT | FLOAT | STRING | CHAR;
+constant returns [Expression ret]
+  : INT {$ret = new IntConstantExpression(); ((IntConstantExpression)$ret).value = Integer.parseInt($INT.getText());} |
+   FLOAT {$ret = new FloatConstantExpression(); ((FloatConstantExpression)$ret).value = Float.parseFloat($FLOAT.getText());}| 
+   STRING {$ret = new StringConstantExpression(); ((StringConstantExpression)$ret).value = $STRING.getText();}| 
+   CHAR {$ret = new CharConstantExpression(); ((CharConstantExpression)$ret).value = $CHAR.getText().charAt(0);};
          
 //sadly this is required because otherwise we get an error from antlr
 external_declaration returns [InBlock ret]
