@@ -77,4 +77,9 @@ public class ConstTypeSizeVisitor implements TypeVisitor, InBlockVisitor {
 		type.accept((TypeVisitor)this);
 	}
 
+	@Override
+	public void visit(PointerType pointerType) {
+		//do nothing
+	}
+
 }

@@ -11,5 +11,7 @@ public interface TypeVisitor {
 	void visit(PrimitiveType primitiveType);
 
 	void visit(EnumType enumType);
+	
+	void visit(PointerType pointerType);
 
 }

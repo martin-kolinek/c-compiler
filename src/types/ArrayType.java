@@ -5,6 +5,11 @@ import expression.Expression;
 
 public class ArrayType implements Type {
 
+	public ArrayType(Type t, Expression e) {
+		size=e;
+		elementType=t;
+	}
+	
 	private Expression size;
 	
 	public Expression getSizeExpression() {
