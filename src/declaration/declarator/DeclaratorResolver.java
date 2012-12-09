@@ -36,6 +36,10 @@ public class DeclaratorResolver implements DeclaratorVisitor {
 	
 	private boolean func;
 	
+	public boolean isFunction() {
+		return func;
+	}
+	
 	@Override
 	public void visit(ArrayDeclarator d) {
 		if(func)
