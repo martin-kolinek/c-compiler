@@ -1,20 +1,30 @@
 package declaration;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import declaration.declarator.DeclaratorResolver;
 import declaration.specifiers.DeclarationSpecifier;
 import declaration.specifiers.SpecifierTypeExtractor;
 
+import statements.BlockModifier;
+import statements.BlockModifierFactory;
+import statements.BlockTransformer;
 import statements.Statement;
 import toplevel.FunctionDefinition;
 import toplevel.InBlock;
 import toplevel.InBlockVisitor;
 import types.Type;
 
-public class DeclarationResolver implements InBlockVisitor {
+public class DeclarationResolver implements InBlockVisitor, BlockModifier {
 	
-	public ArrayList<InBlock> result;
+	private ArrayList<InBlock> result;
+	
+	@Override
+	public List<InBlock> getModified() {
+		return result;
+	}
+	
 	public ArrayList<ResolvedDeclaration> resultDecls;
 	
 	public DeclarationResolver() {
@@ -24,7 +34,14 @@ public class DeclarationResolver implements InBlockVisitor {
 
 	@Override
 	public void visit(Statement statement) {
-		//TODO
+		BlockTransformer trans = new BlockTransformer(new BlockModifierFactory() {
+			
+			@Override
+			public BlockModifier createModifier() {
+				return new DeclarationResolver();
+			}
+		});
+		statement.accept(trans);
 	}
 
 	@Override
@@ -47,6 +64,8 @@ public class DeclarationResolver implements InBlockVisitor {
 			decl.type=dr.wrapType(ex.getType());
 			decl.identifier=dr.getID();
 			decl.initializer=d.initializer;
+			result.add(decl);
+			resultDecls.add(decl);
 		}
 	}
 
@@ -69,4 +88,5 @@ public class DeclarationResolver implements InBlockVisitor {
 	public void visit(ResolvedDeclaration resolvedDeclaration) {
 		assert false;
 	}
+
 }

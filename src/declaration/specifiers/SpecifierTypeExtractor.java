@@ -143,6 +143,9 @@ public class SpecifierTypeExtractor implements DeclarationSpecifierVisitor {
 		for(Declaration d : structSpecifier.memberDecls) {
 			DeclarationResolver res = new DeclarationResolver();
 			d.accept(res);
+			if(res.resultDecls.size()==0) {
+				throw new SemanticException("Member declaration not valid");
+			}
 			decls.add(res.resultDecls.get(0));
 		}
 		struct = new StructType(structSpecifier.tag, decls);
