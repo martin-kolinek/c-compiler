@@ -2,6 +2,8 @@ package types;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import toplevel.InBlockVisitor;
 import declaration.ResolvedDeclaration;
 
 public class StructType implements Type {
@@ -16,6 +18,11 @@ public class StructType implements Type {
 	
 	@Override
 	public void accept(TypeVisitor v) {
+		v.visit(this);
+	}
+
+	@Override
+	public void accept(InBlockVisitor v) {
 		v.visit(this);
 	}
 

@@ -2,6 +2,7 @@ package toplevel;
 
 import declaration.Declaration;
 import statements.Statement;
+import types.Type;
 
 public interface InBlockVisitor {
 
@@ -10,5 +11,7 @@ public interface InBlockVisitor {
 	void visit(Declaration declaration);
 
 	void visit(FunctionDefinition functionDefinition);
+
+	void visit(Type type);
 	
 }

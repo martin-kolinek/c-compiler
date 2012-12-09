@@ -1,10 +1,10 @@
 package expression;
 
-import declaration.Declaration;
+import toplevel.InBlock;
 
 public class SizeofType implements Expression{
 	
-	public Declaration typedecl;
+	public InBlock typedecl; //this can be declaration or a type
 
 	@Override
 	public void accept(ExpressionVisitor v) {
