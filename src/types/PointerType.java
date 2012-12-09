@@ -1,7 +1,5 @@
 package types;
 
-import toplevel.InBlockVisitor;
-
 public class PointerType implements Type {
 
 	public PointerType(Type t) {
@@ -9,11 +7,6 @@ public class PointerType implements Type {
 	}
 	
 	public final Type pointedToType;
-	
-	@Override
-	public void accept(InBlockVisitor v) {
-		v.visit(this);
-	}
 
 	@Override
 	public void accept(TypeVisitor v) {

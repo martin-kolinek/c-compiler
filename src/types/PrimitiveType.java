@@ -1,7 +1,5 @@
 package types;
 
-import toplevel.InBlockVisitor;
-
 public enum PrimitiveType implements Type {
 	VOID,
 	CHAR,
@@ -17,11 +15,6 @@ public enum PrimitiveType implements Type {
 
 	@Override
 	public void accept(TypeVisitor v) {
-		v.visit(this);
-	}
-
-	@Override
-	public void accept(InBlockVisitor v) {
 		v.visit(this);
 	}
 }

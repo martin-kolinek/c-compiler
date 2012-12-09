@@ -59,4 +59,14 @@ public class DeclarationResolver implements InBlockVisitor {
 	public void visit(Type type) {
 		//TODO
 	}
+
+	@Override
+	public void visit(TypedefDeclaration typedefDeclaration) {
+		assert false;
+	}
+
+	@Override
+	public void visit(ResolvedDeclaration resolvedDeclaration) {
+		assert false;
+	}
 }

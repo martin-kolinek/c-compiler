@@ -1,17 +1,9 @@
 package types;
 
-import declaration.Declaration;
 import declaration.ResolvedDeclaration;
 import expression.ConstVisitor;
-import statements.Statement;
-import toplevel.FunctionDefinition;
-import toplevel.InBlockVisitor;
 
-/**
- * Should only be accepted by types
- *
- */
-public class ConstTypeSizeVisitor implements TypeVisitor, InBlockVisitor {
+public class ConstTypeSizeVisitor implements TypeVisitor {
 
 	private ExpressionTypeMapping etypes;
 	
@@ -24,21 +16,6 @@ public class ConstTypeSizeVisitor implements TypeVisitor, InBlockVisitor {
 	
 	public boolean isConstant() {
 		return constant;
-	}
-
-	@Override
-	public void visit(Statement statement) {
-		assert false;
-	}
-
-	@Override
-	public void visit(Declaration declaration) {
-		assert false;
-	}
-
-	@Override
-	public void visit(FunctionDefinition functionDefinition) {
-		assert false;
 	}
 
 	@Override
@@ -73,13 +50,7 @@ public class ConstTypeSizeVisitor implements TypeVisitor, InBlockVisitor {
 	}
 
 	@Override
-	public void visit(Type type) {
-		type.accept((TypeVisitor)this);
-	}
-
-	@Override
 	public void visit(PointerType pointerType) {
 		//do nothing
 	}
-
 }

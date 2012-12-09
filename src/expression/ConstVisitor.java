@@ -1,6 +1,5 @@
 package expression;
 
-import toplevel.InBlock;
 import types.ConstTypeSizeVisitor;
 import types.ExpressionTypeMapping;
 import types.Type;
@@ -42,7 +41,7 @@ public class ConstVisitor implements ExpressionVisitor {
 		
 	}
 
-	private void sizeOfTypeConst(InBlock t) {
+	private void sizeOfTypeConst(Type t) {
 		ConstTypeSizeVisitor cv = new ConstTypeSizeVisitor(etypes);
 		t.accept(cv);
 		if(!cv.isConstant())
@@ -51,7 +50,7 @@ public class ConstVisitor implements ExpressionVisitor {
 	
 	@Override
 	public void visit(SizeofType sizeofType) {
-		sizeOfTypeConst(sizeofType.typedecl);
+		sizeOfTypeConst(sizeofType.type);
 	}
 
 	@Override

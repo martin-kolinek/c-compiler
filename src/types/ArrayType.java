@@ -1,6 +1,5 @@
 package types;
 
-import toplevel.InBlockVisitor;
 import expression.Expression;
 
 public class ArrayType implements Type {
@@ -24,11 +23,6 @@ public class ArrayType implements Type {
 	
 	@Override
 	public void accept(TypeVisitor v) {
-		v.visit(this);
-	}
-
-	@Override
-	public void accept(InBlockVisitor v) {
 		v.visit(this);
 	}
 

@@ -1,8 +1,6 @@
 package types;
 
-import toplevel.InBlock;
-
-public interface Type extends InBlock {
+public interface Type {
 	void accept(TypeVisitor v);
 	
 }
