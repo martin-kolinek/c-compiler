@@ -5,8 +5,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import declaration.Declaration;
+import declaration.DeclarationResolver;
+import declaration.ResolvedDeclaration;
+import exceptions.SemanticException;
+
+import types.EnumType;
 import types.PrimitiveType;
+import types.StructType;
 import types.Type;
+import types.TypedefType;
 
 public class SpecifierTypeExtractor implements DeclarationSpecifierVisitor {
 
@@ -54,10 +62,64 @@ public class SpecifierTypeExtractor implements DeclarationSpecifierVisitor {
 		//double
 		typeMap.put(Arrays.asList(PrimitiveTypeSpecifier.DOUBLE), PrimitiveType.FLOAT);
 		typeMap.put(Arrays.asList(PrimitiveTypeSpecifier.LONG, PrimitiveTypeSpecifier.DOUBLE), PrimitiveType.FLOAT);
+		extern = false;
+		struct = null;
+		enumeration = null;
+		typedef = null;
+		isTypedef = false;
+		inline = false;
 	}
 	
 	private ArrayList<PrimitiveTypeSpecifier> primitiveTypes;
 	private HashMap<List<PrimitiveTypeSpecifier>, Type> typeMap;
+	private boolean extern;
+	private StructType struct;
+	private EnumType enumeration;
+	private TypedefType typedef;
+	private boolean isTypedef;
+	private boolean inline;
+	
+	public Type getType() {
+		int types = 0;
+		if(primitiveTypes.size()!=0)
+			types++;
+		if(struct!=null)
+			types++;
+		if(enumeration!=null)
+			types++;
+		if(typedef!=null)
+			types++;
+		if(types>1)
+			throw new SemanticException("Multiple types defined"); 
+		if(types==0)
+			throw new SemanticException("No type defined");
+		if(primitiveTypes.size()!=0){
+			if(typeMap.containsKey(primitiveTypes)) {
+				return typeMap.get(primitiveTypes);
+			}
+			throw new SemanticException("Not a known primitive type specifier combination");
+		}
+		if(struct!=null)
+			return struct;
+		if(enumeration!=null)
+			return enumeration;
+		if(typedef!=null)
+			return typedef;
+		assert false;
+		return null;
+	}
+	
+	public boolean isTypedef() {
+		return isTypedef;
+	}
+	
+	public boolean isExtern() {
+		return extern;
+	}
+	
+	public boolean isInline() {
+		return inline;
+	}
 	
 	@Override
 	public void visit(PrimitiveTypeSpecifier primitiveTypeSpecifier) {
@@ -66,37 +128,44 @@ public class SpecifierTypeExtractor implements DeclarationSpecifierVisitor {
 
 	@Override
 	public void visit(TypeQualifier typeQualifier) {
-		
+		//we can ignore these
 	}
 
 	@Override
 	public void visit(StorageClassSpecifier storageClassSpecifier) {
-		
+		if(storageClassSpecifier==StorageClassSpecifier.EXTERN)
+			extern = true;
 	}
 
 	@Override
 	public void visit(StructSpecifier structSpecifier) {
-		
+		ArrayList<ResolvedDeclaration> decls = new ArrayList<ResolvedDeclaration>();
+		for(Declaration d : structSpecifier.memberDecls) {
+			decls.add(DeclarationResolver.resolveDeclaration(d));
+		}
+		struct = new StructType(structSpecifier.tag, decls);
 	}
 
 	@Override
 	public void visit(EnumSpecifier enumSpecifier) {
-		
+		enumeration = new EnumType(enumSpecifier.tag, enumSpecifier.enumerators);
 	}
 
 	@Override
 	public void visit(IDDeclarationSpecifier idDeclarationSpecifier) {
-		
+		typedef = new TypedefType(idDeclarationSpecifier.id);
 	}
 
 	@Override
 	public void visit(TypedefDeclarationSpecifier typedefDeclarationSpecifier) {
-		
+		isTypedef=true;
 	}
 
 	@Override
 	public void visit(InlineDeclarationSpecifier inlineDeclarationSpecifier) {
-		
+		inline = true;
 	}
+	
+	
 	
 }

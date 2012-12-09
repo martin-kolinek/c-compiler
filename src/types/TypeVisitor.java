@@ -9,5 +9,7 @@ public interface TypeVisitor {
 	void visit(TypedefType typedefType);
 
 	void visit(PrimitiveType primitiveType);
-	
+
+	void visit(EnumType enumType);
+
 }

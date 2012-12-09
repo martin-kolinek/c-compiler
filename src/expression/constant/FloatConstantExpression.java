@@ -5,7 +5,7 @@ import expression.ExpressionVisitor;
 
 public class FloatConstantExpression implements Expression{
 	
-	public Float value;
+	public float value;
 
 	@Override
 	public void accept(ExpressionVisitor v) {

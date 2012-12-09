@@ -5,7 +5,7 @@ import expression.ExpressionVisitor;
 
 public class StringConstantExpression implements Expression{
 	
-	public String value;
+	public String value; //this is raw string read from source
 
 	@Override
 	public void accept(ExpressionVisitor v) {

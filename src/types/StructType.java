@@ -1,11 +1,18 @@
 package types;
 
+import java.util.ArrayList;
 import java.util.List;
-import declaration.Declaration;
+import declaration.ResolvedDeclaration;
 
 public class StructType implements Type {
 
-	public List<Declaration> members;
+	public StructType(String tag, List<ResolvedDeclaration> members) {
+		this.tag=tag;
+		this.members = new ArrayList<ResolvedDeclaration>(members);
+	}
+	
+	public final List<ResolvedDeclaration> members;
+	public final String tag;
 	
 	@Override
 	public void accept(TypeVisitor v) {
