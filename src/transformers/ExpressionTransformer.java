@@ -91,7 +91,9 @@ public class ExpressionTransformer implements ExpressionVisitor {
 
 	@Override
 	public void visit(FunctionCallExpression functionCallExpression) {
-		//TODO
+		for(int i=0; i<functionCallExpression.args.size(); ++i) {
+			functionCallExpression.args.set(i, descend(functionCallExpression.args.get(i)));
+		}
 	}
 
 }
