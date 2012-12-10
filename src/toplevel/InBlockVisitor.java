@@ -7,14 +7,14 @@ import statements.Statement;
 
 public interface InBlockVisitor {
 
-	void visit(Statement statement);
+	void visit(Statement i);
 
-	void visit(Declaration declaration);
+	void visit(Declaration i);
 
-	void visit(FunctionDefinition functionDefinition);
+	void visit(FunctionDefinition i);
 
-	void visit(TypedefDeclaration typedefDeclaration);
+	void visit(TypedefDeclaration i);
 
-	void visit(ResolvedDeclaration resolvedDeclaration);
+	void visit(ResolvedDeclaration i);
 	
 }

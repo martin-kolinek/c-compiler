@@ -2,24 +2,24 @@ package statements;
 
 public interface StatementVisitor {
 
-	void visit(ReturnStatement returnStatement);
+	void visit(ReturnStatement s);
 
-	void visit(BreakStatement breakStatement);
+	void visit(BreakStatement s);
 
-	void visit(ContinueStatement continueStatement);
+	void visit(ContinueStatement s);
 
-	void visit(DowhileStatement dowhileStatement);
+	void visit(DowhileStatement s);
 
-	void visit(ForStatement forStatement);
+	void visit(ForStatement s);
 
-	void visit(WhileStatement whileStatement);
+	void visit(WhileStatement s);
 
-	void visit(SwitchStatement switchStatement);
+	void visit(SwitchStatement s);
 
-	void visit(IfStatement ifStatement);
+	void visit(IfStatement s);
 
-	void visit(OneexpressionStatement oneexpressionStatement);
+	void visit(OneexpressionStatement s);
 
-	void visit(BlockStatement blockStatement);
+	void visit(BlockStatement s);
 
 }

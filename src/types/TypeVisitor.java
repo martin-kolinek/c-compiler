@@ -2,16 +2,16 @@ package types;
 
 public interface TypeVisitor {
 
-	void visit(StructType structType);
+	void visit(StructType t);
 
-	void visit(ArrayType arrayType);
+	void visit(ArrayType t);
 
-	void visit(TypedefType typedefType);
+	void visit(TypedefType t);
 
-	void visit(PrimitiveType primitiveType);
+	void visit(PrimitiveType t);
 
-	void visit(EnumType enumType);
+	void visit(EnumType t);
 	
-	void visit(PointerType pointerType);
+	void visit(PointerType t);
 
 }
