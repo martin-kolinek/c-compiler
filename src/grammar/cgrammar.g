@@ -18,6 +18,7 @@ tokens {
     import declaration.*;
     import expression.*;
     import expression.unop.*;
+    import expression.binop.*;
     import expression.constant.*;
     import statements.*;
     import toplevel.*;
@@ -31,10 +32,20 @@ $ret = new Program();
   : (ed=external_declaration {$ret.declarations.add($ed.ret);})* EOF;
 
 primary_expression returns [Expression ret]
+@init{
+  $ret=null;
+}
   : ID {$ret = new IDExpression($ID.getText());} |
-  con=constant {$ret = $con.ret;} |
-  (ID {$ret = new FunctionCallExpression(); ((FunctionCallExpression)$ret).name=$ID.getText();})? '(' exp=expression ')' 
-  {if ($ret instanceof FunctionCallExpression){((FunctionCallExpression)$ret).args=$exp.ret;} else{$ret=$exp.ret;}} //not sure this works
+  con=constant {$ret = $con.ret;} | 
+  (ID {$ret = new FunctionCallExpression($ID.getText());})? 
+    '(' exp=expression ')' {
+      if ($ret != null){
+        ((FunctionCallExpression)$ret).addExp($exp.ret);
+      }
+      else {
+        $ret=$exp.ret;
+      }
+    } 
   ;
 
 postfix_expression returns [Expression ret]
@@ -80,9 +91,9 @@ multiplicative_expression :
   ;
 
 multiplicative_operator returns [BinaryOperator ret]:
- '*' {$ret=BinaryOperator.MULT}|
- '/' {$ret=BinaryOperator.DIV}|
- '%' {$ret=BinaryOperator.MOD};
+ '*' {$ret=BinaryOperator.MULT;}|
+ '/' {$ret=BinaryOperator.DIV;}|
+ '%' {$ret=BinaryOperator.MOD;};
 
 additive_expression : multiplicative_expression (additive_operator multiplicative_expression)*
   ;
