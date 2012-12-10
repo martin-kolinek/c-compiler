@@ -36,10 +36,12 @@ public class DeclarationResolver implements BlockModifier {
 	@Override
 	public void visit(Statement statement) {
 		BlockTransformer trans = new BlockTransformer(new BlockModifierFactory() {
-			
 			@Override
 			public BlockModifier createModifier() {
 				return new DeclarationResolver();
+			}
+			@Override
+			public void popModifierStack() {
 			}
 		});
 		statement.accept(trans);
