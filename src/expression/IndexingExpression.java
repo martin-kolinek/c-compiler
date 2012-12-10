@@ -7,8 +7,8 @@ public class IndexingExpression implements Expression {
 		this.index=index;
 	}
 	
-	Expression index;
-	Expression target;
+	public Expression index;
+	public Expression target;
 	
 	@Override
 	public void accept(ExpressionVisitor v) {
