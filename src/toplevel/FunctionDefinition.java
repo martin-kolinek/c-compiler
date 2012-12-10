@@ -3,12 +3,12 @@ package toplevel;
 import java.util.ArrayList;
 
 import declaration.Declaration;
-import statements.BlockStatement;
+import statements.Statement;
 import types.Type;
 
 public class FunctionDefinition implements InBlock {
 
-	public BlockStatement body;
+	public Statement body;
 	
 	public Declaration declaration;
 	

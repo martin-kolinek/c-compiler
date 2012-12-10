@@ -19,7 +19,11 @@ import expression.unop.UnaryExpression;
 
 public class ExpressionTransformer implements ExpressionVisitor {
 
-	ExpressionModifierFactory modFac;
+	public ExpressionTransformer(ExpressionModifierFactory mod) {
+		modFac=mod;
+	}
+	
+	private ExpressionModifierFactory modFac;
 	
 	@Override
 	public void visit(BinaryExpression binaryExpression) {

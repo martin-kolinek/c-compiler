@@ -1,53 +1,30 @@
 package types;
 
-import declaration.ResolvedDeclaration;
 import declaration.TypedefDeclaration;
 import exceptions.SemanticException;
 import symbols.SymbolTable;
-import toplevel.FunctionDefinition;
-import toplevel.FunctionParameter;
-import transformers.EmptyBlockModifier;
 import transformers.EmptyTypeModifier;
+import transformers.TypeBlockModifier;
 import transformers.TypeModifier;
 import transformers.TypeModifierFactory;
-import transformers.TypeTransformer;
 
-public class TypedefRemover extends EmptyBlockModifier {
+public class TypedefRemover extends TypeBlockModifier {
 
 	SymbolTable<Type> types;
-	public TypedefRemover(SymbolTable<Type> types){
-		this.types=types;
-	}
-	
-	private Type transform(Type t){
-		TypeTransformer tt = new TypeTransformer(new TypeModifierFactory() {
+	public TypedefRemover(final SymbolTable<Type> types){
+		super(new TypeModifierFactory() {
+			
 			@Override
 			public TypeModifier create() {
 				return new TypedefTypeChecker(types);
 			}
 		});
-		t.accept(tt);
-		TypeModifier mod = new TypedefTypeChecker(types);
-		t.accept(mod);
-		return mod.getResult();
+		this.types=types;
 	}
 	
 	@Override
-	public void visit(FunctionDefinition i) {
-		i.returnType=transform(i.returnType);
-		for(FunctionParameter fp : i.parameters) {
-			fp.type=transform(fp.type);
-		}
-	}
-
-	@Override
 	public void visit(TypedefDeclaration i) {
 		types.store(i.id, i.type);
-	}
-
-	@Override
-	public void visit(ResolvedDeclaration i) {
-		i.type=transform(i.type);
 	}
 }
 

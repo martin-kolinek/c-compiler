@@ -7,7 +7,11 @@ import toplevel.InBlock;
 
 public class StatementTransformer implements StatementVisitor {
 
-	StatementModifierFactory modFac;
+	public StatementTransformer(StatementModifierFactory mod) {
+		modFac=mod;
+	}
+	
+	private StatementModifierFactory modFac;
 	
 	private Statement descend(Statement s) {
 		s.accept(this);
