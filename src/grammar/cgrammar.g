@@ -79,7 +79,10 @@ multiplicative_expression :
   unary_expression (multiplicative_operator unary_expression)*
   ;
 
-multiplicative_operator: '*' | '/' | '%';
+multiplicative_operator returns [BinaryOperator ret]:
+ '*' {$ret=BinaryOperator.MULT}|
+ '/' {$ret=BinaryOperator.DIV}|
+ '%' {$ret=BinaryOperator.MOD};
 
 additive_expression : multiplicative_expression (additive_operator multiplicative_expression)*
   ;
