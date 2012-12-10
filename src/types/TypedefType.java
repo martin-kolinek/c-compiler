@@ -2,8 +2,10 @@ package types;
 
 public class TypedefType implements Type {
 	
+	public String identifier;
+	
 	public TypedefType(String id) {
-		//TODO
+		identifier = id;
 	}
 
 	@Override

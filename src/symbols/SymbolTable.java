@@ -7,6 +7,10 @@ public class SymbolTable<T> {
 	
 	private HashMap<String, T> map;
 	
+	public SymbolTable<T> getParent(){
+		return par;
+	}
+	
 	public SymbolTable() {
 		par=null;
 		map = new HashMap<String, T>();
