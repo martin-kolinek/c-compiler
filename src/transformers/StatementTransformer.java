@@ -2,13 +2,8 @@ package transformers;
 
 import java.util.ArrayList;
 
-import declaration.Declaration;
-import declaration.ResolvedDeclaration;
-import declaration.TypedefDeclaration;
 import statements.*;
-import toplevel.FunctionDefinition;
 import toplevel.InBlock;
-import toplevel.InBlockVisitor;
 
 public class StatementTransformer implements StatementVisitor {
 
@@ -74,29 +69,16 @@ public class StatementTransformer implements StatementVisitor {
 
 	@Override
 	public void visit(BlockStatement blockStatement) {
-		for(int i=0; i<blockStatement.inBlock.size(); i++) {
-			InBlock ib = blockStatement.inBlock.get(i);
-			final int x = i;
-			final ArrayList<InBlock> ibs = blockStatement.inBlock;
-			ib.accept(new InBlockVisitor() {
-				@Override
-				public void visit(ResolvedDeclaration resolvedDeclaration) {
-				}
-				@Override
-				public void visit(TypedefDeclaration typedefDeclaration) {
-				}
-				@Override
-				public void visit(FunctionDefinition functionDefinition) {
-				}
-				@Override
-				public void visit(Declaration declaration) {
-				}
-				@Override
-				public void visit(Statement statement) {
-					ibs.set(x, descend(statement));
-				}
-			});
+		BlockModifier bm = new EmptyBlockModifier() {
+			@Override
+			public void visit(Statement s) {
+				result.add(descend(s));
+			}
+		};
+		for(InBlock ib : blockStatement.inBlock) {
+			ib.accept(bm);
 		}
+		blockStatement.inBlock=new ArrayList<InBlock>(bm.getModified());
 	}
 	
 }

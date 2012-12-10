@@ -8,15 +8,14 @@ import declaration.specifiers.DeclarationSpecifier;
 import declaration.specifiers.SpecifierTypeExtractor;
 import exceptions.SemanticException;
 
-import statements.BlockModifier;
-import statements.BlockModifierFactory;
-import statements.BlockTransformer;
 import statements.Statement;
 import toplevel.FunctionDefinition;
 import toplevel.InBlock;
-import toplevel.InBlockVisitor;
+import transformers.BlockModifier;
+import transformers.BlockModifierFactory;
+import transformers.BlockTransformer;
 
-public class DeclarationResolver implements InBlockVisitor, BlockModifier {
+public class DeclarationResolver implements BlockModifier {
 	
 	private ArrayList<InBlock> result;
 	
