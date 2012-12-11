@@ -1,3 +1,4 @@
+
 package expression.binop;
 
 public enum BinaryOperator {
@@ -18,6 +19,18 @@ public enum BinaryOperator {
 	GET, // >=
 	LET, // <=
 	EQ, // ==
-	NEQ, // !=
 	COMMA, // ,
+	NEQ, // !=
+	ASSIG, //'='
+	AMULT, //'*=' 
+	ADIV, //'/=' 
+	AMOD, //'%=' 
+	APLUS, //'+=' 
+	AMINUS, //'-=' 
+	ABSLEFT, //'<<='
+	ABSRIGHT, //'>>='
+	ABAND, //'&=' 
+	ABXOR, // '^=' 
+	ABOR, // '|=' 
 }
+

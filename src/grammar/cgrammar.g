@@ -17,6 +17,7 @@ tokens {
     import declaration.initializer.*;
     import declaration.*;
     import expression.*;
+    import expression.binop.*;
     import expression.unop.*;
     import expression.constant.*;
     import statements.*;
@@ -73,90 +74,148 @@ unary_operator returns [UnaryOperator ret] :
   '+' {$ret=UnaryOperator.PLUS;}|
   '-' {$ret=UnaryOperator.MINUS;}|
   '~' {$ret=UnaryOperator.COMP;}|
-  '!' {$ret=UnaryOperator.NOT;};
+  '!' {$ret=UnaryOperator.NOT;}
+  ;
   
-multiplicative_expression :
-  unary_expression (multiplicative_operator unary_expression)*
+multiplicative_expression returns [Expression ret] :
+  u=unary_expression {$ret = $u.ret;} 
+    (o=multiplicative_operator u2=unary_expression {
+      $ret = new BinaryExpression($ret, $o.ret, $u2.ret);
+    })*
   ;
 
 multiplicative_operator returns [BinaryOperator ret]:
- '*' {$ret=BinaryOperator.MULT}|
- '/' {$ret=BinaryOperator.DIV}|
- '%' {$ret=BinaryOperator.MOD};
-
-additive_expression : multiplicative_expression (additive_operator multiplicative_expression)*
-  ;
-
-additive_operator  :  '+' |
-  '-'  
-  ;
-
-shift_expression  : additive_expression (shift_operator additive_expression)*
+ '*' {$ret=BinaryOperator.MULT;}|
+ '/' {$ret=BinaryOperator.DIV;}|
+ '%' {$ret=BinaryOperator.MOD;}
  ;
 
-shift_operator : '<<' |
-  '>>' 
+additive_expression returns [Expression ret]:
+ m=multiplicative_expression {$ret=$m.ret;} 
+ (o=additive_operator m2=multiplicative_expression{
+  $ret=new BinaryExpression($ret,$o.ret,$m2.ret);
+ })*
   ;
 
-relational_expression : shift_expression (relational_operator shift_expression)*
+additive_operator returns [BinaryOperator ret] :  
+  '+' {$ret=BinaryOperator.PLUS;}|
+  '-' {$ret=BinaryOperator.MINUS;} 
+  ;
+
+shift_expression  returns [Expression ret]:
+  a=additive_expression {$ret=$a.ret;}
+   (o=shift_operator a=additive_expression{
+    $ret=new BinaryExpression($ret,$o.ret,$a2.ret);
+   })*
+  ;
+
+shift_operator returns [BinaryOperator ret]:
+  '<<' {$ret=BinaryOperator.BSLEFT;}|
+  '>>' {$ret=BinaryOperator.BSRIGHT;}
+  ;
+
+relational_expression returns [Expression ret]:
+ s=shift_expression {$ret=$s.ret;} 
+  (o=relational_operator s2=shift_expression{
+  $ret=new BinaryExpression($ret,$o.ret,$s2.ret);
+  })*
  ;
 
-relational_operator  : 
-  '<' |
-  '>' |
-  '<='|
-  '>=' 
+relational_operator returns [BinaryOperator ret] : 
+  '<' {$ret=BinaryOperator.LT;}|
+  '>' {$ret=BinaryOperator.GT;}|
+  '<='{$ret=BinaryOperator.LET;}|
+  '>='{$ret=BinaryOperator.GET;} 
   ;
 
-equality_expression : relational_expression (equality_operator relational_expression)*
+equality_expression returns [Expression ret]:
+ r=relational_expression {$ret=$r.ret;} 
+ (o=equality_operator r2=relational_expression{
+  $ret=new BinaryExpression($ret,$o.ret,$r2.ret);
+ })*
   ;
 
-equality_operator  : '==' | '!=';
-
-
-and_expression  : equality_expression ('&' equality_expression)*
+equality_operator returns [BinaryOperator ret] : 
+  '==' {$ret=BinaryOperator.EQ;}|
+  '!=' {$ret=BinaryOperator.NEQ;}
   ;
 
-exclusive_or_expression : and_expression  ('^' and_expression)*
+
+and_expression  returns [Expression ret]:
+ e=equality_expression {$ret=$e.ret;}
+ ('&'{o=BinaryOperator.BAND;} 
+ e2=equality_expression{
+  $ret=new BinaryExpression($ret,$o.ret,$e2.ret);
+ })*
   ;
 
-inclusive_or_expression : exclusive_or_expression ('|' exclusive_or_expression)*
+exclusive_or_expression returns [Expression ret]:
+ a=and_expression  {$ret=$a.ret;}
+ ('^'{o=BinaryOperator.BXOR;}
+ a2=and_expression{
+    $ret=new BinaryExpression($ret,$o.ret,$a2.ret);
+  })*
   ;
 
-logical_and_expression  : inclusive_or_expression ('&&' inclusive_or_expression)*
+inclusive_or_expression returns [Expression ret]:
+ e=exclusive_or_expression 
+ ('|' {o=BinaryOperator.BOR;}
+ e2=exclusive_or_expression{
+  $ret=new BinaryExpression($ret,$o.ret,$e2.ret);
+ })*
   ;
 
-logical_or_expression : logical_and_expression  ('||' logical_and_expression)*
+logical_and_expression  returns [Expression ret]:
+ e=inclusive_or_expression 
+ ('&&' {o=BinaryOperator.AND;}
+ e2=inclusive_or_expression{
+  $ret=new BinaryExpression($ret,$o.ret,$e2.ret);
+ })*
+  ;
+
+logical_or_expression returns [Expression ret]:
+ e=logical_and_expression
+ ('||' {o=BinaryOperator.OR;}
+ e2=logical_and_expression{
+  $ret=new BinaryExpression($ret,$o.ret,$e2.ret);
+ })*
   ;
 
 //TODO
-conditional_expression returns [Expression ret] 
-  : logical_or_expression ('?' expression ':'  conditional_expression)?
+conditional_expression returns [Expression ret] :
+ cond=logical_or_expression  
+ ('?' ontrue=expression ':'  onfalse=conditional_expression)?
+ {$ret=new IfStatement(); $ret.cond=$cond.ret; $ret.ontrue=$ontrue.ret;$ret.onfalse=$onfalse.ret;}
   ;
 
 //tu treba semantickymi pravidlami skontrolovat, ze ak je tam assignment operator, 
 //tak conditional expression musi byt unary - ale to nam asi vypadne z toho, ze nalavo od 
 //priradovacieho operatora musi byt vec do ktorej sa da priradit
 //TODO
-assignment_expression returns [Expression ret] : conditional_expression (assignment_operator assignment_expression)? 
+assignment_expression returns [Expression ret] 
+  : e=conditional_expression {$ret=$e.ret;}
+    (o=assignment_operator e2=assignment_expression{
+      $ret = new BinaryExpression($ret, $o.ret, $e2.ret); 
+    })? 
   ;
 
 //TODO
 expression returns [Expression ret] : assignment_expression (',' assignment_expression)*  
   ;
 
-assignment_operator  : 
-  '='  | 
-  '*=' |
-  '/=' |
-  '%=' |
-  '+=' |
-  '-=' |
-  '<<='|
-  '>>='|
-  '&=' |
-  '^=' |
-  '|=' 
+//TODO
+assignment_operator returns [BinaryOperator ret] : 
+  '='  {$ret=BinaryOperator.ASSIG;}| 
+  '*='  {$ret=BinaryOperator.AMULT;}|
+  '/='  {$ret=BinaryOperator.ADIV;}|
+  '%='  {$ret=BinaryOperator.AMOD;}|
+  '+='  {$ret=BinaryOperator.APLUS;}|
+  '-='  {$ret=BinaryOperator.AMINUS;}|
+  '<<=' {$ret=BinaryOperator.ABSLEFT;}|
+  '>>=' {$ret=BinaryOperator.ABSRIGHT;}|
+  '&='  {$ret=BinaryOperator.ABAND;}|
+  '^='  {$ret=BinaryOperator.ABXOR;}|
+  '|='  {$ret=BinaryOperator.ABOR;}
   ;
 
 constant returns [Expression ret]
