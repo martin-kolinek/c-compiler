@@ -304,5 +304,11 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 	public Expression getResult() {
 		return result;
 	}
+
+	@Override
+	public void visit(CommaExpression e) {
+		mapping.setType(e, mapping.getExpressionType(e.expressions.get(e.expressions.size()-1)));
+		result = e;
+	}
 	
 }
