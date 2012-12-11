@@ -1,7 +1,7 @@
 package expression;
 
+import typeresolve.ExpressionTypeMapping;
 import types.ConstTypeSizeVisitor;
-import types.ExpressionTypeMapping;
 import types.Type;
 import expression.binop.BinaryExpression;
 import expression.constant.CharConstantExpression;
