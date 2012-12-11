@@ -14,6 +14,12 @@ import toplevel.InBlock;
 import transformers.BlockModifier;
 import transformers.BlockModifierFactory;
 import transformers.BlockTransformer;
+import transformers.ExpressionModifier;
+import transformers.ExpressionModifierFactory;
+import transformers.ExpressionStatementModifier;
+import transformers.StatementModifier;
+import transformers.StatementModifierFactory;
+import transformers.StatementTransformer;
 
 public class DeclarationResolver implements BlockModifier {
 	
@@ -35,6 +41,20 @@ public class DeclarationResolver implements BlockModifier {
 
 	@Override
 	public void visit(Statement statement) {
+		StatementModifierFactory stmodfac = new StatementModifierFactory() {
+			@Override
+			public StatementModifier create() {
+				return new ExpressionStatementModifier(new ExpressionModifierFactory() {
+					@Override
+					public ExpressionModifier create() {
+						return new ExpressionDeclarationResolver();
+					}
+				});
+			}
+		};
+		StatementTransformer sttrans = new StatementTransformer(stmodfac);
+		statement.accept(sttrans);
+		
 		BlockTransformer trans = new BlockTransformer(new BlockModifierFactory() {
 			@Override
 			public BlockModifier createModifier() {
@@ -45,6 +65,8 @@ public class DeclarationResolver implements BlockModifier {
 			}
 		});
 		statement.accept(trans);
+		
+		result.add(statement);
 	}
 
 	@Override
