@@ -111,4 +111,11 @@ public class ConstVisitor implements ExpressionVisitor {
 		e.onfalse.accept(this);
 	}
 
+	@Override
+	public void visit(CommaExpression e) {
+		for(Expression ee : e.expressions){
+			ee.accept(this);
+		}
+	}
+
 }

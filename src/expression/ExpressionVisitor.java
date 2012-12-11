@@ -21,4 +21,5 @@ public interface ExpressionVisitor {
 	void visit(CharConstantExpression e);
 	void visit(FunctionCallExpression e);
 	void visit(TernaryExpression e);
+	void visit(CommaExpression e);
 }

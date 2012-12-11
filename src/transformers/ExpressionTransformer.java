@@ -1,6 +1,7 @@
 package transformers;
 
 import expression.CastExpression;
+import expression.CommaExpression;
 import expression.Expression;
 import expression.ExpressionVisitor;
 import expression.FunctionCallExpression;
@@ -106,6 +107,13 @@ public class ExpressionTransformer implements ExpressionVisitor {
 		e.condition=descend(e.condition);
 		e.ontrue=descend(e.ontrue);
 		e.onfalse=descend(e.onfalse);
+	}
+
+	@Override
+	public void visit(CommaExpression e) {
+		for(int i=0;i<e.expressions.size();i++){
+			e.expressions.set(i, descend(e.expressions.get(i)));
+		}
 	}
 
 }

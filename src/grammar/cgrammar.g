@@ -41,7 +41,7 @@ primary_expression returns [Expression ret]
   (ID {$ret = new FunctionCallExpression($ID.getText());})? 
     '(' exp=expression ')' {
       if ($ret != null){
-        ((FunctionCallExpression)$ret).addExp($exp.ret);
+        ((FunctionCallExpression)$ret).argCommaExpression = $exp.ret;
       }
       else {
         $ret=$exp.ret;
@@ -209,10 +209,10 @@ assignment_expression returns [Expression ret]
     })? 
   ;
 
-expression returns [Expression ret] 
-  : e=assignment_expression {$ret = $e.ret;} 
+expression returns [CommaExpression ret] 
+  : e=assignment_expression {$ret = new CommaExpression($e.ret);} 
     (',' e2=assignment_expression {
-      $ret = new BinaryExpression($ret, BinaryOperator.COMMA, $e2.ret);
+      $ret.expressions.add($e2.ret);
     })*  
   ;
 

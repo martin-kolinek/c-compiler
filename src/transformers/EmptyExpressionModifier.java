@@ -1,6 +1,7 @@
 package transformers;
 
 import expression.CastExpression;
+import expression.CommaExpression;
 import expression.Expression;
 import expression.FunctionCallExpression;
 import expression.IDExpression;
@@ -98,6 +99,11 @@ public class EmptyExpressionModifier implements ExpressionModifier {
 
 	@Override
 	public void visit(TernaryExpression e) {
+		result = e;
+	}
+
+	@Override
+	public void visit(CommaExpression e) {
 		result = e;
 	}
 

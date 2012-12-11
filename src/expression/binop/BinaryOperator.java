@@ -19,7 +19,6 @@ public enum BinaryOperator {
 	GET, // >=
 	LET, // <=
 	EQ, // ==
-	COMMA, // ,
 	NEQ, // !=
 	ASSIG, //'='
 	AMULT, //'*=' 
