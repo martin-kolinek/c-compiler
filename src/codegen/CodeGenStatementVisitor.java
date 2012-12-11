@@ -19,68 +19,92 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 
 	private OutputStreamWriter wr;
 	
-	@Override
-	public void visit(ReturnStatement s) {
-		// TODO Auto-generated method stub
+	private void pis(OutputStreamWriter o,String s){
 		try {
-			wr.append("adsf\n");
+			o.append(s);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+	
+	@Override
+	public void visit(ReturnStatement s) {
+		// TODO Auto-generated method stub
+		String v ="";
+		pis(wr,v);
+		
+	}
 
 	@Override
 	public void visit(BreakStatement s) {
 		// TODO Auto-generated method stub
+		String v ="";
+		pis(wr,v);
 
 	}
 
 	@Override
 	public void visit(ContinueStatement s) {
 		// TODO Auto-generated method stub
+		String v ="";
+		pis(wr,v);
 
 	}
 
 	@Override
 	public void visit(DowhileStatement s) {
 		// TODO Auto-generated method stub
+		String v ="";
+		pis(wr,v);
 
 	}
 
 	@Override
 	public void visit(ForStatement s) {
 		// TODO Auto-generated method stub
+		String v ="";
+		pis(wr,v);
 
 	}
 
 	@Override
 	public void visit(WhileStatement s) {
 		// TODO Auto-generated method stub
+		String v ="";
+		pis(wr,v);
 
 	}
 
 	@Override
 	public void visit(SwitchStatement s) {
 		// TODO Auto-generated method stub
+		String v ="";
+		pis(wr,v);
 
 	}
 
 	@Override
 	public void visit(IfStatement s) {
 		// TODO Auto-generated method stub
+		String v ="";
+		pis(wr,v);
 
 	}
 
 	@Override
 	public void visit(OneexpressionStatement s) {
 		// TODO Auto-generated method stub
+		String v ="";
+		pis(wr,v);
 
 	}
 
 	@Override
 	public void visit(BlockStatement s) {
 		// TODO Auto-generated method stub
+		String v ="";
+		pis(wr,v);
 
 	}
 
