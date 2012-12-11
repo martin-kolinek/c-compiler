@@ -1,5 +1,6 @@
 package types;
 
+import typeresolve.ExpressionTypeMapping;
 import declaration.ResolvedDeclaration;
 import expression.ConstVisitor;
 
