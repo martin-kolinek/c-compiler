@@ -15,8 +15,9 @@ import types.Type;
 public class TypeResolver extends StatementBlockModifier {
 	
 	private SymbolTable<Type> types;
+	private SymbolTable<FunctionDefinition> funcs;
 	
-	public TypeResolver(final SymbolTable<Type> symb, final ExpressionTypeMapping resultMapping) {
+	public TypeResolver(final SymbolTable<Type> symb, final SymbolTable<FunctionDefinition> funcs, final ExpressionTypeMapping resultMapping) {
 		super(new StatementModifierFactory() {
 			
 			@Override
@@ -25,12 +26,13 @@ public class TypeResolver extends StatementBlockModifier {
 					
 					@Override
 					public ExpressionModifier create() {
-						return new TypeResolverExpressionModifier(symb, resultMapping);
+						return new TypeResolverExpressionModifier(symb, funcs, resultMapping);
 					}
 				});
 			}
 		});
 		types=symb;
+		this.funcs=funcs;
 	}
 	
 	@Override
@@ -47,6 +49,7 @@ public class TypeResolver extends StatementBlockModifier {
 		}
 		super.visit(i);
 		types=types.getParent();
+		funcs.store(i.name, i);
 	}
 	
 }

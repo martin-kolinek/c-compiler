@@ -26,7 +26,8 @@ public class AutomaticConversions {
 	}
 	
 	public static Expression autoCast(Expression orig, Type to, ExpressionTypeMapping map) {
-		Type from = map.getExpressionType(orig); 
+		Type from = map.getExpressionType(orig);
+		assert from!=null;
 		if(from==to){
 			return orig;
 		}
@@ -63,5 +64,21 @@ public class AutomaticConversions {
 		}
 		//invalid auto cast
 		return null;
+	}
+	
+	public static PointerType arrayToPtr(Type t) {
+		assert TypeClass.isArray(t);
+		return new PointerType(((ArrayType)t).elementType);
+	}
+	
+	public static Expression arrayToPtr(Expression orig, ExpressionTypeMapping map) {
+		Type t = map.getExpressionType(orig);
+		assert t!=null;
+		if(TypeClass.isPointer(t))
+			return orig;
+		Type ptr = arrayToPtr(t);
+		Expression ret = new CastExpression(orig, ptr);
+		map.setType(ret, ptr);
+		return ret;
 	}
 }

@@ -5,12 +5,16 @@ public class TypeClass {
 		return t instanceof PrimitiveType && t!=PrimitiveType.VOID;
 	}
 	
-	public static boolean isPointer(Type t) {
+	public static boolean isPointer(Type t){
 		return t instanceof PointerType;
 	}
 	
+	public static boolean isPointerOrArray(Type t) {
+		return t instanceof PointerType || t instanceof ArrayType;
+	}
+	
 	public static boolean isScalar(Type t) {
-		return isPointer(t) || isArithmethic(t);
+		return isPointerOrArray(t) || isArithmethic(t);
 	}
 	
 	public static boolean isStruct(Type t) {

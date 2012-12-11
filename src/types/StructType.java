@@ -12,6 +12,15 @@ public class StructType implements Type {
 		this.members = new ArrayList<ResolvedDeclaration>(members);
 	}
 	
+	public ResolvedDeclaration getMember(String name) {
+		for(ResolvedDeclaration m:members) {
+			if(m.identifier.equals(name)) {
+				return m;
+			}
+		}
+		return null;
+	}
+	
 	public final List<ResolvedDeclaration> members;
 	public final String tag;
 	
