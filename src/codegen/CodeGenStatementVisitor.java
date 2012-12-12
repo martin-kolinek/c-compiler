@@ -51,9 +51,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		typ=g.GetResultTyp();
 		String v ="ret "+typ+" "+result+'\n';
 		pis(wr,v);
-		
-
-		
+				
 	}
 
 	@Override
@@ -77,7 +75,21 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	@Override
 	public void visit(DowhileStatement s) {
 		// TODO Auto-generated method stub
-		String v ="";
+		String result;
+		String typ;
+		ContinueSkok=l.next();
+		BreakSkok=l.next();
+		String v =ContinueSkok+":\n";
+		pis(wr,v);
+		s.body.accept(this);
+		ExpressionCodeGenerator g=new ExpressionCodeGenerator();
+		s.condition.accept(g);
+		result=g.GetResultRegister();
+		typ=g.GetResultTyp();
+		String cond=null; //TODO z type a result urobit este porovnavanie s nulou tusim
+		v="br i1" + cond + ", label " + ContinueSkok + " label, "+ BreakSkok + "\n";
+		pis(wr,v);
+		v=BreakSkok + ": \n";
 		pis(wr,v);
 
 	}
