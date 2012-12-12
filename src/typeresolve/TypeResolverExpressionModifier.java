@@ -30,6 +30,26 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 		mapping=mp;
 	}
 	
+
+	@Override
+	public void visit(AssignmentExpression e) {
+		Type lt = mapping.getExpressionType(e.left);
+		Type rt = mapping.getExpressionType(e.right);
+		if(lt == rt) {
+			mapping.setType(e, lt);
+		}
+		else if(TypeClass.isScalar(lt) && TypeClass.isScalar(rt)) {
+			if(TypeClass.isArray(lt))
+				throw new SemanticException("Unable to assign to array");
+			e.right=AutomaticConversions.autoCast(e.right, lt, mapping);
+			mapping.setType(e,  lt);
+		}
+		else {
+			throw new SemanticException("Wrong types in assignment");
+		}
+		
+	}
+	
 	@Override
 	public void visit(BinaryExpression e) {
 		Type lt = mapping.getExpressionType(e.left);

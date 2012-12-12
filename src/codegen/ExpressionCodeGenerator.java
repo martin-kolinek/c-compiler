@@ -1,5 +1,6 @@
 package codegen;
 
+import expression.AssignmentExpression;
 import expression.CastExpression;
 import expression.CommaExpression;
 import expression.ExpressionVisitor;
@@ -125,6 +126,12 @@ public class ExpressionCodeGenerator implements ExpressionVisitor {
 	public void visit(CommaExpression e) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void visit(AssignmentExpression e) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

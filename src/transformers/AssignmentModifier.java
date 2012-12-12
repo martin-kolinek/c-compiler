@@ -1,10 +1,12 @@
 package transformers;
 
 import java.util.HashMap;
+
+import expression.AssignmentExpression;
 import expression.binop.*;
 
 /**
- * Zjednodušovanie priradení typu a += b; na b = a + b;
+ * Zjednodusovanie priradeni typu a += b; na b = a + b;
  * @author GREPY
  *
  */
@@ -29,8 +31,11 @@ public class AssignmentModifier extends EmptyExpressionModifier {
 	@Override
 	public void visit(BinaryExpression be) {
 		if (assignops.containsKey(be.operator)){
-			BinaryExpression assign  = new BinaryExpression(be.left, BinaryOperator.ASSIG, new BinaryExpression(be.left, assignops.get(be.operator), be.right));
+			AssignmentExpression assign  = new AssignmentExpression(be.left, new BinaryExpression(be.left, assignops.get(be.operator), be.right));
 			result = assign;
+			
+		} else if(be.operator==BinaryOperator.ASSIG) {
+			result = new AssignmentExpression(be.left, be.right);
 		} else {
 			result = be;
 		}

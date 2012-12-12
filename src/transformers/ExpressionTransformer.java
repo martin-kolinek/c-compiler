@@ -1,5 +1,6 @@
 package transformers;
 
+import expression.AssignmentExpression;
 import expression.CastExpression;
 import expression.CommaExpression;
 import expression.Expression;
@@ -33,6 +34,12 @@ public class ExpressionTransformer implements ExpressionVisitor {
 		binaryExpression.right=descend(binaryExpression.right);
 	}
 
+	@Override
+	public void visit(AssignmentExpression e) {
+		e.left=descend(e.left);
+		e.right=descend(e.right);
+	}
+	
 	private Expression descend(Expression e) {
 		e.accept(this);
 		ExpressionModifier mod = modFac.create();

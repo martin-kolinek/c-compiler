@@ -1,5 +1,6 @@
 package transformers;
 
+import expression.AssignmentExpression;
 import expression.CastExpression;
 import expression.CommaExpression;
 import expression.Expression;
@@ -104,6 +105,11 @@ public class EmptyExpressionModifier implements ExpressionModifier {
 
 	@Override
 	public void visit(CommaExpression e) {
+		result = e;
+	}
+
+	@Override
+	public void visit(AssignmentExpression e) {
 		result = e;
 	}
 

@@ -118,4 +118,9 @@ public class ConstVisitor implements ExpressionVisitor {
 		}
 	}
 
+	@Override
+	public void visit(AssignmentExpression e) {
+		constant=false;
+	}
+
 }
