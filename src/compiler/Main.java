@@ -1,24 +1,24 @@
 package compiler;
 
+import modifiers.AssignmentModifier;
+import modifiers.CommaExpressionModifier;
+import modifiers.LoopModifier;
+import modifiers.PointerModifier;
+import modifiers.UnaryChargeModifier;
+
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.CommonTokenStream;
 
 import declaration.DeclarationResolver;
 
 import toplevel.Program;
-import transformers.AssignmentModifier;
 import transformers.BlockModifier;
 import transformers.BlockModifierFactory;
-import transformers.BlockTransformer;
-import transformers.CommaExpressionModifier;
 import transformers.ExpressionModifier;
 import transformers.ExpressionModifierFactory;
-import transformers.LoopModifier;
-import transformers.PointerModifier;
 import transformers.StatementModifier;
 import transformers.StatementModifierFactory;
 import transformers.TransformerUtil;
-import transformers.UnaryChargeModifier;
 import types.TypedefRemoverFactory;
 
 import grammar.generated.cgrammarLexer;
@@ -39,16 +39,15 @@ public class Main {
 		Program prog = pars.program().ret;
 
 		//remove other loops than while
-		BlockTransformer loops = TransformerUtil.blockTranForStatementModifier(new StatementModifierFactory() {
+		TransformerUtil.transformProgram(prog, new StatementModifierFactory() {
 			@Override
 			public StatementModifier create() {
 				return new LoopModifier();
 			}
 		});
-		prog.declarations.accept(loops);
 		
 		//resolve declarations
-		BlockTransformer decls = new BlockTransformer(new BlockModifierFactory() {
+		TransformerUtil.transformProgram(prog, new BlockModifierFactory() {
 			@Override
 			public void popModifierStack() {
 			}
@@ -57,51 +56,45 @@ public class Main {
 				return new DeclarationResolver();
 			}
 		});
-		prog.declarations.accept(decls);
 		
 		//remove single expression comma expressions
-		BlockTransformer comma = TransformerUtil.blockTranForExpressionModifier(new ExpressionModifierFactory() {
+		TransformerUtil.transformProgram(prog, new ExpressionModifierFactory() {
 			
 			@Override
 			public ExpressionModifier create() {
 				return new CommaExpressionModifier();
 			}
 		});
-		prog.declarations.accept(comma);
 		
 		//remove [] and -> expressions
-		BlockTransformer deref = TransformerUtil.blockTranForExpressionModifier(new ExpressionModifierFactory() {
+		TransformerUtil.transformProgram(prog, new ExpressionModifierFactory() {
 			
 			@Override
 			public ExpressionModifier create() {
 				return new PointerModifier();
 			}
 		});
-		prog.declarations.accept(deref);
 		
 		//remove compound assignments
-		BlockTransformer compound = TransformerUtil.blockTranForExpressionModifier(new ExpressionModifierFactory() {
+		TransformerUtil.transformProgram(prog, new ExpressionModifierFactory() {
 			
 			@Override
 			public ExpressionModifier create() {
 				return new AssignmentModifier();
 			}
 		});
-		prog.declarations.accept(compound);
 		
 		//remove unary +,- operators
-		BlockTransformer charge = TransformerUtil.blockTranForExpressionModifier(new ExpressionModifierFactory() {
+		TransformerUtil.transformProgram(prog, new ExpressionModifierFactory() {
 			
 			@Override
 			public ExpressionModifier create() {
 				return new UnaryChargeModifier();
 			}
 		});
-		prog.declarations.accept(charge);
 
 		//remove typedefs
-		BlockTransformer typedef = new BlockTransformer(new TypedefRemoverFactory());
-		prog.declarations.accept(typedef);
+		TransformerUtil.transformProgram(prog, new TypedefRemoverFactory());
 		
 		System.out.println(prog.declarations.inBlock.size());
 	}

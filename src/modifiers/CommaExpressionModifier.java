@@ -1,5 +1,6 @@
-package transformers;
+package modifiers;
 
+import transformers.EmptyExpressionModifier;
 import expression.CommaExpression;
 
 public class CommaExpressionModifier extends EmptyExpressionModifier {

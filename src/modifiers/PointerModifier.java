@@ -1,5 +1,6 @@
-package transformers;
+package modifiers;
 
+import transformers.EmptyExpressionModifier;
 import expression.IndexingExpression;
 import expression.MemberAccessExpression;
 import expression.MemberDereferenceExpression;

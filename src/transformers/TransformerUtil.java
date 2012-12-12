@@ -1,18 +1,50 @@
 package transformers;
 
+import declaration.initializer.Initializer;
+import statements.Statement;
+import toplevel.Program;
+import types.Type;
+import expression.Expression;
+
 public class TransformerUtil {
-	public static BlockTransformer blockTranForExpressionModifier(final ExpressionModifierFactory emf) {
-		return blockTranForStatementModifier(new StatementModifierFactory() {
-			
-			@Override
-			public StatementModifier create() {
-				return new ExpressionStatementModifier(emf);
-			}
-		});
+	
+	public static Expression transformExpression(Expression exp, ExpressionModifierFactory fac) {
+		ExpressionTransformer trans = new ExpressionTransformer(fac);
+		exp.accept(trans);
+		ExpressionModifier mod = fac.create();
+		exp.accept(mod);
+		return mod.getResult();
 	}
 	
-	public static BlockTransformer blockTranForStatementModifier(final StatementModifierFactory smf) {
-		return new BlockTransformer(new BlockModifierFactory() {
+	public static Statement transformStatement(Statement st, StatementModifierFactory fac) {
+		StatementTransformer trans = new StatementTransformer(fac);
+		st.accept(trans);
+		StatementModifier mod = fac.create();
+		st.accept(mod);
+		return mod.getResult();
+	}
+	
+	public static Type transformType(Type t, TypeModifierFactory fac) {
+		TypeTransformer trans = new TypeTransformer(fac);
+		t.accept(trans);
+		TypeModifier mod = fac.create();
+		t.accept(mod);
+		return mod.getResult();
+	}
+	
+	public static Initializer transformInitializer(Initializer i, ExpressionModifierFactory fac) {
+		InitializerTransformer trans = new InitializerTransformer(fac);
+		i.accept(trans);
+		return i;
+	}
+	
+	public static void transformProgram(Program p, BlockModifierFactory fac) {
+		BlockTransformer trans = new BlockTransformer(fac);
+		p.declarations.accept(trans);
+	}
+	
+	public static void transformProgram(Program p, final StatementModifierFactory fac) {
+		transformProgram(p, new BlockModifierFactory() {
 			
 			@Override
 			public void popModifierStack() {
@@ -20,13 +52,13 @@ public class TransformerUtil {
 			
 			@Override
 			public BlockModifier createModifier() {
-				return new StatementBlockModifier(smf);
+				return new StatementBlockModifier(fac);
 			}
 		});
 	}
 	
-	public static BlockTransformer blockTranForTypeModifier(final TypeModifierFactory tmf) {
-		return new BlockTransformer(new BlockModifierFactory() {
+	public static void transformProgram(Program p, final ExpressionModifierFactory fac) {
+		transformProgram(p, new BlockModifierFactory() {
 			
 			@Override
 			public void popModifierStack() {
@@ -34,7 +66,21 @@ public class TransformerUtil {
 			
 			@Override
 			public BlockModifier createModifier() {
-				return new TypeBlockModifier(tmf);
+				return new ExpressionBlockModifier(fac);
+			}
+		});
+	}
+	
+	public static void transformProgram(Program p, final TypeModifierFactory fac) {
+		transformProgram(p, new BlockModifierFactory() {
+			
+			@Override
+			public void popModifierStack() {
+			}
+			
+			@Override
+			public BlockModifier createModifier() {
+				return new TypeBlockModifier(fac);
 			}
 		});
 	}

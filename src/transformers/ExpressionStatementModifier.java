@@ -1,6 +1,13 @@
 package transformers;
 
+import statements.Case;
+import statements.DowhileStatement;
+import statements.ForStatement;
+import statements.IfStatement;
 import statements.OneexpressionStatement;
+import statements.ReturnStatement;
+import statements.SwitchStatement;
+import statements.WhileStatement;
 
 public class ExpressionStatementModifier extends EmptyStatementModifier {
 	private ExpressionModifierFactory emf;
@@ -10,12 +17,45 @@ public class ExpressionStatementModifier extends EmptyStatementModifier {
 	
 	@Override
 	public void visit(OneexpressionStatement s) {
-		ExpressionTransformer trans = new ExpressionTransformer(emf);
-		s.exp.accept(trans);
-		ExpressionModifier m = emf.create();
-		s.exp.accept(m);
-		s.exp=m.getResult();
+		s.exp=TransformerUtil.transformExpression(s.exp, emf);
 		super.visit(s);
 	}
 	
+	@Override
+	public void visit(IfStatement s) {
+		s.cond=TransformerUtil.transformExpression(s.cond, emf);
+		super.visit(s);
+	}
+	
+	@Override
+	public void visit(ReturnStatement s) {
+		s.exp=TransformerUtil.transformExpression(s.exp, emf);
+		super.visit(s);
+	}
+	
+	@Override
+	public void visit(DowhileStatement s) {
+		assert false; //povedzme ze forov sme sa uz zbavili
+		super.visit(s);
+	}
+	
+	@Override
+	public void visit(ForStatement s) {
+		assert false; //povedzme ze forov sme sa uz zbavili
+		super.visit(s);
+	}
+	
+	@Override
+	public void visit(SwitchStatement s) {
+		s.expr = TransformerUtil.transformExpression(s.expr, emf);
+		for(Case c : s.cases) {
+			c.cond = TransformerUtil.transformExpression(c.cond, emf);
+		}
+		super.visit(s);
+	}
+	@Override
+	public void visit(WhileStatement s) {
+		s.condition=TransformerUtil.transformExpression(s.condition, emf);
+		super.visit(s);
+	}
 }

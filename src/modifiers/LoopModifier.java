@@ -1,4 +1,4 @@
-package transformers;
+package modifiers;
 
 import expression.Expression;
 import expression.constant.IntConstantExpression;
@@ -7,6 +7,7 @@ import statements.DowhileStatement;
 import statements.ForStatement;
 import statements.OneexpressionStatement;
 import statements.WhileStatement;
+import transformers.EmptyStatementModifier;
 
 /**
  * Toto by sa malo spustit pred riesenim deklaracii, kvoli deklaracii vo fore, ktoru tymto presunieme do bloku

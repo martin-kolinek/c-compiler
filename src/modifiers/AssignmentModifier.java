@@ -1,6 +1,8 @@
-package transformers;
+package modifiers;
 
 import java.util.HashMap;
+
+import transformers.EmptyExpressionModifier;
 
 import expression.AssignmentExpression;
 import expression.binop.*;

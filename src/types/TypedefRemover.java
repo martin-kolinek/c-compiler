@@ -1,5 +1,6 @@
 package types;
 
+import declaration.ResolvedDeclaration;
 import declaration.TypedefDeclaration;
 import exceptions.SemanticException;
 import symbols.SymbolTable;
@@ -25,6 +26,11 @@ public class TypedefRemover extends TypeBlockModifier {
 	@Override
 	public void visit(TypedefDeclaration i) {
 		types.store(i.id, i.type);
+		ResolvedDeclaration res = new ResolvedDeclaration();
+		res.type=i.type;
+		res.identifier = null;
+		res.initializer=null;
+		res.accept(this);
 	}
 }
 

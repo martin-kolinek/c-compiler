@@ -1,5 +1,6 @@
-package transformers;
+package modifiers;
 
+import transformers.EmptyExpressionModifier;
 import expression.TernaryExpression;
 import expression.binop.BinaryExpression;
 import expression.binop.BinaryOperator;

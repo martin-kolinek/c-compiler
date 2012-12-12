@@ -17,7 +17,7 @@ import transformers.ExpressionModifierFactory;
 import transformers.ExpressionStatementModifier;
 import transformers.StatementModifier;
 import transformers.StatementModifierFactory;
-import transformers.StatementTransformer;
+import transformers.TransformerUtil;
 
 public class DeclarationResolver implements BlockModifier {
 	
@@ -30,32 +30,31 @@ public class DeclarationResolver implements BlockModifier {
 	
 	public ArrayList<ResolvedDeclaration> resultDecls;
 	private ArrayList<FunctionDefinition> resultFuncs;
+	private ExpressionModifierFactory emf;
+	private StatementModifierFactory smf;
 	
 	public DeclarationResolver() {
 		result = new ArrayList<InBlock>();
 		resultDecls = new ArrayList<ResolvedDeclaration>();
 		resultFuncs=new ArrayList<FunctionDefinition>();
-	}
-
-	@Override
-	public void visit(Statement statement) {
-		StatementModifierFactory stmodfac = new StatementModifierFactory() {
+		emf = new ExpressionModifierFactory() {
 			@Override
-			public StatementModifier create() {
-				return new ExpressionStatementModifier(new ExpressionModifierFactory() {
-					@Override
-					public ExpressionModifier create() {
-						return new ExpressionDeclarationResolver();
-					}
-				});
+			public ExpressionModifier create() {
+				return new ExpressionDeclarationResolver();
 			}
 		};
-		StatementTransformer sttrans = new StatementTransformer(stmodfac);
-		statement.accept(sttrans);
-		StatementModifier stmod =stmodfac.create(); 
-		statement.accept(stmod);
-		statement = stmod.getResult();
-		
+		smf = new StatementModifierFactory() {
+			
+			@Override
+			public StatementModifier create() {
+				return new ExpressionStatementModifier(emf);
+			}
+		};
+	}
+	
+	@Override
+	public void visit(Statement statement) {
+		statement = TransformerUtil.transformStatement(statement, smf);
 		result.add(statement);
 	}
 
@@ -75,6 +74,8 @@ public class DeclarationResolver implements BlockModifier {
 		}
 		for(InitDeclarator d : declaration.declarators) {
 			DeclaratorResolver dr = new DeclaratorResolver();
+			if(d.initializer!=null) 
+				d.initializer=TransformerUtil.transformInitializer(d.initializer, emf);
 			d.declarator.accept(dr);
 			if(dr.isFunction()) {
 				FunctionDefinition fun = new FunctionDefinition();

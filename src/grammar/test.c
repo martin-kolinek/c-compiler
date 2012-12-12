@@ -1,9 +1,12 @@
-int function(int* ptr);
+typedef int uuu_int;
+
+int function(uuu_int* ptr);
 
 typedef struct str1tests
 {
     int a;
     int b[10];
+    uuu_int c;
 } str1test;
 
 enum testen 
@@ -16,7 +19,9 @@ enum testen
 int main(int args, char** argv)
 {
     int x,y;
+    uuu_int* z;
     x=-(-10);
+    int zz = (uuu_int)x;
     y=+1;
     str1test s;
     s.a=x;
@@ -82,8 +87,8 @@ int main(int args, char** argv)
     }
     //result should be 5
     result = 1;
-    int c = 1;
-    while(true)
+    c = 1;
+    while(1)
     {
         if(result++==1)
             continue;
@@ -93,7 +98,7 @@ int main(int args, char** argv)
     }
     //result should be 2
     //c should be 2
-    int d = ((result/c)*36+11-3)%5;
+    d = ((result/c)*36+11-3)%5;
     //d should be 4
     double e = (1.0/2.0)*3+2-4;
     int ok = e<-0.25;

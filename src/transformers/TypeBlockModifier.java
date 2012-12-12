@@ -3,7 +3,6 @@ package transformers;
 import declaration.ResolvedDeclaration;
 import toplevel.FunctionDefinition;
 import toplevel.FunctionParameter;
-import types.Type;
 
 public class TypeBlockModifier extends EmptyBlockModifier {
 	
@@ -12,26 +11,19 @@ public class TypeBlockModifier extends EmptyBlockModifier {
 		this.tmf=tmf;
 	}
 	
-	private Type transform(Type t){
-		TypeTransformer tt = new TypeTransformer(tmf);
-		t.accept(tt);
-		TypeModifier mod = tmf.create();
-		t.accept(mod);
-		return mod.getResult();
-	}
-	
 	@Override
 	public void visit(FunctionDefinition i) {
-		i.returnType=transform(i.returnType);
+		i.returnType=TransformerUtil.transformType(i.returnType, tmf);
 		for(FunctionParameter fp : i.parameters) {
-			fp.type=transform(fp.type);
+			fp.type=TransformerUtil.transformType(fp.type, tmf);;
 		}
 		super.visit(i);
 	}
 	
 	@Override
 	public void visit(ResolvedDeclaration i) {
-		i.type=transform(i.type);
+		i.type=TransformerUtil.transformType(i.type, tmf);
 		super.visit(i);
 	}
+
 }

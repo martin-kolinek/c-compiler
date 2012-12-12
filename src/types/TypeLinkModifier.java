@@ -1,12 +1,8 @@
 package types;
 
-import declaration.ResolvedDeclaration;
 import exceptions.SemanticException;
 import symbols.SymbolTable;
 import transformers.EmptyTypeModifier;
-import transformers.TypeBlockModifier;
-import transformers.TypeModifier;
-import transformers.TypeModifierFactory;
 
 public class TypeLinkModifier extends EmptyTypeModifier {
 	
@@ -34,17 +30,7 @@ public class TypeLinkModifier extends EmptyTypeModifier {
 			structs.store(t.tag, t);
 			st = t;
 		}
-
-		for(ResolvedDeclaration member:t.members) {
-			TypeBlockModifier mod = new TypeBlockModifier(new TypeModifierFactory() {
-				@Override
-				public TypeModifier create() {
-					return new TypeLinkModifier(structs, enums, t);
-				}
-			});
-			member.accept(mod);
-		}
-		if(t!=st) {
+		else {
 			if(st.members==null) {
 				st.members=t.members;
 			}
@@ -60,6 +46,5 @@ public class TypeLinkModifier extends EmptyTypeModifier {
 			}
 		}
 		result = st;
-		super.visit(t);
 	}
 }
