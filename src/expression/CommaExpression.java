@@ -2,7 +2,7 @@ package expression;
 
 import java.util.ArrayList;
 
-import codegen.Label;
+import codegen.LabelGenerator;
 
 public class CommaExpression implements Expression {
 
@@ -12,7 +12,7 @@ public class CommaExpression implements Expression {
 	}
 	
 	public ArrayList<Expression> expressions;
-	private Label l;
+	private LabelGenerator l;
 	private String zaciatok;
 	private String koniec;
 	
@@ -24,7 +24,7 @@ public class CommaExpression implements Expression {
 	@Override
 	public void ber_l(String s) {
 		// TODO Auto-generated method stub
-		this.l=new Label(s);
+		this.l=new LabelGenerator(s);
 		
 	}
 

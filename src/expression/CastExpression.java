@@ -1,6 +1,6 @@
 package expression;
 
-import codegen.Label;
+import codegen.LabelGenerator;
 import types.Type;
 import declaration.Declaration;
 
@@ -26,12 +26,12 @@ public class CastExpression implements Expression{
 	
 	public String zaciatok;//1 - zaciatok bloku, 
 	public String koniec;//2 - koniec bloku
-	public Label l;
+	public LabelGenerator l;
 
 	@Override
 	public void ber_l(String s) {
 		// TODO Auto-generated method stub
-		this.l=new Label(s);
+		this.l=new LabelGenerator(s);
 		
 	}
 

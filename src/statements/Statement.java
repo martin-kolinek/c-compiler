@@ -1,13 +1,13 @@
 package statements;
 
-import codegen.Label;
+import codegen.LabelGenerator;
 import toplevel.InBlock;
 import toplevel.InBlockVisitor;
 
 public abstract class Statement implements InBlock {
 	public String zaciatok;//1 - zaciatok bloku, 
 	public String koniec;//2 - koniec bloku
-	public Label l;
+	public LabelGenerator l;
 	
 	public abstract void accept(StatementVisitor v);
 	
@@ -18,7 +18,7 @@ public abstract class Statement implements InBlock {
 	@Override
 	public void ber_l(String s) {
 		// TODO Auto-generated method stub
-		this.l=new Label(s);
+		this.l=new LabelGenerator(s);
 		
 	}
 

@@ -2,7 +2,7 @@ package declaration;
 
 import java.util.ArrayList;
 
-import codegen.Label;
+import codegen.LabelGenerator;
 
 import toplevel.InBlock;
 import toplevel.InBlockVisitor;
@@ -23,7 +23,7 @@ public class Declaration implements InBlock {
 	}
 	public ArrayList<DeclarationSpecifier> declSpecs;
 	public ArrayList<InitDeclarator> declarators;
-	private Label l;
+	private LabelGenerator l;
 	private String zaciatok;
 	private String koniec;
 	
@@ -39,7 +39,7 @@ public class Declaration implements InBlock {
 	@Override
 	public void ber_l(String s) {
 		// TODO Auto-generated method stub
-		this.l=new Label(s);
+		this.l=new LabelGenerator(s);
 		
 	}
 

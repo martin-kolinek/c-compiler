@@ -1,6 +1,6 @@
 package expression;
 
-import codegen.Label;
+import codegen.LabelGenerator;
 
 public class IDExpression implements Expression {
 
@@ -9,7 +9,7 @@ public class IDExpression implements Expression {
 	}
 	
 	public String id;
-	private Label l;
+	private LabelGenerator l;
 	private String zaciatok;
 	private String koniec;
 	
@@ -21,7 +21,7 @@ public class IDExpression implements Expression {
 	@Override
 	public void ber_l(String s) {
 		// TODO Auto-generated method stub
-		this.l=new Label(s);
+		this.l=new LabelGenerator(s);
 		
 	}
 

@@ -1,6 +1,6 @@
 package declaration;
 
-import codegen.Label;
+import codegen.LabelGenerator;
 import declaration.initializer.Initializer;
 import toplevel.InBlock;
 import toplevel.InBlockVisitor;
@@ -10,7 +10,7 @@ public class ResolvedDeclaration implements InBlock {
 	public Type type;
 	public String identifier;
 	public Initializer initializer;
-	private Label l;
+	private LabelGenerator l;
 	private String zaciatok;
 	private String koniec;
 	@Override
@@ -21,7 +21,7 @@ public class ResolvedDeclaration implements InBlock {
 	@Override
 	public void ber_l(String s) {
 		// TODO Auto-generated method stub
-		this.l=new Label(s);
+		this.l=new LabelGenerator(s);
 		
 	}
 

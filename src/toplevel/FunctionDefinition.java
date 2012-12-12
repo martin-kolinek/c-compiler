@@ -2,7 +2,7 @@ package toplevel;
 
 import java.util.ArrayList;
 
-import codegen.Label;
+import codegen.LabelGenerator;
 
 import declaration.Declaration;
 import statements.Statement;
@@ -20,7 +20,7 @@ public class FunctionDefinition implements InBlock {
 	
 	public String name;
 
-	private Label l;
+	private LabelGenerator l;
 
 	private String zaciatok;
 
@@ -34,7 +34,7 @@ public class FunctionDefinition implements InBlock {
 	@Override
 	public void ber_l(String s) {
 		// TODO Auto-generated method stub
-		this.l=new Label(s);
+		this.l=new LabelGenerator(s);
 		
 	}
 

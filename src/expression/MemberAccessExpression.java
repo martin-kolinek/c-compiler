@@ -1,12 +1,12 @@
 package expression;
 
-import codegen.Label;
+import codegen.LabelGenerator;
 
 public class MemberAccessExpression implements Expression {
 	
 	public Expression exp;
 	public String id;
-	private Label l;
+	private LabelGenerator l;
 	private String zaciatok;
 	private String koniec;
 
@@ -23,7 +23,7 @@ public class MemberAccessExpression implements Expression {
 	@Override
 	public void ber_l(String s) {
 		// TODO Auto-generated method stub
-		this.l=new Label(s);
+		this.l=new LabelGenerator(s);
 		
 	}
 

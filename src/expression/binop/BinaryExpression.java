@@ -1,6 +1,6 @@
 package expression.binop;
 
-import codegen.Label;
+import codegen.LabelGenerator;
 import expression.Expression;
 import expression.ExpressionVisitor;
 
@@ -14,7 +14,7 @@ public class BinaryExpression implements Expression {
 	
 	public String zaciatok;//1 - zaciatok bloku, 
 	public String koniec;//2 - koniec bloku
-	public Label l;
+	public LabelGenerator l;
 	
 	public BinaryOperator operator;
 	public Expression left;
@@ -28,7 +28,7 @@ public class BinaryExpression implements Expression {
 	@Override
 	public void ber_l(String s) {
 		// TODO Auto-generated method stub
-		this.l=new Label(s);
+		this.l=new LabelGenerator(s);
 		
 	}
 

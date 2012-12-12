@@ -1,6 +1,6 @@
 package expression.constant;
 
-import codegen.Label;
+import codegen.LabelGenerator;
 import expression.Expression;
 import expression.ExpressionVisitor;
 
@@ -14,7 +14,7 @@ public class IntConstantExpression implements Expression{
 	}
 	
 	public int value;
-	private Label l;
+	private LabelGenerator l;
 	private String zaciatok;
 	private String koniec;
 
@@ -26,7 +26,7 @@ public class IntConstantExpression implements Expression{
 	@Override
 	public void ber_l(String s) {
 		// TODO Auto-generated method stub
-		this.l=new Label(s);
+		this.l=new LabelGenerator(s);
 		
 	}
 
