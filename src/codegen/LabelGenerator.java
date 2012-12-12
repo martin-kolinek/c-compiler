@@ -3,7 +3,6 @@ package codegen;
 public class LabelGenerator {
 	private String prefix;
 	private int i; //pocitadlo kvoli unikatnosti
-	//char od='a';	//oddelovac cisel
 	
 	public LabelGenerator(String s){
 		this.prefix=s;
