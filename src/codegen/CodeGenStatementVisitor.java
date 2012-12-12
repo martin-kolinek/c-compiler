@@ -24,10 +24,12 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	private String BreakSkok;
 	private String ContinueSkok;
 	LabelGenerator l;
+	RegisterGenerator r;
 	
-	public CodeGenStatementVisitor(OutputStreamWriter wr,LabelGenerator l){
+	public CodeGenStatementVisitor(OutputStreamWriter wr,LabelGenerator l,RegisterGenerator r){
 		this.l=l;
 		this.wr=wr;
+		this.r=r;
 	}
 	
 	private void pis(OutputStreamWriter o,String s){
@@ -45,22 +47,20 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		// TODO Auto-generated method stub
 		String result;
 		String typ;
-		ExpressionCodeGenerator g=new ExpressionCodeGenerator();
+		ExpressionCodeGenerator g=new ExpressionCodeGenerator(r);
 		s.exp.accept(g);
 		result=g.GetResultRegister();
 		typ=g.GetResultTyp();
 		String v ="ret "+typ+" "+result+'\n';
 		pis(wr,v);
-		
-
-		
+				
 	}
 
 	@Override
 	public void visit(BreakStatement s) {
 		// TODO Auto-generated method stub
 		if(BreakSkok == null) throw new SemanticException("Break mimo cyklu.");
-		String v ="br label "+BreakSkok;
+		String v ="br "+BreakSkok;
 		pis(wr,v);
 
 	}
@@ -69,7 +69,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	public void visit(ContinueStatement s) {
 		// TODO Auto-generated method stub
 		if(ContinueSkok == null) throw new SemanticException("Continue mimo cyklu.");
-		String v ="br label "+ContinueSkok;
+		String v ="br "+ContinueSkok;
 		pis(wr,v);
 
 	}
@@ -77,7 +77,33 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	@Override
 	public void visit(DowhileStatement s) {
 		// TODO Auto-generated method stub
-		String v ="";
+		
+		//inicializacia
+		String result;
+		String typ;
+		ContinueSkok=l.next();
+		BreakSkok=l.next();
+		
+		//label na zaciatok cyklu
+		String v =ContinueSkok+":\n";
+		pis(wr,v);
+		
+		//telo cyklu
+		s.body.accept(this);
+		
+		//podmienka cyklu
+		ExpressionCodeGenerator g=new ExpressionCodeGenerator(r);
+		s.condition.accept(g);
+		result=g.GetResultRegister();
+		typ=g.GetResultTyp();
+		
+		//rozhodovanie cyklu
+		v=r.next() + "= icmp ne " + typ + " " /*TODO + pretypovana(0) */+ " " + result + "\n"; 
+		pis(wr,v);
+		v="br i1" + r.akt() + ", " + ContinueSkok + ", "+ BreakSkok + "\n";
+		pis(wr,v);
+		
+		v=" " + BreakSkok + ": \n";
 		pis(wr,v);
 
 	}
@@ -93,7 +119,39 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	@Override
 	public void visit(WhileStatement s) {
 		// TODO Auto-generated method stub
-		String v ="";
+		
+		//inicializacia
+		String result;
+		String typ;		
+		ContinueSkok=l.next();
+		BreakSkok=l.next();
+		String DalejSkok = l.next();
+		
+		//label zaciatku cyklu
+		String v =ContinueSkok+":\n";
+		pis(wr,v);
+		
+		//podmienka cyklu
+		ExpressionCodeGenerator g=new ExpressionCodeGenerator(r);
+		s.condition.accept(g);
+		result=g.GetResultRegister();
+		typ=g.GetResultTyp();
+		v=r.next() + "= icmp ne " + typ + " " /*TODO + pretypovana(0) */+ " " + result + "\n"; 
+		pis(wr,v);
+		v="br i1" + r.akt() + ", " + DalejSkok + ", "+ BreakSkok + "\n";
+		pis(wr,v);
+		
+		//pokracovanie v cykle
+		v=DalejSkok + ": \n";
+		pis(wr,v);
+		
+		//vykona sa telo cyklu a skace sa za podmienku
+		s.body.accept(this);
+		v="br " + ContinueSkok + "\n";
+		pis(wr,v);
+		
+		//label za cyklom
+		v=BreakSkok + ": \n";
 		pis(wr,v);
 
 	}
