@@ -22,6 +22,11 @@ public class ExpressionCodeGenerator implements ExpressionVisitor {
 	
 	private String Register;
 	private String Typ;
+	private RegisterGenerator r;
+	
+	public ExpressionCodeGenerator(RegisterGenerator r){
+		this.r=r;
+	}
 	
 	public String GetResultRegister(){//TODO
 		return Register;

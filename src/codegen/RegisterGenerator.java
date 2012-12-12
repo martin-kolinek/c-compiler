@@ -9,7 +9,11 @@ public class RegisterGenerator {
 	
 	public String next(){
 		i++;
-		return Integer.toString(i);
+		return "%" +Integer.toString(i);
+	}
+	
+	public String akt(){
+		return "%" +Integer.toString(i);
 	}
 
 }

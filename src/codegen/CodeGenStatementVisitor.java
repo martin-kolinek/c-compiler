@@ -24,10 +24,12 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	private String BreakSkok;
 	private String ContinueSkok;
 	LabelGenerator l;
+	RegisterGenerator r;
 	
-	public CodeGenStatementVisitor(OutputStreamWriter wr,LabelGenerator l){
+	public CodeGenStatementVisitor(OutputStreamWriter wr,LabelGenerator l,RegisterGenerator r){
 		this.l=l;
 		this.wr=wr;
+		this.r=r;
 	}
 	
 	private void pis(OutputStreamWriter o,String s){
@@ -45,7 +47,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		// TODO Auto-generated method stub
 		String result;
 		String typ;
-		ExpressionCodeGenerator g=new ExpressionCodeGenerator();
+		ExpressionCodeGenerator g=new ExpressionCodeGenerator(r);
 		s.exp.accept(g);
 		result=g.GetResultRegister();
 		typ=g.GetResultTyp();
@@ -82,12 +84,13 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		String v =ContinueSkok+":\n";
 		pis(wr,v);
 		s.body.accept(this);
-		ExpressionCodeGenerator g=new ExpressionCodeGenerator();
+		ExpressionCodeGenerator g=new ExpressionCodeGenerator(r);
 		s.condition.accept(g);
 		result=g.GetResultRegister();
 		typ=g.GetResultTyp();
-		String cond=null; //TODO z type a result urobit este porovnavanie s nulou tusim
-		v="br i1" + cond + ", label " + ContinueSkok + " label, "+ BreakSkok + "\n";
+		v=r.next() + "= icmp ne " + typ + " " /*TODO + pretypovana(0) */+ " " + result + "\n"; 
+		pis(wr,v);
+		v="br i1" + r.akt() + ", label " + ContinueSkok + " label, "+ BreakSkok + "\n";
 		pis(wr,v);
 		v=BreakSkok + ": \n";
 		pis(wr,v);
