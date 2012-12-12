@@ -3,3 +3,4 @@
 /src/grammar/generated
 /src/grammar/output
 *.tokens
+*~

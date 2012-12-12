@@ -296,8 +296,8 @@ while_stat returns [WhileStatement ret]
 
 for_stat returns [ForStatement ret]
   : FOR {$ret=new ForStatement();} 
-  '(' ((declaration) => decl=declaration {$ret.decl=$decl.ret;} | ) 
-  (init=expression {$ret.init=init.ret;})? ';' 
+  '(' ((declaration) => decl=declaration {$ret.decl=$decl.ret;} |  
+  (init=expression {$ret.init=init.ret;})? ';' )
   (cond=expression {$ret.cond=cond.ret;})? ';' 
   (after=expression {$ret.after=after.ret;})? ')' 
   body=statement {$ret.body=body.ret;};

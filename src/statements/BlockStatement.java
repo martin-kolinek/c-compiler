@@ -7,6 +7,10 @@ import toplevel.InBlock;
 
 public class BlockStatement extends Statement {
 	
+	public BlockStatement(){
+		inBlock=new ArrayList<InBlock>();
+	}
+	
 	public ArrayList<InBlock> inBlock;
 
 	@Override
