@@ -16,8 +16,8 @@ enum testen
 int main(int args, char** argv)
 {
     int x,y;
-    x=10;
-    y=1;
+    x=-(-10);
+    y=+1;
     str1test s;
     s.a=x;
     for(int i = 0; i<10; i++)

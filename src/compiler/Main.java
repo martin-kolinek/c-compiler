@@ -6,13 +6,19 @@ import org.antlr.runtime.CommonTokenStream;
 import declaration.DeclarationResolver;
 
 import toplevel.Program;
+import transformers.AssignmentModifier;
 import transformers.BlockModifier;
 import transformers.BlockModifierFactory;
 import transformers.BlockTransformer;
+import transformers.CommaExpressionModifier;
+import transformers.ExpressionModifier;
+import transformers.ExpressionModifierFactory;
 import transformers.LoopModifier;
+import transformers.PointerModifier;
 import transformers.StatementModifier;
 import transformers.StatementModifierFactory;
 import transformers.TransformerUtil;
+import transformers.UnaryChargeModifier;
 
 import grammar.generated.cgrammarLexer;
 import grammar.generated.cgrammarParser;
@@ -52,6 +58,45 @@ public class Main {
 		});
 		prog.declarations.accept(decls);
 		
+		//remove single expression comma expressions
+		BlockTransformer comma = TransformerUtil.blockTranForExpressionModifier(new ExpressionModifierFactory() {
+			
+			@Override
+			public ExpressionModifier create() {
+				return new CommaExpressionModifier();
+			}
+		});
+		prog.declarations.accept(comma);
+		
+		//remove [] and -> expressions
+		BlockTransformer deref = TransformerUtil.blockTranForExpressionModifier(new ExpressionModifierFactory() {
+			
+			@Override
+			public ExpressionModifier create() {
+				return new PointerModifier();
+			}
+		});
+		prog.declarations.accept(deref);
+		
+		//remove compound assignments
+		BlockTransformer compound = TransformerUtil.blockTranForExpressionModifier(new ExpressionModifierFactory() {
+			
+			@Override
+			public ExpressionModifier create() {
+				return new AssignmentModifier();
+			}
+		});
+		prog.declarations.accept(compound);
+		
+		//remove unary +,- operators
+		BlockTransformer charge = TransformerUtil.blockTranForExpressionModifier(new ExpressionModifierFactory() {
+			
+			@Override
+			public ExpressionModifier create() {
+				return new UnaryChargeModifier();
+			}
+		});
+		prog.declarations.accept(charge);
 		
 		System.out.println(prog.declarations.inBlock.size());
 	}

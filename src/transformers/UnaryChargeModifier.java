@@ -12,9 +12,11 @@ public class UnaryChargeModifier extends EmptyExpressionModifier {
 		if (ue.op == UnaryOperator.PLUS){
 			result = ue.exp;
 		}
-		if (ue.op == UnaryOperator.MINUS){
+		else if (ue.op == UnaryOperator.MINUS){
 			result = new BinaryExpression(new IntConstantExpression(0), BinaryOperator.MINUS, ue.exp);
 		}
+		else
+			super.visit(ue);
 	}
 
 }

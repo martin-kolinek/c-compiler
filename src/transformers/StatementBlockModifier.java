@@ -26,7 +26,8 @@ public class StatementBlockModifier extends EmptyBlockModifier {
 	
 	@Override
 	public void visit(FunctionDefinition i) {
-		i.body=transform(i.body);
+		if(i.body!=null)
+			i.body=transform(i.body);
 		super.visit(i);
 	}
 }
