@@ -19,6 +19,7 @@ import transformers.StatementModifier;
 import transformers.StatementModifierFactory;
 import transformers.TransformerUtil;
 import transformers.UnaryChargeModifier;
+import types.TypedefRemoverFactory;
 
 import grammar.generated.cgrammarLexer;
 import grammar.generated.cgrammarParser;
@@ -97,6 +98,10 @@ public class Main {
 			}
 		});
 		prog.declarations.accept(charge);
+
+		//remove typedefs
+		BlockTransformer typedef = new BlockTransformer(new TypedefRemoverFactory());
+		prog.declarations.accept(typedef);
 		
 		System.out.println(prog.declarations.inBlock.size());
 	}
