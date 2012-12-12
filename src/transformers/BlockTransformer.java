@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import statements.*;
 import toplevel.EmptyInBlockVisitor;
+import toplevel.FunctionDefinition;
 import toplevel.InBlock;
 
 public class BlockTransformer implements StatementVisitor {
@@ -78,6 +79,12 @@ public class BlockTransformer implements StatementVisitor {
 				@Override
 				public void visit(Statement i) {
 					descend(i);
+				}
+				
+				@Override
+				public void visit(FunctionDefinition i) {
+					if(i.body!=null)
+						descend(i.body);
 				}
 			});
 			ib.accept(m);

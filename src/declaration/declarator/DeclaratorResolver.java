@@ -19,6 +19,7 @@ public class DeclaratorResolver implements DeclaratorVisitor {
 	public DeclaratorResolver(){
 		func=false;
 		funcParams=new ArrayList<FunctionParameter>();
+		wrappers = new ArrayList<TypeWrapper>();
 	}
 	
 	private interface TypeWrapper {

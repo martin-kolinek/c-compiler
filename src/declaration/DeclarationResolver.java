@@ -12,8 +12,6 @@ import statements.Statement;
 import toplevel.FunctionDefinition;
 import toplevel.InBlock;
 import transformers.BlockModifier;
-import transformers.BlockModifierFactory;
-import transformers.BlockTransformer;
 import transformers.ExpressionModifier;
 import transformers.ExpressionModifierFactory;
 import transformers.ExpressionStatementModifier;
@@ -54,17 +52,9 @@ public class DeclarationResolver implements BlockModifier {
 		};
 		StatementTransformer sttrans = new StatementTransformer(stmodfac);
 		statement.accept(sttrans);
-		
-		BlockTransformer trans = new BlockTransformer(new BlockModifierFactory() {
-			@Override
-			public BlockModifier createModifier() {
-				return new DeclarationResolver();
-			}
-			@Override
-			public void popModifierStack() {
-			}
-		});
-		statement.accept(trans);
+		StatementModifier stmod =stmodfac.create(); 
+		statement.accept(stmod);
+		statement = stmod.getResult();
 		
 		result.add(statement);
 	}
@@ -75,7 +65,14 @@ public class DeclarationResolver implements BlockModifier {
 		for(DeclarationSpecifier sp : declaration.declSpecs) {
 			sp.accept(ex);
 		}
-		
+		if(declaration.declarators.size()==0) {
+			if(!ex.isTypedef()){
+				ResolvedDeclaration rd = new ResolvedDeclaration();
+				rd.type=ex.getType();
+				result.add(rd);
+				resultDecls.add(rd);
+			}
+		}
 		for(InitDeclarator d : declaration.declarators) {
 			DeclaratorResolver dr = new DeclaratorResolver();
 			d.declarator.accept(dr);

@@ -1,10 +1,10 @@
 package toplevel;
 
-import java.util.ArrayList;
+import statements.BlockStatement;
 
 public class Program {
-	public ArrayList<InBlock> declarations;
+	public BlockStatement declarations;
 	public Program(){
-		declarations=new ArrayList<InBlock>();
+		declarations=new BlockStatement();
 	}
 }

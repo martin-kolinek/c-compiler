@@ -140,13 +140,15 @@ public class SpecifierTypeExtractor implements DeclarationSpecifierVisitor {
 	@Override
 	public void visit(StructSpecifier structSpecifier) {
 		ArrayList<ResolvedDeclaration> decls = new ArrayList<ResolvedDeclaration>();
-		for(Declaration d : structSpecifier.memberDecls) {
-			DeclarationResolver res = new DeclarationResolver();
-			d.accept(res);
-			if(res.resultDecls.size()==0) {
-				throw new SemanticException("Member declaration not valid");
+		if(structSpecifier.memberDecls!=null){
+			for(Declaration d : structSpecifier.memberDecls) {
+				DeclarationResolver res = new DeclarationResolver();
+				d.accept(res);
+				if(res.resultDecls.size()==0) {
+					throw new SemanticException("Member declaration not valid");
+				}
+				decls.add(res.resultDecls.get(0));
 			}
-			decls.add(res.resultDecls.get(0));
 		}
 		struct = new StructType(structSpecifier.tag, decls);
 	}

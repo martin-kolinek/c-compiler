@@ -30,7 +30,7 @@ program returns [Program ret]
 @init {
 $ret = new Program();
 }
-  : (ed=external_declaration {$ret.declarations.add($ed.ret);})* EOF;
+  : (ed=external_declaration {$ret.declarations.inBlock.add($ed.ret);})* EOF;
 
 primary_expression returns [Expression ret]
 @init{
@@ -169,7 +169,7 @@ exclusive_or_expression returns [Expression ret]:
   ;
 
 inclusive_or_expression returns [Expression ret]:
- e=exclusive_or_expression 
+ e=exclusive_or_expression {$ret = $e.ret;}
  ('|' 
  e2=exclusive_or_expression{
   $ret=new BinaryExpression($ret,BinaryOperator.BOR,$e2.ret);
@@ -177,7 +177,7 @@ inclusive_or_expression returns [Expression ret]:
   ;
 
 logical_and_expression  returns [Expression ret]:
- e=inclusive_or_expression 
+ e=inclusive_or_expression {$ret = $e.ret;}
  ('&&' 
  e2=inclusive_or_expression{
   $ret=new BinaryExpression($ret,BinaryOperator.AND,$e2.ret);
@@ -185,18 +185,17 @@ logical_and_expression  returns [Expression ret]:
   ;
 
 logical_or_expression returns [Expression ret]:
- e=logical_and_expression
+ e=logical_and_expression {$ret = $e.ret;}
  ('||' 
  e2=logical_and_expression{
   $ret=new BinaryExpression($ret,BinaryOperator.OR,$e2.ret);
  })*
   ;
 
-//TODO
 conditional_expression returns [Expression ret] :
- cond=logical_or_expression  
- ('?' ontrue=expression ':'  onfalse=conditional_expression)?
- {$ret=new TernaryExpression($cond.ret, $ontrue.ret, $onfalse.ret);}
+ cond=logical_or_expression {$ret = $cond.ret;}
+ ('?' ontrue=expression ':'  onfalse=conditional_expression
+ {$ret=new TernaryExpression($ret, $ontrue.ret, $onfalse.ret);} )?
   ;
 
 //tu treba semantickymi pravidlami skontrolovat, ze ak je tam assignment operator, 
