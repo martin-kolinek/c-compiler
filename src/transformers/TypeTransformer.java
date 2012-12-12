@@ -26,9 +26,11 @@ public class TypeTransformer implements TypeVisitor {
 	
 	@Override
 	public void visit(StructType t) {
-		for(int i=0; i<t.members.size(); i++){
-			ResolvedDeclaration d = t.members.get(i);
-			d.type=descend(d.type);
+		if(t.members != null) {
+			for(int i=0; i<t.members.size(); i++){
+				ResolvedDeclaration d = t.members.get(i);
+				d.type=descend(d.type);
+			}
 		}
 	}
 

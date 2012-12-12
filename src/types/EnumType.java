@@ -8,7 +8,7 @@ import declaration.specifiers.Enumerator;
 public class EnumType implements Type {
 
 	public final String tag;
-	public final List<Enumerator> enumerators;
+	public List<Enumerator> enumerators;
 	
 	public EnumType(String tag, List<Enumerator> enums) {
 		this.tag=tag;

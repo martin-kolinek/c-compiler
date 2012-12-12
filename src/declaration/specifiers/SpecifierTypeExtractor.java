@@ -139,8 +139,9 @@ public class SpecifierTypeExtractor implements DeclarationSpecifierVisitor {
 
 	@Override
 	public void visit(StructSpecifier structSpecifier) {
-		ArrayList<ResolvedDeclaration> decls = new ArrayList<ResolvedDeclaration>();
+		ArrayList<ResolvedDeclaration> decls = null;
 		if(structSpecifier.memberDecls!=null){
+			decls = new ArrayList<ResolvedDeclaration>();
 			for(Declaration d : structSpecifier.memberDecls) {
 				DeclarationResolver res = new DeclarationResolver();
 				d.accept(res);

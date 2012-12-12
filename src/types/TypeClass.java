@@ -31,5 +31,13 @@ public class TypeClass {
 		return t==PrimitiveType.CHAR || t==PrimitiveType.INT || t==PrimitiveType.LONG || t==PrimitiveType.SHORT || t==PrimitiveType.UCHAR || t==PrimitiveType.UINT || t==PrimitiveType.ULONG || t==PrimitiveType.USHORT;
 	}
 	
-	
+	public static boolean isComplete(Type t) {
+		if(isStruct(t) && ((StructType)t).members==null)
+			return false;
+		if(isArray(t) && ((ArrayType)t).size==null)
+			return false;
+		if(t instanceof EnumType && ((EnumType)t).enumerators==null)
+			return false;
+		return true;
+	}
 }

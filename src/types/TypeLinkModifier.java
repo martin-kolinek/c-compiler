@@ -8,19 +8,14 @@ public class TypeLinkModifier extends EmptyTypeModifier {
 	
 	private SymbolTable<StructType> structs;
 	private SymbolTable<EnumType> enums;
-	private Type parentType;
 	
-	public TypeLinkModifier(SymbolTable<StructType> structs, SymbolTable<EnumType> enums, Type par) {
+	public TypeLinkModifier(SymbolTable<StructType> structs, SymbolTable<EnumType> enums) {
 		this.structs=structs;
 		this.enums=enums;
-		parentType=par;
 	}
 	
 	@Override
 	public void visit(final StructType t) {
-		if(t==parentType) {
-			throw new SemanticException("Struct containg itself");
-		}
 		StructType st = structs.get(t.tag);
 		if(st==t){
 			result=st;
@@ -31,20 +26,30 @@ public class TypeLinkModifier extends EmptyTypeModifier {
 			st = t;
 		}
 		else {
-			if(st.members==null) {
-				st.members=t.members;
+			if(st.members!=null) {
+				throw new SemanticException("Redeclaration of struct");
 			}
-			else if(t.members.size() != st.members.size()) {
-				throw new SemanticException("Incompatible redefinition of struct");
-			}
-			else {
-				for(int i=0; i<t.members.size(); i++){
-					if(st.members.get(i).type!=t.members.get(i).type ||
-							!st.members.get(i).identifier.equals(t.members.get(i).identifier))
-						throw new SemanticException("Incompatible redefinition of struct");
-				}
-			}
+			st.members=t.members;
 		}
 		result = st;
+	}
+	
+	@Override
+	public void visit(EnumType t) {
+		EnumType et = enums.get(t.tag);
+		if(t==et){
+			result = t;
+			return;
+		}
+		if(et==null) {
+			enums.store(t.tag, t);
+			et=t;
+		}
+		else {
+			if(et.enumerators!=null)
+				throw new SemanticException("Redeclaration of enum");
+			et.enumerators=t.enumerators;
+		}
+		result = et;
 	}
 }

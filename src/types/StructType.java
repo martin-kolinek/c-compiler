@@ -9,7 +9,8 @@ public class StructType implements Type {
 
 	public StructType(String tag, List<ResolvedDeclaration> members) {
 		this.tag=tag;
-		this.members = new ArrayList<ResolvedDeclaration>(members);
+		if(members!=null)
+			this.members = new ArrayList<ResolvedDeclaration>(members);
 	}
 	
 	public ResolvedDeclaration getMember(String name) {
