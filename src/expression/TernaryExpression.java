@@ -1,13 +1,13 @@
 package expression;
 
-import codegen.Label;
+import codegen.LabelGenerator;
 
 public class TernaryExpression implements Expression {
 
 	public Expression condition;
 	public Expression ontrue;
 	public Expression onfalse;
-	private Label l;
+	private LabelGenerator l;
 	private String zaciatok;
 	private String koniec;
 	
@@ -25,7 +25,7 @@ public class TernaryExpression implements Expression {
 	@Override
 	public void ber_l(String s) {
 		// TODO Auto-generated method stub
-		this.l=new Label(s);
+		this.l=new LabelGenerator(s);
 		
 	}
 

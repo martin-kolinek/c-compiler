@@ -1,6 +1,6 @@
 package expression;
 
-import codegen.Label;
+import codegen.LabelGenerator;
 import declaration.Declaration;
 import types.Type;
 
@@ -10,7 +10,7 @@ public class SizeofType implements Expression{
 	
 	public Type type;
 
-	private Label l;
+	private LabelGenerator l;
 
 	private String zaciatok;
 
@@ -24,7 +24,7 @@ public class SizeofType implements Expression{
 	@Override
 	public void ber_l(String s) {
 		// TODO Auto-generated method stub
-		this.l=new Label(s);
+		this.l=new LabelGenerator(s);
 		
 	}
 

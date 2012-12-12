@@ -3,6 +3,8 @@ package codegen;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
+import exceptions.SemanticException;
+
 import statements.BlockStatement;
 import statements.BreakStatement;
 import statements.ContinueStatement;
@@ -19,6 +21,15 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 
 	private OutputStreamWriter wr;
 	
+	private String BreakSkok;
+	private String ContinueSkok;
+	LabelGenerator l;
+	
+	public CodeGenStatementVisitor(OutputStreamWriter wr,LabelGenerator l){
+		this.l=l;
+		this.wr=wr;
+	}
+	
 	private void pis(OutputStreamWriter o,String s){
 		try {
 			o.append(s);
@@ -32,8 +43,15 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	@Override
 	public void visit(ReturnStatement s) {
 		// TODO Auto-generated method stub
-		String v ="";
+		String result;
+		String typ;
+		ExpressionCodeGenerator g=new ExpressionCodeGenerator();
+		s.exp.accept(g);
+		result=g.GetResultRegister();
+		typ=g.GetResultTyp();
+		String v ="ret "+typ+" "+result+'\n';
 		pis(wr,v);
+		
 
 		
 	}
@@ -41,7 +59,8 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	@Override
 	public void visit(BreakStatement s) {
 		// TODO Auto-generated method stub
-		String v ="";
+		if(BreakSkok == null) throw new SemanticException("Break mimo cyklu.");
+		String v ="br label "+BreakSkok;
 		pis(wr,v);
 
 	}
@@ -49,7 +68,8 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	@Override
 	public void visit(ContinueStatement s) {
 		// TODO Auto-generated method stub
-		String v ="";
+		if(ContinueSkok == null) throw new SemanticException("Continue mimo cyklu.");
+		String v ="br label "+ContinueSkok;
 		pis(wr,v);
 
 	}

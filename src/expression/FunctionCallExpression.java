@@ -2,7 +2,7 @@ package expression;
 
 import java.util.ArrayList;
 
-import codegen.Label;
+import codegen.LabelGenerator;
 
 public class FunctionCallExpression implements Expression {
 
@@ -13,7 +13,7 @@ public class FunctionCallExpression implements Expression {
 	
 	public String name;
 	public ArrayList<Expression> args;
-	private Label l;
+	private LabelGenerator l;
 	private String zaciatok;
 	private String koniec;
 	
@@ -29,7 +29,7 @@ public class FunctionCallExpression implements Expression {
 	@Override
 	public void ber_l(String s) {
 		// TODO Auto-generated method stub
-		this.l=new Label(s);
+		this.l=new LabelGenerator(s);
 		
 	}
 

@@ -1,22 +1,18 @@
 package codegen;
 
-public class Label {
+public class LabelGenerator {
 	private String prefix;
 	private int i; //pocitadlo kvoli unikatnosti
-	char od='a';	//oddelovac cisel
+	//char od='a';	//oddelovac cisel
 	
-	public Label(String s){
-		this.prefix=s + od;
+	public LabelGenerator(String s){
+		this.prefix=s;
 		this.i=0;
 	}
 	
 	public String next(){
 		i++;
-		return prefix + od + i;
-	}
-	
-	public String akt(){
-		return prefix + od + i;
+		return prefix + i;
 	}
 
 }
