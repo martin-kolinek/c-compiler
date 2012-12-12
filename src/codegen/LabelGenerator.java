@@ -11,7 +11,7 @@ public class LabelGenerator {
 	
 	public String next(){
 		i++;
-		return prefix + i;
+		return " label "+prefix + i;
 	}
 
 }
