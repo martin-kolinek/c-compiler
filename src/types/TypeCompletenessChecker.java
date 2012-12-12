@@ -21,9 +21,9 @@ public class TypeCompletenessChecker extends TypeBlockModifier {
 	
 	@Override
 	public void visit(ResolvedDeclaration i) {
+		super.visit(i);
 		if(!TypeClass.isComplete(i.type))
 			throw new SemanticException("Declaration of variable with incomplete type");
-		super.visit(i);
 	}
 
 }

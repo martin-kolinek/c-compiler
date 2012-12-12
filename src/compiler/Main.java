@@ -19,6 +19,7 @@ import transformers.ExpressionModifierFactory;
 import transformers.StatementModifier;
 import transformers.StatementModifierFactory;
 import transformers.TransformerUtil;
+import types.TypeCompletenessFactory;
 import types.TypedefRemoverFactory;
 
 import grammar.generated.cgrammarLexer;
@@ -95,6 +96,9 @@ public class Main {
 
 		//remove typedefs
 		TransformerUtil.transformProgram(prog, new TypedefRemoverFactory());
+		
+		//link types
+		TransformerUtil.transformProgram(prog, new TypeCompletenessFactory());
 		
 		System.out.println(prog.declarations.inBlock.size());
 	}
