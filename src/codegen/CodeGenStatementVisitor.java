@@ -47,7 +47,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		// TODO Auto-generated method stub
 		String result;
 		String typ;
-		ExpressionCodeGenerator g=new ExpressionCodeGenerator(r);
+		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(r);
 		s.exp.accept(g);
 		result=g.GetResultRegister();
 		typ=g.GetResultTyp();
@@ -92,7 +92,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		s.body.accept(this);
 		
 		//podmienka cyklu
-		ExpressionCodeGenerator g=new ExpressionCodeGenerator(r);
+		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(r);
 		s.condition.accept(g);
 		result=g.GetResultRegister();
 		typ=g.GetResultTyp();
@@ -132,7 +132,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		pis(wr,v);
 		
 		//podmienka cyklu
-		ExpressionCodeGenerator g=new ExpressionCodeGenerator(r);
+		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(r);
 		s.condition.accept(g);
 		result=g.GetResultRegister();
 		typ=g.GetResultTyp();

@@ -19,13 +19,13 @@ import expression.constant.IntConstantExpression;
 import expression.constant.StringConstantExpression;
 import expression.unop.UnaryExpression;
 
-public class ExpressionCodeGenerator implements ExpressionVisitor {
+public class CodeGenExpressionVisitor implements ExpressionVisitor {
 	
 	private String Register;
 	private String Typ;
 	private RegisterGenerator r;
 	
-	public ExpressionCodeGenerator(RegisterGenerator r){
+	public CodeGenExpressionVisitor(RegisterGenerator r){
 		this.r=r;
 	}
 	
