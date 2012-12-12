@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 import exceptions.SemanticException;
-import expression.ExpressionVisitor;
 
 import statements.BlockStatement;
 import statements.BreakStatement;
@@ -112,34 +111,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	@Override
 	public void visit(ForStatement s) {
 		// TODO Auto-generated method stub
-		
-		
-		String result;
-		String typ;
-		
-		//label kvoli phi funkcii
-		String Zaciatok=l.next();
-		String v = Zaciatok;
-		pis(wr,v);
-		
-		//inicializacna expression
-		CodeGenExpressionVisitor g = new CodeGenExpressionVisitor(r);
-		s.init.accept(g);
-		
-		//inicializovanie
-		result=g.GetResultRegister();//toto bude vec pre phi funkciu
-		typ=g.GetResultTyp();
-		ContinueSkok=l.next();
-		BreakSkok=l.next();
-		
-		//label pred podmienkou
-		v = ContinueSkok;
-		pis(wr,v);
-		
-		//TODO
-		
-		//label na konci cyklu
-		v = BreakSkok;
+		String v ="";
 		pis(wr,v);
 
 	}
