@@ -62,7 +62,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	@Override
 	public void visit(BreakStatement s) {
 		if(BreakSkok == null) throw new SemanticException("Break mimo cyklu.");
-		String v ="br "+BreakSkok;
+		String v ="br "+" label %"+BreakSkok;
 		pis(wr,v);
 
 	}
@@ -70,7 +70,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	@Override
 	public void visit(ContinueStatement s) {
 		if(ContinueSkok == null) throw new SemanticException("Continue mimo cyklu.");
-		String v ="br "+ContinueSkok;
+		String v ="br "+" label %"+ContinueSkok;
 		pis(wr,v);
 
 	}
@@ -78,32 +78,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	@Override
 	public void visit(DowhileStatement s) {
 		
-		//inicializacia
-		String result;
-		String typ;
-		ContinueSkok=l.next();
-		BreakSkok=l.next();
-		
-		//label na zaciatok cyklu
-		String v =ContinueSkok+":\n";
-		pis(wr,v);
-		
-		//telo cyklu
-		s.body.accept(this);
-		
-		//podmienka cyklu
-		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(pack);
-		s.condition.accept(g);
-		result=g.GetResultRegister();
-		typ=g.GetResultTyp();
-		
-		//rozhodovanie cyklu
-		v=r.next() + "= icmp ne " + typ + " "  + Integer.toString(0) + " " + result + "\n"; 
-		pis(wr,v);
-		v="br i1" + r.akt() + ", " + ContinueSkok + ", "+ BreakSkok + "\n";
-		pis(wr,v);
-		
-		v=" " + BreakSkok + ": \n";
+		String v=null;
 		pis(wr,v);
 
 	}
@@ -137,7 +112,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		typ=g.GetResultTyp();
 		v=r.next() + "= icmp ne " + typ + " " + Integer.toString(0) + " " + result + "\n"; 
 		pis(wr,v);
-		v="br i1" + r.akt() + ", " + DalejSkok + ", "+ BreakSkok + "\n";
+		v="br i1" + r.akt() + ", " + " label %"+DalejSkok + ", "+" label %"+ BreakSkok + "\n";
 		pis(wr,v);
 		
 		//pokracovanie v cykle
@@ -179,7 +154,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		}
 		String v = z.dalsi + ":\n";
 		pis(wr,v);
-		v="br "+inak + "\n"; 
+		v="br "+" label %"+inak + "\n"; 
 		
 		v = inak +":\n";
 		pis(wr,v);
@@ -192,15 +167,15 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		}
 		
 		//podsunut visitoru label na koniec switch
-		v="br " + Koniec + "\n";
+		v="br " +" label %"+ Koniec + "\n";
 		pis(wr,v);
 		
-		v ="switch " + typ + " " + result+ ", " + inak + " [ \n";
+		v ="switch " + typ + " " + result+ ", " +" label %"+ inak + " [ \n";
 		pis(wr,v);
 		
 		// vypis predpocitanych options a labelov na statementy na ne
 		for (CaseLine d:z.moje){
-			v=typ + " " + d.expr + ", "+ d.label + "\n";
+			v=typ + " " + d.expr + ", "+ " label %"+d.label + "\n";
 			pis(wr,v);
 		}		
 		
@@ -228,7 +203,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		//vyhodnotenie podmienky
 		String v = r.next() + "= icmp ne " + typ + " " + Integer.toString(0) + " " + result + "\n"; 
 		pis(wr,v);
-		v="br i1" + r.akt() + ", " + PrvaVetva + ", "+ DruhaVetva + "\n";
+		v="br i1" + r.akt() + ", " +" label %"+ PrvaVetva + ", "+" label %"+ DruhaVetva + "\n";
 		pis(wr,v);
 		
 		//prva vetva if-u
@@ -237,7 +212,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		s.ontrue.accept(this);
 		
 		//skok na koniec
-		v="br " + Koniec + "\n";
+		v="br " +" label %"+ Koniec + "\n";
 		
 		//druha vetva if-u
 		v=DruhaVetva+ ":\n";

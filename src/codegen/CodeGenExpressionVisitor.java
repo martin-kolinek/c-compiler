@@ -51,6 +51,12 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 		
 		CodeGenExpressionVisitor v1 = new CodeGenExpressionVisitor(pack);
 		CodeGenExpressionVisitor v2 = new CodeGenExpressionVisitor(pack);
+		e.right.accept(v1);
+		e.left.accept(v2);
+		String result1 = v1.GetResultRegister();
+		String result2 = v2.GetResultRegister();
+		String typ1 = v1.GetResultTyp();
+		String typ2 = v2.GetResultTyp();
 
 	}
 

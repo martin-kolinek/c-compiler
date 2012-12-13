@@ -62,7 +62,7 @@ public class CodeGenCaseVisitor implements CaseVisitor {
 		}
 		
 		//skok na dalsi case switch-u
-		v="br " + dalsi + "\n";
+		v="br " +" label %"+ dalsi + "\n";
 		pis(wr,v);
 		
 		CaseLine t = new CaseLine(result,zaciatok);
