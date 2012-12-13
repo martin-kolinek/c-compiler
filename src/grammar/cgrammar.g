@@ -261,7 +261,7 @@ in_block returns [InBlock ret]:
    
 statement returns [Statement ret]:
   bl=block {$ret=$bl.ret;} |
-  {$ret=new OneexpressionStatement();} (exp=expression {((OneexpressionStatement)$ret).exp=$exp.ret;})? ';' |
+  {$ret=new OneexpressionStatement();} (exp=expression {((OneexpressionStatement)$ret).expr=$exp.ret;})? ';' |
   ifs=if_stat {$ret=$ifs.ret;} | switchs=switch_stat {$ret=$switchs.ret;} | whiles=while_stat {$ret=$whiles.ret;} |
   fors=for_stat {$ret=$fors.ret;} | dws=dowhile_stat {$ret=$dws.ret;} | jmps=jmp_stat {$ret=$jmps.ret;};
 
