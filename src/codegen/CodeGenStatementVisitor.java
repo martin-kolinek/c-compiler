@@ -231,8 +231,8 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	@Override
 	public void visit(OneexpressionStatement s) {
 		// TODO Auto-generated method stub
-		String v ="";
-		pis(wr,v);
+		CodeGenExpressionVisitor g = new CodeGenExpressionVisitor(r);
+		s.expr.accept(g);
 
 	}
 

@@ -9,10 +9,10 @@ public class OneexpressionStatement extends Statement{
 	}
 	
 	public OneexpressionStatement(Expression e){
-		exp=e;
+		expr=e;
 	}
 	
-	public Expression exp;
+	public Expression expr;
 
 	@Override
 	public void accept(StatementVisitor v) {
