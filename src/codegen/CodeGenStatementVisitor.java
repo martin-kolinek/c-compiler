@@ -7,12 +7,14 @@ import exceptions.SemanticException;
 
 import statements.BlockStatement;
 import statements.BreakStatement;
+import statements.Case;
 import statements.ContinueStatement;
 import statements.DowhileStatement;
 import statements.ForStatement;
 import statements.IfStatement;
 import statements.OneexpressionStatement;
 import statements.ReturnStatement;
+import statements.Statement;
 import statements.StatementVisitor;
 import statements.SwitchStatement;
 import statements.WhileStatement;
@@ -161,10 +163,23 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		s.expr.accept(g);
 		String result = g.GetResultRegister();
 		String typ = g.GetResultTyp(); 
+		
+		//toto ma predpocitat jednotlive hodnoty case-u a zozbierat pre ne nazvy docas premennych
+		CodeGenCaseVisitor z=new CodeGenCaseVisitor(r);
+		
+		for (Case c : s.cases){
+			c.accept(z);//TODO
+		}
+		//TODO podsunut visitoru label na koniec switch, pre istotu
+		for (Statement  d: s.def){
+			d.accept(null);//TODO
+		}
+		
 		String v ="switch " + typ + " " + result+ ", " + Koniec + " [ \n";
 		pis(wr,v);
 		
 		//TODO prechadzanie pola moznosti
+		//sem pojde vypis predpocitanych options a labelov na statementy na ne
 		
 		v = "]\n";
 		pis(wr,v);
@@ -176,7 +191,39 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	@Override
 	public void visit(IfStatement s) {
 		// TODO Auto-generated method stub
-		String v ="";
+		
+		//podmienka ifu
+		CodeGenExpressionVisitor g = new CodeGenExpressionVisitor(r);
+		s.cond.accept(g);
+		String result = g.GetResultRegister();
+		String typ = g.GetResultTyp(); 
+		
+		//inicializacia labelov
+		String Koniec = l.next();
+		String PrvaVetva = l.next();
+		String DruhaVetva = l.next();
+		
+		//vyhodnotenie podmienky
+		String v = r.next() + "= icmp ne " + typ + " " + Integer.toString(0) + " " + result + "\n"; 
+		pis(wr,v);
+		v="br i1" + r.akt() + ", " + PrvaVetva + ", "+ DruhaVetva + "\n";
+		pis(wr,v);
+		
+		//prva vetva if-u
+		v = PrvaVetva + ":\n";
+		pis(wr,v);
+		s.ontrue.accept(this);
+		
+		//skok na koniec
+		v="br " + Koniec + "\n";
+		
+		//druha vetva if-u
+		v=DruhaVetva+ ":\n";
+		pis(wr,v);
+		s.onfalse.accept(this);
+		
+		//vypis label-u konca		
+		v =Koniec + ":\n";
 		pis(wr,v);
 
 	}
