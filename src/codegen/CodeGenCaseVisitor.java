@@ -23,6 +23,8 @@ public class CodeGenCaseVisitor implements CaseVisitor {
 	
 	private RegisterGenerator r;
 	public String Koniec;
+	public String dalsi;
+	public String zaciatok;
 
 	private OutputStreamWriter wr;
 
@@ -43,18 +45,19 @@ public class CodeGenCaseVisitor implements CaseVisitor {
 		String result = e.GetResultRegister();
 		
 		//zaciatocny label statementov
-		String zaciatok=l.next();
+		
 		String v = zaciatok + ":\n";
 		pis(wr,v);
 		
 		CodeGenStatementVisitor q = new CodeGenStatementVisitor(wr,l,r);
+		q.BreakSkok=Koniec;
 		
 		for(Statement s:c.statements){
 			s.accept(q);
 		}
 		
-		//skok na koniec switch-u
-		v="br " + Koniec + "\n";
+		//skok na dalsi case switch-u
+		v="br " + dalsi + "\n";
 		pis(wr,v);
 		
 		CaseLine t = new CaseLine(result,zaciatok);

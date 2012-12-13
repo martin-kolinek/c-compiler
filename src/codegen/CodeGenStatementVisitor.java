@@ -23,8 +23,8 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 
 	private OutputStreamWriter wr;
 	
-	private String BreakSkok;
-	private String ContinueSkok;
+	public String BreakSkok;
+	public String ContinueSkok;
 	LabelGenerator l;
 	RegisterGenerator r;
 	
@@ -166,21 +166,28 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		//toto ma predpocitat jednotlive hodnoty case-u a zozbierat pre ne nazvy docas premennych
 		CodeGenCaseVisitor z=new CodeGenCaseVisitor(wr,l,r);
 		z.Koniec=Koniec;
-		
-		for (Case c : s.cases){
-			c.accept(z);//TODO
-		}
-		//TODO podsunut visitoru label na koniec switch, pre istotu
-		
+		z.dalsi=l.next();
 		String inak = l.next();
 		
-		String v = inak +":\n";
+		for (Case c : s.cases){
+			z.zaciatok=z.dalsi;
+			z.dalsi=l.next();
+			c.accept(z);//TODO
+		}
+		String v = z.dalsi + ":\n";
+		pis(wr,v);
+		v="br "+inak + "\n"; 
+		
+		v = inak +":\n";
 		pis(wr,v);
 		
 		CodeGenStatementVisitor f = new CodeGenStatementVisitor(wr,l,r);
+		f.BreakSkok=Koniec;
 		for (Statement  d: s.def){
 			d.accept(f);//TODO
 		}
+		
+		//podsunut visitoru label na koniec switch
 		v="br " + Koniec + "\n";
 		pis(wr,v);
 		
