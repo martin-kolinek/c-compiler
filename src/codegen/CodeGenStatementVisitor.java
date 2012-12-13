@@ -23,15 +23,17 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 
 	private OutputStreamWriter wr;
 	
+	public VisitPack pack;
 	public String BreakSkok;
 	public String ContinueSkok;
 	LabelGenerator l;
 	RegisterGenerator r;
 	
-	public CodeGenStatementVisitor(OutputStreamWriter wr,LabelGenerator l,RegisterGenerator r){
-		this.l=l;
-		this.wr=wr;
-		this.r=r;
+	public CodeGenStatementVisitor(VisitPack pack){
+		this.pack=pack;
+		this.l=this.pack.l;
+		this.r=this.pack.r;
+		this.wr=this.pack.wr;
 	}
 	
 	private void pis(OutputStreamWriter o,String s){
@@ -48,7 +50,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	public void visit(ReturnStatement s) {
 		String result;
 		String typ;
-		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(wr,l,r);
+		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(pack);
 		s.exp.accept(g);
 		result=g.GetResultRegister();
 		typ=g.GetResultTyp();
@@ -90,7 +92,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		s.body.accept(this);
 		
 		//podmienka cyklu
-		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(wr,l,r);
+		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(pack);
 		s.condition.accept(g);
 		result=g.GetResultRegister();
 		typ=g.GetResultTyp();
@@ -108,7 +110,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 
 	@Override
 	public void visit(ForStatement s) {
-		// TODO Auto-generated method stub
+		//nerobi sa, konvertuje sa na while
 		String v ="";
 		pis(wr,v);
 
@@ -129,7 +131,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		pis(wr,v);
 		
 		//podmienka cyklu
-		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(wr,l,r);
+		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(pack);
 		s.condition.accept(g);
 		result=g.GetResultRegister();
 		typ=g.GetResultTyp();
@@ -155,16 +157,17 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 
 	@Override
 	public void visit(SwitchStatement s) {
-		// TODO Auto-generated method stub
 		
 		String Koniec = l.next();//default label, ak nic nematch-ne
-		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(wr,l,r);
+		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(pack);
 		s.expr.accept(g);
 		String result = g.GetResultRegister();
 		String typ = g.GetResultTyp(); 
 		
 		//toto ma predpocitat jednotlive hodnoty case-u a zozbierat pre ne nazvy docas premennych
-		CodeGenCaseVisitor z=new CodeGenCaseVisitor(wr,l,r);
+		
+		VisitPack p=new VisitPack(wr,l,r,this.pack.table);
+		CodeGenCaseVisitor z=new CodeGenCaseVisitor(p);
 		z.Koniec=Koniec;
 		z.dalsi=l.next();
 		String inak = l.next();
@@ -172,7 +175,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		for (Case c : s.cases){
 			z.zaciatok=z.dalsi;
 			z.dalsi=l.next();
-			c.accept(z);//TODO
+			c.accept(z);
 		}
 		String v = z.dalsi + ":\n";
 		pis(wr,v);
@@ -181,10 +184,11 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		v = inak +":\n";
 		pis(wr,v);
 		
-		CodeGenStatementVisitor f = new CodeGenStatementVisitor(wr,l,r);
+		p = new VisitPack(wr,l,r,this.pack.table);
+		CodeGenStatementVisitor f = new CodeGenStatementVisitor(p);
 		f.BreakSkok=Koniec;
 		for (Statement  d: s.def){
-			d.accept(f);//TODO
+			d.accept(f);
 		}
 		
 		//podsunut visitoru label na koniec switch
@@ -209,10 +213,9 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 
 	@Override
 	public void visit(IfStatement s) {
-		// TODO Auto-generated method stub
 		
 		//podmienka ifu
-		CodeGenExpressionVisitor g = new CodeGenExpressionVisitor(wr,l,r);
+		CodeGenExpressionVisitor g = new CodeGenExpressionVisitor(pack);
 		s.cond.accept(g);
 		String result = g.GetResultRegister();
 		String typ = g.GetResultTyp(); 
@@ -249,7 +252,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 
 	@Override
 	public void visit(OneexpressionStatement s) {
-		CodeGenExpressionVisitor g = new CodeGenExpressionVisitor(wr,l,r);
+		CodeGenExpressionVisitor g = new CodeGenExpressionVisitor(pack);
 		s.expr.accept(g);
 
 	}

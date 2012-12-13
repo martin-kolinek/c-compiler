@@ -30,17 +30,20 @@ public class CodeGenCaseVisitor implements CaseVisitor {
 
 	private LabelGenerator l;
 
-	public CodeGenCaseVisitor(OutputStreamWriter wr, LabelGenerator l, RegisterGenerator r) {
-		this.r=r;
-		this.wr=wr;
-		this.l=l;
+	private VisitPack pack;
+
+	public CodeGenCaseVisitor(VisitPack pack) {
+		this.pack=pack;
+		this.l=this.pack.l;
+		this.r=this.pack.r;
+		this.wr=this.pack.wr;
 	}
 
 	@Override
 	public void visit(Case c) {
 		
 		//vypocitanie expression
-		CodeGenExpressionVisitor e = new CodeGenExpressionVisitor(wr,l,r);
+		CodeGenExpressionVisitor e = new CodeGenExpressionVisitor(pack);
 		c.cond.accept(e);
 		String result = e.GetResultRegister();
 		
@@ -49,7 +52,9 @@ public class CodeGenCaseVisitor implements CaseVisitor {
 		String v = zaciatok + ":\n";
 		pis(wr,v);
 		
-		CodeGenStatementVisitor q = new CodeGenStatementVisitor(wr,l,r);
+		VisitPack p = new VisitPack(wr,l,r,pack.table);
+		
+		CodeGenStatementVisitor q = new CodeGenStatementVisitor(p);
 		q.BreakSkok=Koniec;
 		
 		for(Statement s:c.statements){

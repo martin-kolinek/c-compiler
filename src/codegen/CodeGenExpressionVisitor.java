@@ -26,9 +26,15 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 	private String Register;
 	private String Typ;
 	private RegisterGenerator r;
+	private LabelGenerator l;
+	private OutputStreamWriter wr;
+	private VisitPack pack;
 	
-	public CodeGenExpressionVisitor(OutputStreamWriter wr, LabelGenerator l, RegisterGenerator r){
-		this.r=r;
+	public CodeGenExpressionVisitor(VisitPack pack){
+		this.pack=pack;
+		this.l=this.pack.l;
+		this.r=this.pack.r;
+		this.wr=this.pack.wr;
 	}
 	
 	public String GetResultRegister(){//TODO
@@ -42,6 +48,9 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 	@Override
 	public void visit(BinaryExpression e) {
 		// TODO Auto-generated method stub
+		
+		CodeGenExpressionVisitor v1 = new CodeGenExpressionVisitor(pack);
+		CodeGenExpressionVisitor v2 = new CodeGenExpressionVisitor(pack);
 
 	}
 
