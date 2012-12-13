@@ -94,11 +94,9 @@ public class ConstantExpressionModifier extends EmptyExpressionModifier{
 	public void visit(UnaryExpression e){
 		if (isConstant(e.exp)){
 			if (e.op == UnaryOperator.ADDR){
-				//@TODO: Don't know
 				result = e;
 				return;
 			} else if (e.op == UnaryOperator.PTR){
-				//@TODO: Don't know
 				result = e;
 				return;
 			} else if (e.op == UnaryOperator.PLUS){
@@ -126,13 +124,16 @@ public class ConstantExpressionModifier extends EmptyExpressionModifier{
 	}
 	
 	public void visit(CastExpression e){
-		//@TODO: ???
+		//@TODO: iba mozno, nemyslim si ze to bude potrebne
+		super.visit(e);
 	}
 	public void visit(SizeofType e){
-		//@TODO: ???
+		//@TODO: iba mozno, nemyslim si ze to bude potrebne
+		super.visit(e);
 	}
 	public void visit(SizeofExpression e){
-		//@TODO: ???
+		//@TODO: iba mozno, nemyslim si ze to bude potrebne
+		super.visit(e);
 	}
 	
 	public void visit(TernaryExpression e){
