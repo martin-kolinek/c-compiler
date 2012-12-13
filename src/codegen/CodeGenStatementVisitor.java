@@ -116,7 +116,6 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 
 	@Override
 	public void visit(WhileStatement s) {
-		// TODO Auto-generated method stub
 		
 		//inicializacia
 		String result;
@@ -230,7 +229,6 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 
 	@Override
 	public void visit(OneexpressionStatement s) {
-		// TODO Auto-generated method stub
 		CodeGenExpressionVisitor g = new CodeGenExpressionVisitor(r);
 		s.expr.accept(g);
 
