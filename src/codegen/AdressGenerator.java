@@ -2,10 +2,11 @@ package codegen;
 
 public class AdressGenerator {
 	public int i;
-	public String prefix;
+	public String prefix;// = @a
 	
-	public AdressGenerator(String s){
-		this.prefix=s;
+	public AdressGenerator(){
+		this.prefix= "@a";
+		i=0;
 	}
 	
 	public String next(){

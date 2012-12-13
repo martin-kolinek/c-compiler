@@ -1,5 +1,6 @@
 package codegen;
 
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 import expression.AssignmentExpression;
@@ -30,6 +31,15 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 	private OutputStreamWriter wr;
 	private VisitPack pack;
 	
+	private void pis(OutputStreamWriter o,String s){
+		try {
+			o.append(s);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public CodeGenExpressionVisitor(VisitPack pack){
 		this.pack=pack;
 		this.l=this.pack.l;
@@ -48,7 +58,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 	@Override
 	public void visit(BinaryExpression e) {
 		// TODO Auto-generated method stub
-		
+		String v=null;
 		CodeGenExpressionVisitor v1 = new CodeGenExpressionVisitor(pack);
 		CodeGenExpressionVisitor v2 = new CodeGenExpressionVisitor(pack);
 		e.right.accept(v1);
@@ -57,6 +67,136 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 		String result2 = v2.GetResultRegister();
 		String typ1 = v1.GetResultTyp();
 		String typ2 = v2.GetResultTyp();
+		
+		
+		switch(e.operator){
+		case PLUS :
+			Typ=null;//TODO z typ1 a typ2
+			Register=pack.l.next();
+			v=Register + "= add "+ Typ + " " + result1 + ", " + result2 + "\n";
+			pis(pack.wr,v);
+			break; // +
+		case MINUS : 
+			Typ=null;//TODO z typ1 a typ2
+			Register=pack.l.next();
+			v=Register + "= sub "+ Typ + " " + result1 + ", " + result2 + "\n";
+			pis(pack.wr,v);
+			break; // -
+		case MULT :
+			Typ=null;//TODO z typ1 a typ2
+			Register=pack.l.next();
+			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
+			pis(pack.wr,v);
+			break; // *
+		case DIV :
+			Typ=null;//TODO z typ1 a typ2
+			Register=pack.l.next();
+			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
+			pis(pack.wr,v);
+			break; // /
+		case MOD :
+			Typ=null;//TODO z typ1 a typ2
+			Register=pack.l.next();
+			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
+			pis(pack.wr,v);
+			break; // %
+		case BSLEFT :
+			Typ=null;//TODO z typ1 a typ2
+			Register=pack.l.next();
+			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
+			pis(pack.wr,v);
+			break; // <<
+		case BSRIGHT :
+			Typ=null;//TODO z typ1 a typ2
+			Register=pack.l.next();
+			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
+			pis(pack.wr,v);
+			break; // >>
+		case BAND :
+			Typ=null;//TODO z typ1 a typ2
+			Register=pack.l.next();
+			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
+			pis(pack.wr,v);
+			break; // &
+		case BXOR :
+			Typ=null;//TODO z typ1 a typ2
+			Register=pack.l.next();
+			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
+			pis(pack.wr,v);
+			break; // ^
+		case BOR :
+			Typ=null;//TODO z typ1 a typ2
+			Register=pack.l.next();
+			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
+			pis(pack.wr,v);
+			break;  // |
+		case AND :
+			Typ=null;//TODO z typ1 a typ2
+			Register=pack.l.next();
+			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
+			pis(pack.wr,v);
+			break; // &&
+		case OR :
+			Typ=null;//TODO z typ1 a typ2
+			Register=pack.l.next();
+			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
+			pis(pack.wr,v);
+			break; // ||
+		case GT :
+			Typ=null;//TODO z typ1 a typ2
+			Register=pack.l.next();
+			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
+			pis(pack.wr,v);
+			break; // >
+		case LT :
+			Typ=null;//TODO z typ1 a typ2
+			Register=pack.l.next();
+			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
+			pis(pack.wr,v);
+			break; // <
+		case GET :
+			Typ=null;//TODO z typ1 a typ2
+			Register=pack.l.next();
+			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
+			pis(pack.wr,v);
+			break; // >=
+		case LET :
+			Typ=null;//TODO z typ1 a typ2
+			Register=pack.l.next();
+			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
+			pis(pack.wr,v);
+			break; // <=
+		case EQ :
+			Typ=null;//TODO z typ1 a typ2
+			Register=pack.l.next();
+			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
+			pis(pack.wr,v);
+			break; // ==
+		case NEQ :
+			Typ=null;//TODO z typ1 a typ2
+			Register=pack.l.next();
+			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
+			pis(pack.wr,v);
+			break; // !=
+		case ASSIG ://TODO priradenie do pamate
+			Typ=null;//TODO z typ1 a typ2
+			Register=pack.l.next();
+			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
+			pis(pack.wr,v);
+			break; //'='
+		
+		/*
+		AMULT, //'*=' 
+		ADIV, //'/=' 
+		AMOD, //'%=' 
+		APLUS, //'+=' 
+		AMINUS, //'-=' 
+		ABSLEFT, //'<<='
+		ABSRIGHT, //'>>='
+		ABAND, //'&=' 
+		ABXOR, // '^=' 
+		ABOR, */
+		}
 
 	}
 
