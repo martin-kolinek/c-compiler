@@ -7,11 +7,9 @@ import transformers.EmptyTypeModifier;
 public class TypeLinkModifier extends EmptyTypeModifier {
 	
 	private SymbolTable<StructType> structs;
-	private SymbolTable<EnumType> enums;
 	
-	public TypeLinkModifier(SymbolTable<StructType> structs, SymbolTable<EnumType> enums) {
+	public TypeLinkModifier(SymbolTable<StructType> structs) {
 		this.structs=structs;
-		this.enums=enums;
 	}
 	
 	@Override
@@ -33,24 +31,5 @@ public class TypeLinkModifier extends EmptyTypeModifier {
 				st.members=t.members;
 		}
 		result = st;
-	}
-	
-	@Override
-	public void visit(EnumType t) {
-		EnumType et = enums.get(t.tag);
-		if(t==et){
-			result = t;
-			return;
-		}
-		if(et==null) {
-			enums.store(t.tag, t);
-			et=t;
-		}
-		else {
-			if(et.enumerators!=null)
-				throw new SemanticException("Redeclaration of enum");
-			et.enumerators=t.enumerators;
-		}
-		result = et;
 	}
 }

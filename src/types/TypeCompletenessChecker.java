@@ -9,12 +9,12 @@ import transformers.TypeModifierFactory;
 
 public class TypeCompletenessChecker extends TypeBlockModifier {
 	
-	public TypeCompletenessChecker(final SymbolTable<StructType> structs, final SymbolTable<EnumType> enums) {
+	public TypeCompletenessChecker(final SymbolTable<StructType> structs) {
 		super(new TypeModifierFactory() {
 			
 			@Override
 			public TypeModifier create() {
-				return new TypeLinkModifier(structs, enums);
+				return new TypeLinkModifier(structs);
 			}
 		});
 	}
