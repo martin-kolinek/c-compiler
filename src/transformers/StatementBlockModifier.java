@@ -11,23 +11,15 @@ public class StatementBlockModifier extends EmptyBlockModifier {
 		this.smf=smf;
 	}
 	
-	public Statement transform(Statement s) {
-		StatementTransformer trans = new StatementTransformer(smf);
-		s.accept(trans);
-		StatementModifier m = smf.create();
-		s.accept(m);
-		return m.getResult();
-	}
-	
 	@Override
 	public void visit(Statement i) {
-		result.add(transform(i));
+		result.add(TransformerUtil.transformStatement(i, smf));
 	}
 	
 	@Override
 	public void visit(FunctionDefinition i) {
 		if(i.body!=null)
-			i.body=transform(i.body);
+			i.body=TransformerUtil.transformStatement(i.body, smf);
 		super.visit(i);
 	}
 }

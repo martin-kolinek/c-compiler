@@ -14,8 +14,8 @@ import types.Type;
 
 public class TypeResolver extends StatementBlockModifier {
 	
-	private SymbolTable<Type> types;
-	private SymbolTable<FunctionDefinition> funcs;
+	public SymbolTable<Type> types;
+	public SymbolTable<FunctionDefinition> funcs;
 	
 	public TypeResolver(final SymbolTable<Type> symb, final SymbolTable<FunctionDefinition> funcs, final ExpressionTypeMapping resultMapping) {
 		super(new StatementModifierFactory() {
@@ -43,12 +43,7 @@ public class TypeResolver extends StatementBlockModifier {
 	
 	@Override
 	public void visit(FunctionDefinition i) {
-		types=new SymbolTable<Type>(types);
-		for(FunctionParameter fp : i.parameters) {
-			types.store(fp.id, fp.type);
-		}
 		super.visit(i);
-		types=types.getParent();
 		funcs.store(i.name, i);
 	}
 	

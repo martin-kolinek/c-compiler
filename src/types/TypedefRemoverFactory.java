@@ -1,6 +1,7 @@
 package types;
 
 import symbols.SymbolTable;
+import toplevel.FunctionDefinition;
 import transformers.BlockModifier;
 import transformers.BlockModifierFactory;
 
@@ -13,7 +14,7 @@ public class TypedefRemoverFactory implements BlockModifierFactory {
 	}
 	
 	@Override
-	public BlockModifier createModifier() {
+	public BlockModifier createModifier(FunctionDefinition def) {
 		symbs = new SymbolTable<Type>(symbs);
 		return new TypedefRemover(symbs);
 	}

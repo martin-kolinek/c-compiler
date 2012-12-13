@@ -1,6 +1,7 @@
 typedef int uuu_int;
 
 int function(uuu_int* ptr);
+void recurse(int x);
 
 typedef struct str1tests
 {
@@ -34,6 +35,9 @@ int main(int args, char** argv)
     s2=s;
     int q = s2.a;
     //q should be 10
+    enum testen qen = AAA;
+    qen = BBB;
+    //qen should be 3
     q = sizeof(str1test);
     //q should be 44
     q = sizeof 4;
@@ -121,6 +125,7 @@ int main(int args, char** argv)
     //ok should be 0
     ok = 4,5,6;
     //ok should be 6
+    recurse(10);
 }
 
 int function(int* ptr)
@@ -129,4 +134,11 @@ int function(int* ptr)
     *ptr = ((x<<3>>2)^1);
     int ret = (*ptr | 4) & ~6;
     return ret;
+}
+
+void recurse(int x)
+{
+    if(x==0)
+        return;
+    recurse(x-1);
 }

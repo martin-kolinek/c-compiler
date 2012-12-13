@@ -12,7 +12,8 @@ public class EnumType implements Type {
 	
 	public EnumType(String tag, List<Enumerator> enums) {
 		this.tag=tag;
-		enumerators = new ArrayList<Enumerator>(enums);
+		if(enums!=null)
+			enumerators = new ArrayList<Enumerator>(enums);
 	}
 	
 	@Override

@@ -11,6 +11,7 @@ import org.antlr.runtime.CommonTokenStream;
 
 import declaration.DeclarationResolver;
 
+import toplevel.FunctionDefinition;
 import toplevel.Program;
 import transformers.BlockModifier;
 import transformers.BlockModifierFactory;
@@ -19,6 +20,8 @@ import transformers.ExpressionModifierFactory;
 import transformers.StatementModifier;
 import transformers.StatementModifierFactory;
 import transformers.TransformerUtil;
+import typeresolve.TypeResolverFactory;
+import types.EnumRemoverFactory;
 import types.TypeCompletenessFactory;
 import types.TypedefRemoverFactory;
 
@@ -53,7 +56,7 @@ public class Main {
 			public void popModifierStack() {
 			}
 			@Override
-			public BlockModifier createModifier() {
+			public BlockModifier createModifier(FunctionDefinition def) {
 				return new DeclarationResolver();
 			}
 		});
@@ -97,8 +100,14 @@ public class Main {
 		//remove typedefs
 		TransformerUtil.transformProgram(prog, new TypedefRemoverFactory());
 		
+		//remove enums
+		TransformerUtil.transformProgram(prog, new EnumRemoverFactory());
+		
 		//link types
 		TransformerUtil.transformProgram(prog, new TypeCompletenessFactory());
+		
+		TypeResolverFactory fac = new TypeResolverFactory();
+		TransformerUtil.transformProgram(prog, fac);
 		
 		System.out.println(prog.declarations.inBlock.size());
 	}

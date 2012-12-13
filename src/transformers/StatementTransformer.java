@@ -1,9 +1,6 @@
 package transformers;
 
-import java.util.ArrayList;
-
 import statements.*;
-import toplevel.InBlock;
 
 public class StatementTransformer implements StatementVisitor {
 
@@ -73,16 +70,6 @@ public class StatementTransformer implements StatementVisitor {
 
 	@Override
 	public void visit(BlockStatement blockStatement) {
-		BlockModifier bm = new EmptyBlockModifier() {
-			@Override
-			public void visit(Statement s) {
-				result.add(descend(s));
-			}
-		};
-		for(InBlock ib : blockStatement.inBlock) {
-			ib.accept(bm);
-		}
-		blockStatement.inBlock=new ArrayList<InBlock>(bm.getModified());
 	}
 	
 }

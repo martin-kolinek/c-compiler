@@ -2,6 +2,7 @@ package typeresolve;
 
 import symbols.SymbolTable;
 import toplevel.FunctionDefinition;
+import toplevel.FunctionParameter;
 import transformers.BlockModifier;
 import transformers.BlockModifierFactory;
 import types.Type;
@@ -22,9 +23,15 @@ public class TypeResolverFactory implements BlockModifierFactory {
 	}
 	
 	@Override
-	public BlockModifier createModifier() {
+	public BlockModifier createModifier(FunctionDefinition def) {
 		symbs = new SymbolTable<Type>(symbs);
 		funcs = new SymbolTable<FunctionDefinition>(funcs);
+		if(def!=null) {
+			funcs.store(def.name, def);
+			for(FunctionParameter p : def.parameters) {
+				symbs.store(p.id, p.type);
+			}
+		}
 		return new TypeResolver(symbs, funcs, mapping);
 	}
 

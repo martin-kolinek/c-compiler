@@ -51,7 +51,7 @@ class PrimitiveTypeCache{
 	}
 	
 	private int getKey(int size, boolean sign, boolean floating){
-		return size<<2 | (sign?1:0) |(floating?1:0);
+		return size<<2 | (sign?2:0) |(floating?1:0);
 	}
 	
 	public PrimitiveType getType(int size, boolean sign, boolean floating){

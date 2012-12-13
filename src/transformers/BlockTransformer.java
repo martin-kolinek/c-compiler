@@ -10,6 +10,7 @@ import toplevel.InBlock;
 public class BlockTransformer implements StatementVisitor {
 
 	private BlockModifierFactory modFac;
+	private FunctionDefinition parentFunc; //dost hnusny hack, ktorym sa obchadza to, ze nevieme najprv spracovat deklaraciu funkcie a az potom telo
 	
 	public BlockTransformer(BlockModifierFactory mod) {
 		this.modFac = mod;
@@ -73,7 +74,8 @@ public class BlockTransformer implements StatementVisitor {
 
 	@Override
 	public void visit(BlockStatement blockStatement) {
-		BlockModifier m = modFac.createModifier();
+		BlockModifier m = modFac.createModifier(parentFunc);
+		parentFunc = null;
 		for(InBlock ib : blockStatement.inBlock) {
 			ib.accept(new EmptyInBlockVisitor() {
 				@Override
@@ -83,6 +85,7 @@ public class BlockTransformer implements StatementVisitor {
 				
 				@Override
 				public void visit(FunctionDefinition i) {
+					parentFunc=i;
 					if(i.body!=null)
 						descend(i.body);
 				}

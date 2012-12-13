@@ -47,7 +47,7 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 		else {
 			throw new SemanticException("Wrong types in assignment");
 		}
-		
+		result = e;
 	}
 	
 	@Override
@@ -273,6 +273,9 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 	@Override
 	public void visit(FunctionCallExpression e) {
 		FunctionDefinition f = funcs.get(e.name);
+		if(f==null) {
+			throw new SemanticException("Call to unknown function");
+		}
 		if(e.args.size()!=f.parameters.size())
 			throw new SemanticException("Function call with wrong number of parameters");
 		for(int i=0; i<e.args.size(); i++){

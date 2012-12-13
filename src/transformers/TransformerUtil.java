@@ -2,6 +2,7 @@ package transformers;
 
 import declaration.initializer.Initializer;
 import statements.Statement;
+import toplevel.FunctionDefinition;
 import toplevel.Program;
 import types.Type;
 import expression.Expression;
@@ -51,7 +52,7 @@ public class TransformerUtil {
 			}
 			
 			@Override
-			public BlockModifier createModifier() {
+			public BlockModifier createModifier(FunctionDefinition def) {
 				return new StatementBlockModifier(fac);
 			}
 		});
@@ -65,7 +66,7 @@ public class TransformerUtil {
 			}
 			
 			@Override
-			public BlockModifier createModifier() {
+			public BlockModifier createModifier(FunctionDefinition def) {
 				return new ExpressionBlockModifier(fac);
 			}
 		});
@@ -79,7 +80,7 @@ public class TransformerUtil {
 			}
 			
 			@Override
-			public BlockModifier createModifier() {
+			public BlockModifier createModifier(FunctionDefinition def) {
 				return new TypeBlockModifier(fac);
 			}
 		});

@@ -2,6 +2,7 @@ package types;
 
 import expression.Expression;
 import symbols.SymbolTable;
+import toplevel.FunctionDefinition;
 import transformers.BlockModifier;
 import transformers.BlockModifierFactory;
 import transformers.CompoundBlockModifier;
@@ -17,7 +18,7 @@ public class EnumRemoverFactory implements BlockModifierFactory {
 	private SymbolTable<Expression> enumerators;
 	
 	@Override
-	public BlockModifier createModifier() {
+	public BlockModifier createModifier(FunctionDefinition def) {
 		enumerators = new SymbolTable<Expression>(enumerators);
 		return new CompoundBlockModifier(
 				new TypeBlockModifier(new TypeModifierFactory() {

@@ -29,7 +29,8 @@ public class ExpressionStatementModifier extends EmptyStatementModifier {
 	
 	@Override
 	public void visit(ReturnStatement s) {
-		s.exp=TransformerUtil.transformExpression(s.exp, emf);
+		if(s.exp!=null)
+			s.exp=TransformerUtil.transformExpression(s.exp, emf);
 		super.visit(s);
 	}
 	
