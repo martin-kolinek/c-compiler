@@ -44,7 +44,6 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	
 	@Override
 	public void visit(ReturnStatement s) {
-		// TODO Auto-generated method stub
 		String result;
 		String typ;
 		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(r);
@@ -58,7 +57,6 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 
 	@Override
 	public void visit(BreakStatement s) {
-		// TODO Auto-generated method stub
 		if(BreakSkok == null) throw new SemanticException("Break mimo cyklu.");
 		String v ="br "+BreakSkok;
 		pis(wr,v);
@@ -67,7 +65,6 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 
 	@Override
 	public void visit(ContinueStatement s) {
-		// TODO Auto-generated method stub
 		if(ContinueSkok == null) throw new SemanticException("Continue mimo cyklu.");
 		String v ="br "+ContinueSkok;
 		pis(wr,v);
@@ -76,7 +73,6 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 
 	@Override
 	public void visit(DowhileStatement s) {
-		// TODO Auto-generated method stub
 		
 		//inicializacia
 		String result;
@@ -98,7 +94,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		typ=g.GetResultTyp();
 		
 		//rozhodovanie cyklu
-		v=r.next() + "= icmp ne " + typ + " " /*TODO + pretypovana(0) */+ " " + result + "\n"; 
+		v=r.next() + "= icmp ne " + typ + " "  + Integer.toString(0) + " " + result + "\n"; 
 		pis(wr,v);
 		v="br i1" + r.akt() + ", " + ContinueSkok + ", "+ BreakSkok + "\n";
 		pis(wr,v);
@@ -136,7 +132,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		s.condition.accept(g);
 		result=g.GetResultRegister();
 		typ=g.GetResultTyp();
-		v=r.next() + "= icmp ne " + typ + " " /*TODO + pretypovana(0) */+ " " + result + "\n"; 
+		v=r.next() + "= icmp ne " + typ + " " + Integer.toString(0) + " " + result + "\n"; 
 		pis(wr,v);
 		v="br i1" + r.akt() + ", " + DalejSkok + ", "+ BreakSkok + "\n";
 		pis(wr,v);
@@ -159,7 +155,20 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	@Override
 	public void visit(SwitchStatement s) {
 		// TODO Auto-generated method stub
-		String v ="";
+		
+		String Koniec = l.next();//default label, ak nic nematch-ne
+		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(r);
+		s.expr.accept(g);
+		String result = g.GetResultRegister();
+		String typ = g.GetResultTyp(); 
+		String v ="switch " + typ + " " + result+ ", " + Koniec + " [ \n";
+		pis(wr,v);
+		
+		//TODO prechadzanie pola moznosti
+		
+		v = "]\n";
+		pis(wr,v);
+		v= Koniec + "\n";//label na konci switch-u
 		pis(wr,v);
 
 	}
