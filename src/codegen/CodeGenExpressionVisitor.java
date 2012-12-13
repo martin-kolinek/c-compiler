@@ -1,5 +1,7 @@
 package codegen;
 
+import java.io.OutputStreamWriter;
+
 import expression.AssignmentExpression;
 import expression.CastExpression;
 import expression.CommaExpression;
@@ -25,7 +27,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 	private String Typ;
 	private RegisterGenerator r;
 	
-	public CodeGenExpressionVisitor(RegisterGenerator r){
+	public CodeGenExpressionVisitor(OutputStreamWriter wr, LabelGenerator l, RegisterGenerator r){
 		this.r=r;
 	}
 	

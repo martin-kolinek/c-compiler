@@ -48,7 +48,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	public void visit(ReturnStatement s) {
 		String result;
 		String typ;
-		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(r);
+		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(wr,l,r);
 		s.exp.accept(g);
 		result=g.GetResultRegister();
 		typ=g.GetResultTyp();
@@ -90,7 +90,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		s.body.accept(this);
 		
 		//podmienka cyklu
-		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(r);
+		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(wr,l,r);
 		s.condition.accept(g);
 		result=g.GetResultRegister();
 		typ=g.GetResultTyp();
@@ -129,7 +129,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		pis(wr,v);
 		
 		//podmienka cyklu
-		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(r);
+		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(wr,l,r);
 		s.condition.accept(g);
 		result=g.GetResultRegister();
 		typ=g.GetResultTyp();
@@ -158,13 +158,14 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		// TODO Auto-generated method stub
 		
 		String Koniec = l.next();//default label, ak nic nematch-ne
-		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(r);
+		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(wr,l,r);
 		s.expr.accept(g);
 		String result = g.GetResultRegister();
 		String typ = g.GetResultTyp(); 
 		
 		//toto ma predpocitat jednotlive hodnoty case-u a zozbierat pre ne nazvy docas premennych
-		CodeGenCaseVisitor z=new CodeGenCaseVisitor(r);
+		CodeGenCaseVisitor z=new CodeGenCaseVisitor(wr,l,r);
+		z.Koniec=Koniec;
 		
 		for (Case c : s.cases){
 			c.accept(z);//TODO
@@ -192,7 +193,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		// TODO Auto-generated method stub
 		
 		//podmienka ifu
-		CodeGenExpressionVisitor g = new CodeGenExpressionVisitor(r);
+		CodeGenExpressionVisitor g = new CodeGenExpressionVisitor(wr,l,r);
 		s.cond.accept(g);
 		String result = g.GetResultRegister();
 		String typ = g.GetResultTyp(); 
@@ -229,7 +230,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 
 	@Override
 	public void visit(OneexpressionStatement s) {
-		CodeGenExpressionVisitor g = new CodeGenExpressionVisitor(r);
+		CodeGenExpressionVisitor g = new CodeGenExpressionVisitor(wr,l,r);
 		s.expr.accept(g);
 
 	}
