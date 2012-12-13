@@ -171,15 +171,27 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 			c.accept(z);//TODO
 		}
 		//TODO podsunut visitoru label na koniec switch, pre istotu
-		for (Statement  d: s.def){
-			d.accept(null);//TODO
-		}
 		
-		String v ="switch " + typ + " " + result+ ", " + Koniec + " [ \n";
+		String inak = l.next();
+		
+		String v = inak +":\n";
 		pis(wr,v);
 		
-		//TODO prechadzanie pola moznosti
-		//sem pojde vypis predpocitanych options a labelov na statementy na ne
+		CodeGenStatementVisitor f = new CodeGenStatementVisitor(wr,l,r);
+		for (Statement  d: s.def){
+			d.accept(f);//TODO
+		}
+		v="br " + Koniec + "\n";
+		pis(wr,v);
+		
+		v ="switch " + typ + " " + result+ ", " + inak + " [ \n";
+		pis(wr,v);
+		
+		// vypis predpocitanych options a labelov na statementy na ne
+		for (CaseLine d:z.moje){
+			v=typ + " " + d.expr + ", "+ d.label + "\n";
+			pis(wr,v);
+		}		
 		
 		v = "]\n";
 		pis(wr,v);
