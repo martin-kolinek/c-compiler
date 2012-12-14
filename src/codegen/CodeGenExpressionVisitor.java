@@ -3,6 +3,8 @@ package codegen;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
+import types.Type;
+
 import expression.AssignmentExpression;
 import expression.CastExpression;
 import expression.CommaExpression;
@@ -71,115 +73,172 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 		
 		switch(e.operator){
 		case PLUS :
-			Typ=null;//TODO z typ1 a typ2
+			Type t=pack.t.getExpressionType(e);
+			CodeGenTypeVisitor tv = new CodeGenTypeVisitor(pack);
+			t.accept(tv);
+			Typ=tv.GetTypeText();//TODO z typ1 a typ2
 			Register=pack.l.next();
 			v=Register + "= add "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
 			break; // +
 		case MINUS : 
-			Typ=null;//TODO z typ1 a typ2
+			t=pack.t.getExpressionType(e);
+			tv = new CodeGenTypeVisitor(pack);
+			t.accept(tv);
+			Typ=tv.GetTypeText();;//TODO z typ1 a typ2
 			Register=pack.l.next();
 			v=Register + "= sub "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
 			break; // -
 		case MULT :
-			Typ=null;//TODO z typ1 a typ2
+			t=pack.t.getExpressionType(e);
+			tv = new CodeGenTypeVisitor(pack);
+			t.accept(tv);
+			Typ=tv.GetTypeText();//TODO z typ1 a typ2
 			Register=pack.l.next();
 			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
 			break; // *
 		case DIV :
-			Typ=null;//TODO z typ1 a typ2
+			t=pack.t.getExpressionType(e);
+			tv = new CodeGenTypeVisitor(pack);
+			t.accept(tv);
+			Typ=tv.GetTypeText();//TODO z typ1 a typ2
 			Register=pack.l.next();
 			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
 			break; // /
 		case MOD :
-			Typ=null;//TODO z typ1 a typ2
+			t=pack.t.getExpressionType(e);
+			tv = new CodeGenTypeVisitor(pack);
+			t.accept(tv);
+			Typ=tv.GetTypeText();//TODO z typ1 a typ2
 			Register=pack.l.next();
 			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
 			break; // %
 		case BSLEFT :
-			Typ=null;//TODO z typ1 a typ2
+			t=pack.t.getExpressionType(e);
+			tv = new CodeGenTypeVisitor(pack);
+			t.accept(tv);
+			Typ=tv.GetTypeText();//TODO z typ1 a typ2
 			Register=pack.l.next();
 			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
 			break; // <<
 		case BSRIGHT :
-			Typ=null;//TODO z typ1 a typ2
+			t=pack.t.getExpressionType(e);
+			tv = new CodeGenTypeVisitor(pack);
+			t.accept(tv);
+			Typ=tv.GetTypeText();;//TODO z typ1 a typ2
 			Register=pack.l.next();
 			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
 			break; // >>
 		case BAND :
-			Typ=null;//TODO z typ1 a typ2
+			t=pack.t.getExpressionType(e);
+			tv = new CodeGenTypeVisitor(pack);
+			t.accept(tv);
+			Typ=tv.GetTypeText();//TODO z typ1 a typ2
 			Register=pack.l.next();
 			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
 			break; // &
 		case BXOR :
-			Typ=null;//TODO z typ1 a typ2
+			t=pack.t.getExpressionType(e);
+			tv = new CodeGenTypeVisitor(pack);
+			t.accept(tv);
+			Typ=tv.GetTypeText();//TODO z typ1 a typ2
 			Register=pack.l.next();
 			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
 			break; // ^
 		case BOR :
-			Typ=null;//TODO z typ1 a typ2
+			t=pack.t.getExpressionType(e);
+			tv = new CodeGenTypeVisitor(pack);
+			t.accept(tv);
+			Typ=tv.GetTypeText();//TODO z typ1 a typ2
 			Register=pack.l.next();
 			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
 			break;  // |
 		case AND :
-			Typ=null;//TODO z typ1 a typ2
+			t=pack.t.getExpressionType(e);
+			tv = new CodeGenTypeVisitor(pack);
+			t.accept(tv);
+			Typ=tv.GetTypeText();//TODO z typ1 a typ2
 			Register=pack.l.next();
 			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
 			break; // &&
 		case OR :
-			Typ=null;//TODO z typ1 a typ2
+			t=pack.t.getExpressionType(e);
+			tv = new CodeGenTypeVisitor(pack);
+			t.accept(tv);
+			Typ=tv.GetTypeText();//TODO z typ1 a typ2
 			Register=pack.l.next();
 			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
 			break; // ||
 		case GT :
-			Typ=null;//TODO z typ1 a typ2
+			t=pack.t.getExpressionType(e);
+			tv = new CodeGenTypeVisitor(pack);
+			t.accept(tv);
+			Typ=tv.GetTypeText();//TODO z typ1 a typ2
 			Register=pack.l.next();
 			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
 			break; // >
 		case LT :
-			Typ=null;//TODO z typ1 a typ2
+			t=pack.t.getExpressionType(e);
+			tv = new CodeGenTypeVisitor(pack);
+			t.accept(tv);
+			Typ=tv.GetTypeText();//TODO z typ1 a typ2
 			Register=pack.l.next();
 			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
 			break; // <
 		case GET :
-			Typ=null;//TODO z typ1 a typ2
+			t=pack.t.getExpressionType(e);
+			tv = new CodeGenTypeVisitor(pack);
+			t.accept(tv);
+			Typ=tv.GetTypeText();//TODO z typ1 a typ2
 			Register=pack.l.next();
 			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
 			break; // >=
 		case LET :
-			Typ=null;//TODO z typ1 a typ2
+			t=pack.t.getExpressionType(e);
+			tv = new CodeGenTypeVisitor(pack);
+			t.accept(tv);
+			Typ=tv.GetTypeText();//TODO z typ1 a typ2
 			Register=pack.l.next();
 			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
 			break; // <=
 		case EQ :
-			Typ=null;//TODO z typ1 a typ2
+			t=pack.t.getExpressionType(e);
+			tv = new CodeGenTypeVisitor(pack);
+			t.accept(tv);
+			Typ=tv.GetTypeText();//TODO z typ1 a typ2
 			Register=pack.l.next();
 			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
 			break; // ==
 		case NEQ :
-			Typ=null;//TODO z typ1 a typ2
+			t=pack.t.getExpressionType(e);
+			tv = new CodeGenTypeVisitor(pack);
+			t.accept(tv);
+			Typ=tv.GetTypeText();//TODO z typ1 a typ2
 			Register=pack.l.next();
 			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
 			break; // !=
 		case ASSIG ://TODO priradenie do pamate
-			Typ=null;//TODO z typ1 a typ2
+			t=pack.t.getExpressionType(e);
+			tv = new CodeGenTypeVisitor(pack);
+			t.accept(tv);
+			Typ=tv.GetTypeText();//TODO z typ1 a typ2
 			Register=pack.l.next();
 			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);

@@ -3,6 +3,7 @@ package codegen;
 import java.io.OutputStreamWriter;
 
 import symbols.AdressTable;
+import typeresolve.ExpressionTypeMapping;
 
 public class VisitPack {
 
@@ -20,5 +21,6 @@ public class VisitPack {
 	public LabelGenerator l;
 	public OutputStreamWriter wr;
 	public RegisterGenerator r;
+	public ExpressionTypeMapping t;
 
 }
