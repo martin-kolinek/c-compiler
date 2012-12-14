@@ -110,7 +110,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		s.condition.accept(g);
 		result=g.GetResultRegister();
 		typ=g.GetResultTyp();
-		v=r.next() + "= icmp ne " + typ + " " + Integer.toString(0) + " " + result + "\n"; 
+		v=r.next() + "= icmp ne " + typ + " " + Integer.toString(0) + ", " + result + "\n"; 
 		pis(wr,v);
 		v="br i1" + r.akt() + ", " + " label %"+DalejSkok + ", "+" label %"+ BreakSkok + "\n";
 		pis(wr,v);
@@ -201,7 +201,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		String DruhaVetva = l.next();
 		
 		//vyhodnotenie podmienky
-		String v = r.next() + "= icmp ne " + typ + " " + Integer.toString(0) + " " + result + "\n"; 
+		String v = r.next() + "= icmp ne " + typ + " " + Integer.toString(0) + ", " + result + "\n"; 
 		pis(wr,v);
 		v="br i1" + r.akt() + ", " +" label %"+ PrvaVetva + ", "+" label %"+ DruhaVetva + "\n";
 		pis(wr,v);

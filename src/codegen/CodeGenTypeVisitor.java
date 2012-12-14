@@ -20,6 +20,8 @@ public class CodeGenTypeVisitor implements TypeVisitor {
 
 	@Override
 	public void visit(StructType t) {
+		
+		
 		// TODO Auto-generated method stub
 
 	}
@@ -57,6 +59,11 @@ public class CodeGenTypeVisitor implements TypeVisitor {
 	public String GetTypeText() {
 		// TODO Auto-generated method stub
 		return this.Typ;
+	}
+
+	public boolean unsig() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }
