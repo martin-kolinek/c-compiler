@@ -42,9 +42,14 @@ public class CodeGenTypeVisitor implements TypeVisitor {
 	@Override
 	public void visit(PrimitiveType t) {
 		// TODO Auto-generated method stub
-		Typ = "i" + t.size;
+		//Typ = "i" + t.size;
 		if (!t.sign) unsig=true;
-		if (!t.floating) integer=true; 
+		if (!t.floating){
+			integer=true;
+			
+		else
+			null;
+		}Typ = "i" + t.size;
 
 	}
 
