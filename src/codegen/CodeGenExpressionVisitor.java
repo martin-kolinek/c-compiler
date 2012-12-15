@@ -29,6 +29,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 //	private LabelGenerator l;
 //	private OutputStreamWriter wr;
 	private VisitPack pack;
+	private boolean acces = false;
 	
 	private void pis(CodeGenStream o,String s){
 		o.writeLine(new String[]{s});
@@ -263,7 +264,48 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 	@Override
 	public void visit(UnaryExpression e) {
 		// TODO Auto-generated method stub
+		
+		CodeGenExpressionVisitor v1 = new CodeGenExpressionVisitor(pack);
+		e.exp.accept(v1);
+		String result1 = v1.GetResultRegister();
+		Type t = pack.t.getExpressionType(e);
+		CodeGenTypeVisitor tv = new CodeGenTypeVisitor(pack);
+		t.accept(tv);
+		Typ=tv.GetTypeText();
+		
+		switch(e.op){
+			case PRE_INC :
+				Register=pack.r.next();
+				pack.wr.writeAssignment(Register, "add", "1", result1);
+				if (v1.acces()) pack.wr.store(v1.adress(),Register);
+				break; //++
+			case PRE_DEC :
+				break; //--
+			case POST_INC :
+				break; //++
+			case POST_DEC :
+				break; //--
+			case ADDR :
+				break; //&
+			case PTR :
+				break; //*
+			case COMP :
+				break; //~ 
+			case NOT :
+				break; //!
+		
+		}
 
+	}
+
+	private String adress() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private boolean acces() {
+		// TODO Auto-generated method stub
+		return acces ;
 	}
 
 	@Override

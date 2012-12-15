@@ -34,4 +34,9 @@ public class CodeGenStream {
 			arr.add(s);
 		writeLine(arr.toArray(ss));
 	}
+
+	public void store(String adress, String register) {
+		// TODO Auto-generated method stub
+		
+	}
 }
