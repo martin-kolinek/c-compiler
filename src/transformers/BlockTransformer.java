@@ -54,11 +54,6 @@ public class BlockTransformer implements StatementVisitor {
 				descend(s);
 			}
 		}
-		if(switchStatement.def!=null) {
-			for(Statement s : switchStatement.def) {
-				descend(s);
-			}
-		}
 	}
 
 	@Override

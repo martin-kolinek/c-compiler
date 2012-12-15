@@ -278,11 +278,13 @@ switch_stat returns [SwitchStatement ret]
   : SWITCH {$ret=new SwitchStatement();} 
   '(' expr=expression {$ret.expr=$expr.ret;} ')' 
   '{' (cc=case_clause {$ret.cases.add($cc.ret);})* 
-  (DEFAULT ':'  
-  (st=statement {$ret.def.add($st.ret);})* )? '}';
+  '}';
 
 case_clause returns [Case ret]
-  : CASE cond=conditional_expression ':' {$ret=new Case(); $ret.cond=$cond.ret;}
+@init {
+  $ret = new Case();
+}
+  : (CASE cond=conditional_expression {$ret.cond=$cond.ret;} | DEFAULT ) ':'  
   (st=statement {$ret.statements.add($st.ret);})*;
 
 while_stat returns [WhileStatement ret]

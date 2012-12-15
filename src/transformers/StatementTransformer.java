@@ -51,9 +51,6 @@ public class StatementTransformer implements StatementVisitor {
 				c.statements.set(i, descend(c.statements.get(i)));
 			}
 		}
-		for(int i=0; i<switchStatement.def.size(); i++) {
-			switchStatement.def.set(i, descend(switchStatement.def.get(i)));
-		}
 	}
 
 	@Override
