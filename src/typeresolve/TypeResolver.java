@@ -3,7 +3,6 @@ package typeresolve;
 import declaration.ResolvedDeclaration;
 import symbols.SymbolTable;
 import toplevel.FunctionDefinition;
-import toplevel.FunctionParameter;
 import transformers.ExpressionModifier;
 import transformers.ExpressionModifierFactory;
 import transformers.ExpressionStatementModifier;

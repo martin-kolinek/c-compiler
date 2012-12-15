@@ -1,8 +1,5 @@
 package codegen;
 
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-
 import types.Type;
 
 import expression.AssignmentExpression;
@@ -33,13 +30,8 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 //	private OutputStreamWriter wr;
 	private VisitPack pack;
 	
-	private void pis(OutputStreamWriter o,String s){
-		try {
-			o.append(s);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	private void pis(CodeGenStream o,String s){
+		o.writeLine(new String[]{s});
 	}
 	
 	public CodeGenExpressionVisitor(VisitPack pack){

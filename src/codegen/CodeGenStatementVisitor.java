@@ -1,10 +1,8 @@
 package codegen;
 
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-
+import java.util.ArrayList;
 import exceptions.SemanticException;
-
+import expression.constant.IntConstantExpression;
 import statements.BlockStatement;
 import statements.BreakStatement;
 import statements.Case;
@@ -20,170 +18,117 @@ import statements.SwitchStatement;
 import statements.WhileStatement;
 
 public class CodeGenStatementVisitor implements StatementVisitor {
-
-	private OutputStreamWriter wr;
 	
-	public VisitPack pack;
-	public String BreakSkok;
-	public String ContinueSkok;
-	LabelGenerator l;
-	RegisterGenerator r;
+	private VisitPack pack;
+	private String BreakSkok;
+	private String ContinueSkok;
+	private CodeGenStream wr;
 	
 	public CodeGenStatementVisitor(VisitPack pack){
 		this.pack=pack;
-		this.l=this.pack.l;
-		this.r=this.pack.r;
-		this.wr=this.pack.wr;
+		wr=pack.wr;
 	}
-	
-	private void pis(OutputStreamWriter o,String s){
-		try {
-			o.append(s);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
 	
 	@Override
 	public void visit(ReturnStatement s) {
-		String result;
-		String typ;
 		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(pack);
-		s.exp.accept(g);
-		result=g.GetResultRegister();
-		typ=g.GetResultTyp();
-		String v ="ret "+typ+" "+result+'\n';
-		pis(wr,v);
+		if(s.exp!=null) {
+			s.exp.accept(g);
+			wr.writeLine("ret", g.GetResultTyp(), g.GetResultRegister());
+		}
+		else
+			wr.writeLine("ret");
 				
 	}
 
 	@Override
 	public void visit(BreakStatement s) {
 		if(BreakSkok == null) throw new SemanticException("Break mimo cyklu.");
-		String v ="br "+" label %"+BreakSkok;
-		pis(wr,v);
+		wr.writeLine("br", "label", BreakSkok);
 
 	}
 
 	@Override
 	public void visit(ContinueStatement s) {
 		if(ContinueSkok == null) throw new SemanticException("Continue mimo cyklu.");
-		String v ="br "+" label %"+ContinueSkok;
-		pis(wr,v);
+		wr.writeLine("br", "label", ContinueSkok);
 
 	}
 
 	@Override
 	public void visit(DowhileStatement s) {
-		
-		String v=null;
-		pis(wr,v);
+		assert false; //tieto by tu uz nemali byt
 
 	}
 
 	@Override
 	public void visit(ForStatement s) {
-		//nerobi sa, konvertuje sa na while
-		String v ="";
-		pis(wr,v);
-
+		assert false; //tieto by tu uz nemali byt
 	}
 
+	private void writeCondition(String resultRegister, String resultType, String iftrue, String iffalse) {
+		String condRes = pack.r.next();
+		wr.writeAssignment(condRes, "icmp ne", resultType, "0, ",resultRegister);
+		wr.writeLine("br i1", condRes, ", label", iftrue, "label", iffalse);
+	}
+	
 	@Override
 	public void visit(WhileStatement s) {
-		
-		//inicializacia
-		String result;
-		String typ;		
-		ContinueSkok=l.next();
-		BreakSkok=l.next();
-		String DalejSkok = l.next();
-		
-		//label zaciatku cyklu
-		String v =ContinueSkok+":\n";
-		pis(wr,v);
-		
-		//podmienka cyklu
+		//ziskame labely
+		String predCyklom = pack.l.next();
+		String zaCyklom = pack.l.next();
+		String zaPodmienkou = pack.l.next();
+		//zaciatok cyklu a podmienka
+		wr.writeLabel(predCyklom);
 		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(pack);
 		s.condition.accept(g);
-		result=g.GetResultRegister();
-		typ=g.GetResultTyp();
-		v=r.next() + "= icmp ne " + typ + " " + Integer.toString(0) + ", " + result + "\n"; 
-		pis(wr,v);
-		v="br i1" + r.akt() + ", " + " label %"+DalejSkok + ", "+" label %"+ BreakSkok + "\n";
-		pis(wr,v);
-		
-		//pokracovanie v cykle
-		v=DalejSkok + ": \n";
-		pis(wr,v);
-		
-		//vykona sa telo cyklu a skace sa za podmienku
-		s.body.accept(this);
-		v="br " + ContinueSkok + "\n";
-		pis(wr,v);
-		
+		writeCondition(g.GetResultRegister(), g.GetResultTyp(), zaPodmienkou, zaCyklom);
+		//telo cyklu
+		wr.writeLabel(zaPodmienkou);
+		CodeGenStatementVisitor childVisitor = new CodeGenStatementVisitor(pack);
+		childVisitor.BreakSkok=zaCyklom;
+		childVisitor.ContinueSkok=predCyklom;
+		s.body.accept(childVisitor);
+		//skok na zaciatok
+		wr.writeLine("br", "label", predCyklom);
 		//label za cyklom
-		v=BreakSkok + ": \n";
-		pis(wr,v);
-
+		wr.writeLabel(zaCyklom);
 	}
 
 	@Override
 	public void visit(SwitchStatement s) {
-		
-		String Koniec = l.next();//default label, ak nic nematch-ne
+		String zaSwitch = pack.l.next();
+		ArrayList<String> caseLabels = new ArrayList<String>();
+		StringBuilder sb = new StringBuilder();
+		String defLabel = null;
+		for(Case c: s.cases) {
+			
+			String lbl = pack.l.next();
+			caseLabels.add(lbl);
+			if(c.cond!=null) {
+				assert c.cond instanceof IntConstantExpression;
+				IntConstantExpression cexp = (IntConstantExpression)c.cond;
+				sb.append("i32 "+cexp.value+", label "+lbl+" ");
+			}
+			else {
+				defLabel = lbl;
+			}
+		}
+		if(defLabel==null) {
+			defLabel=zaSwitch;
+		}
 		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(pack);
 		s.expr.accept(g);
-		String result = g.GetResultRegister();
-		String typ = g.GetResultTyp(); 
-		
-		//toto ma predpocitat jednotlive hodnoty case-u a zozbierat pre ne nazvy docas premennych
-		
-		VisitPack p=new VisitPack(wr,l,r,this.pack.table);
-		CodeGenCaseVisitor z=new CodeGenCaseVisitor(p);
-		z.Koniec=Koniec;
-		z.dalsi=l.next();
-		String inak = l.next();
-		
-		for (Case c : s.cases){
-			z.zaciatok=z.dalsi;
-			z.dalsi=l.next();
-			c.accept(z);
+		wr.writeLine("switch", g.GetResultTyp(), g.GetResultRegister(), ", label ", defLabel, "[" + sb.toString() + "]");
+		CodeGenStatementVisitor childVis = new CodeGenStatementVisitor(pack);
+		childVis.BreakSkok=zaSwitch;
+		for(int i=0; i<s.cases.size(); i++) {
+			wr.writeLabel(caseLabels.get(i));
+			for(Statement s2 :s.cases.get(i).statements) {
+				s2.accept(childVis);
+			}
 		}
-		String v = z.dalsi + ":\n";
-		pis(wr,v);
-		v="br "+" label %"+inak + "\n"; 
-		
-		v = inak +":\n";
-		pis(wr,v);
-		
-		p = new VisitPack(wr,l,r,this.pack.table);
-		CodeGenStatementVisitor f = new CodeGenStatementVisitor(p);
-		f.BreakSkok=Koniec;
-		for (Statement  d: s.def){
-			d.accept(f);
-		}
-		
-		//podsunut visitoru label na koniec switch
-		v="br " +" label %"+ Koniec + "\n";
-		pis(wr,v);
-		
-		v ="switch " + typ + " " + result+ ", " +" label %"+ inak + " [ \n";
-		pis(wr,v);
-		
-		// vypis predpocitanych options a labelov na statementy na ne
-		for (CaseLine d:z.moje){
-			v=typ + " " + d.expr + ", "+ " label %"+d.label + "\n";
-			pis(wr,v);
-		}		
-		
-		v = "]\n";
-		pis(wr,v);
-		v= Koniec + "\n";//label na konci switch-u
-		pis(wr,v);
-
+		wr.writeLabel(zaSwitch);
 	}
 
 	@Override
@@ -196,48 +141,42 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		String typ = g.GetResultTyp(); 
 		
 		//inicializacia labelov
-		String Koniec = l.next();
-		String PrvaVetva = l.next();
-		String DruhaVetva = l.next();
+		String Koniec = pack.l.next();
+		String PrvaVetva = pack.l.next();
+		String DruhaVetva;
+		if(s.onfalse!=null)
+			DruhaVetva = pack.l.next();
+		else
+			DruhaVetva = Koniec;
 		
 		//vyhodnotenie podmienky
-		String v = r.next() + "= icmp ne " + typ + " " + Integer.toString(0) + ", " + result + "\n"; 
-		pis(wr,v);
-		v="br i1" + r.akt() + ", " +" label %"+ PrvaVetva + ", "+" label %"+ DruhaVetva + "\n";
-		pis(wr,v);
+		writeCondition(result, typ, PrvaVetva, DruhaVetva);
 		
 		//prva vetva if-u
-		v = PrvaVetva + ":\n";
-		pis(wr,v);
+		wr.writeLabel(PrvaVetva);
 		s.ontrue.accept(this);
 		
 		//skok na koniec
-		v="br " +" label %"+ Koniec + "\n";
+		wr.writeLine("br", "label", Koniec);
 		
 		//druha vetva if-u
-		v=DruhaVetva+ ":\n";
-		pis(wr,v);
-		s.onfalse.accept(this);
-		
+		if(s.onfalse!=null) {
+			wr.writeLabel(DruhaVetva);
+			s.onfalse.accept(this);
+		}
 		//vypis label-u konca		
-		v =Koniec + ":\n";
-		pis(wr,v);
-
+		wr.writeLabel(Koniec);
 	}
 
 	@Override
 	public void visit(OneexpressionStatement s) {
 		CodeGenExpressionVisitor g = new CodeGenExpressionVisitor(pack);
 		s.expr.accept(g);
-
 	}
 
 	@Override
 	public void visit(BlockStatement s) {
-		// TODO Auto-generated method stub
-		String v ="";
-		pis(wr,v);
-
+		// TODO bloky treba riesit inym visitorom
 	}
 
 }
