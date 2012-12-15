@@ -1,8 +1,9 @@
 package statements;
 
+import astnode.ASTNode;
 import expression.Expression;
 
-public class DowhileStatement extends Statement {
+public class DowhileStatement extends Statement implements ASTNode{
 	
 	public Statement body;
 	public Expression condition;

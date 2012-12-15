@@ -1,6 +1,8 @@
 package declaration.specifiers;
 
-public class IDDeclarationSpecifier implements DeclarationSpecifier {
+import astnode.ASTNode;
+
+public class IDDeclarationSpecifier implements DeclarationSpecifier, ASTNode {
 
 	public String id;
 	

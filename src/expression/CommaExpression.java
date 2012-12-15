@@ -2,7 +2,9 @@ package expression;
 
 import java.util.ArrayList;
 
-public class CommaExpression implements Expression {
+import astnode.ASTNode;
+
+public class CommaExpression implements Expression, ASTNode {
 
 	public CommaExpression(Expression e){
 		expressions=new ArrayList<Expression>();

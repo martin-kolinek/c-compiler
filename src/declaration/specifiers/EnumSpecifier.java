@@ -2,7 +2,9 @@ package declaration.specifiers;
 
 import java.util.ArrayList;
 
-public class EnumSpecifier implements DeclarationSpecifier {
+import astnode.ASTNode;
+
+public class EnumSpecifier implements DeclarationSpecifier, ASTNode {
 	
 	public EnumSpecifier(String tag) {
 		enumerators = null;

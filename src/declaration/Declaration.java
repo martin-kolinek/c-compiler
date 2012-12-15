@@ -2,6 +2,8 @@ package declaration;
 
 import java.util.ArrayList;
 
+import astnode.ASTNode;
+
 import toplevel.InBlock;
 import toplevel.InBlockVisitor;
 
@@ -9,7 +11,7 @@ import toplevel.InBlockVisitor;
 import declaration.declarator.Declarator;
 import declaration.specifiers.DeclarationSpecifier;
 
-public class Declaration implements InBlock {
+public class Declaration implements InBlock, ASTNode {
 
 	public Declaration() {
 		declSpecs=new ArrayList<DeclarationSpecifier>();

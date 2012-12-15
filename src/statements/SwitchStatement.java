@@ -2,9 +2,11 @@ package statements;
 
 import java.util.ArrayList;
 
+import astnode.ASTNode;
+
 import expression.Expression;
 
-public class SwitchStatement extends Statement {
+public class SwitchStatement extends Statement implements ASTNode {
 	
 	public Expression expr;
 	public ArrayList<Case> cases;

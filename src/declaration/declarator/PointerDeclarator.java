@@ -2,9 +2,11 @@ package declaration.declarator;
 
 import java.util.ArrayList;
 
+import astnode.ASTNode;
+
 import declaration.specifiers.TypeQualifier;
 
-public class PointerDeclarator implements Declarator {
+public class PointerDeclarator implements Declarator, ASTNode {
 
 	public PointerDeclarator(ArrayList<TypeQualifier> qual){
 		qualifiers=qual;

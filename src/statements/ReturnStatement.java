@@ -1,8 +1,9 @@
 package statements;
 
+import astnode.ASTNode;
 import expression.Expression;
 
-public class ReturnStatement extends Statement {
+public class ReturnStatement extends Statement implements ASTNode {
 	
 	public Expression exp;
 

@@ -1,9 +1,10 @@
 package statements;
 
+import astnode.ASTNode;
 import declaration.Declaration;
 import expression.Expression;
 
-public class ForStatement extends Statement{
+public class ForStatement extends Statement implements ASTNode{
 	
 	// if (decl init; cond; after) body
 	public Declaration decl;

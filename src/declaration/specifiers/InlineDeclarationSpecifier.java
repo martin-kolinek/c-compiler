@@ -1,6 +1,8 @@
 package declaration.specifiers;
 
-public class InlineDeclarationSpecifier implements DeclarationSpecifier {
+import astnode.ASTNode;
+
+public class InlineDeclarationSpecifier implements DeclarationSpecifier, ASTNode {
 
 	@Override
 	public void accept(DeclarationSpecifierVisitor v) {

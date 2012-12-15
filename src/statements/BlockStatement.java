@@ -2,10 +2,12 @@ package statements;
 
 import java.util.ArrayList;
 
+import astnode.ASTNode;
+
 import toplevel.InBlock;
 
 
-public class BlockStatement extends Statement {
+public class BlockStatement extends Statement implements ASTNode {
 	
 	public BlockStatement(){
 		inBlock=new ArrayList<InBlock>();

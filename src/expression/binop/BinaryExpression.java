@@ -1,9 +1,10 @@
 package expression.binop;
 
+import astnode.ASTNode;
 import expression.Expression;
 import expression.ExpressionVisitor;
 
-public class BinaryExpression implements Expression {
+public class BinaryExpression implements Expression, ASTNode {
 	
 	public BinaryExpression(Expression e1, BinaryOperator op, Expression e2) {
 		left=e1;

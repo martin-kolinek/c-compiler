@@ -2,7 +2,9 @@ package types;
 
 import java.util.HashMap;
 
-public enum PrimitiveType implements Type {
+import astnode.ASTNode;
+
+public enum PrimitiveType implements Type, ASTNode {
 	VOID(0,false, false),
 	CHAR(1, true, false),
 	UCHAR(1, false, false),

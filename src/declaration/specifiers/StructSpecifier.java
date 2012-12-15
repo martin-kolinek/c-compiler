@@ -2,9 +2,11 @@ package declaration.specifiers;
 
 import java.util.ArrayList;
 
+import astnode.ASTNode;
+
 import declaration.Declaration;
 
-public class StructSpecifier implements DeclarationSpecifier {
+public class StructSpecifier implements DeclarationSpecifier, ASTNode {
 
 	public StructSpecifier(String tag){
 		this.tag=tag;

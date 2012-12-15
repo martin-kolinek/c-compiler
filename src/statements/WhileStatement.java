@@ -1,8 +1,9 @@
 package statements;
 
+import astnode.ASTNode;
 import expression.Expression;
 
-public class WhileStatement extends Statement {
+public class WhileStatement extends Statement implements ASTNode{
 
 	public WhileStatement(){
 	}

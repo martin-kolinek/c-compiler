@@ -1,8 +1,9 @@
 package types;
 
+import astnode.ASTNode;
 import expression.Expression;
 
-public class ArrayType implements Type {
+public class ArrayType implements Type, ASTNode {
 
 	public ArrayType(Type t, Expression e) {
 		size=e;

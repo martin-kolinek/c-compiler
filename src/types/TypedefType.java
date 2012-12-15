@@ -1,6 +1,8 @@
 package types;
 
-public class TypedefType implements Type {
+import astnode.ASTNode;
+
+public class TypedefType implements Type, ASTNode {
 	
 	public String identifier;
 	

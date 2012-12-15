@@ -1,9 +1,10 @@
 package expression.unop;
 
+import astnode.ASTNode;
 import expression.Expression;
 import expression.ExpressionVisitor;
 
-public class UnaryExpression implements Expression{
+public class UnaryExpression implements Expression, ASTNode{
 	
 	public UnaryExpression() {
 	}

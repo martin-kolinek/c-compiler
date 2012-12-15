@@ -2,7 +2,9 @@ package declaration.initializer;
 
 import java.util.ArrayList;
 
-public class CompoundInitializer implements Initializer {
+import astnode.ASTNode;
+
+public class CompoundInitializer implements Initializer, ASTNode {
 
 	public CompoundInitializer() {
 		initializers=new ArrayList<DesignatedInitializer>();

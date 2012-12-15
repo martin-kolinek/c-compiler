@@ -1,9 +1,10 @@
 package expression;
 
+import astnode.ASTNode;
 import types.Type;
 import declaration.Declaration;
 
-public class CastExpression implements Expression{
+public class CastExpression implements Expression, ASTNode{
 	
 	public CastExpression(){
 	}

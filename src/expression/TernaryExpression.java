@@ -1,6 +1,8 @@
 package expression;
 
-public class TernaryExpression implements Expression {
+import astnode.ASTNode;
+
+public class TernaryExpression implements Expression, ASTNode {
 
 	public Expression condition;
 	public Expression ontrue;

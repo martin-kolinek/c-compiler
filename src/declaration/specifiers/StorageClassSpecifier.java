@@ -1,6 +1,8 @@
 package declaration.specifiers;
 
-public enum StorageClassSpecifier implements DeclarationSpecifier {
+import astnode.ASTNode;
+
+public enum StorageClassSpecifier implements DeclarationSpecifier, ASTNode {
 	STATIC, EXTERN, AUTO, REGISTER;
 	@Override
 	public void accept(DeclarationSpecifierVisitor v) {

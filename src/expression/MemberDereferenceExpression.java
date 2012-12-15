@@ -1,6 +1,8 @@
 package expression;
 
-public class MemberDereferenceExpression implements Expression{
+import astnode.ASTNode;
+
+public class MemberDereferenceExpression implements Expression, ASTNode{
 	
 	public Expression exp;
 	public String id;

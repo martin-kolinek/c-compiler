@@ -2,9 +2,11 @@ package declaration.declarator;
 
 import java.util.ArrayList;
 
+import astnode.ASTNode;
+
 import declaration.Declaration;
 
-public class FunctionDeclarator implements Declarator {
+public class FunctionDeclarator implements Declarator, ASTNode {
 
 	public FunctionDeclarator(Declarator d){
 		parameters=new ArrayList<Declaration>();

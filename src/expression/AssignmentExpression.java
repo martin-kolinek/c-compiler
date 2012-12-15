@@ -1,6 +1,8 @@
 package expression;
 
-public class AssignmentExpression implements Expression {
+import astnode.ASTNode;
+
+public class AssignmentExpression implements Expression, ASTNode {
 
 	public Expression left, right;
 	

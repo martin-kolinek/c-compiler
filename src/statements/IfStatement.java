@@ -1,8 +1,9 @@
 package statements;
 
+import astnode.ASTNode;
 import expression.Expression;
 
-public class IfStatement extends Statement{
+public class IfStatement extends Statement implements ASTNode{
 	
 	public Expression cond;
 	public Statement ontrue;

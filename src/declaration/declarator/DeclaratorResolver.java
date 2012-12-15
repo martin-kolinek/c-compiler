@@ -2,6 +2,8 @@ package declaration.declarator;
 
 import java.util.ArrayList;
 
+import astnode.ASTNode;
+
 import declaration.Declaration;
 import declaration.DeclarationResolver;
 import declaration.ResolvedDeclaration;
@@ -14,7 +16,7 @@ import types.ArrayType;
 import types.PointerType;
 import types.Type;
 
-public class DeclaratorResolver implements DeclaratorVisitor {
+public class DeclaratorResolver implements DeclaratorVisitor, ASTNode{
 
 	public DeclaratorResolver(){
 		func=false;

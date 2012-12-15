@@ -2,11 +2,13 @@ package declaration.declarator;
 
 import java.util.ArrayList;
 
+import astnode.ASTNode;
+
 import declaration.specifiers.TypeQualifier;
 
 import expression.Expression;
 
-public class ArrayDeclarator implements Declarator {
+public class ArrayDeclarator implements Declarator, ASTNode {
 	
 	public ArrayDeclarator(Declarator d,boolean ast, boolean st) {
 		stat=st;

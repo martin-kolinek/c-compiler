@@ -1,6 +1,8 @@
 package declaration.declarator;
 
-public class IDDeclarator implements Declarator {
+import astnode.ASTNode;
+
+public class IDDeclarator implements Declarator, ASTNode {
 
 	public IDDeclarator(String id) {
 		this.id=id;

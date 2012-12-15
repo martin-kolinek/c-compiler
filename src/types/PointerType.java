@@ -1,6 +1,8 @@
 package types;
 
-public class PointerType implements Type {
+import astnode.ASTNode;
+
+public class PointerType implements Type, ASTNode {
 
 	public PointerType(Type t) {
 		pointedToType=t;

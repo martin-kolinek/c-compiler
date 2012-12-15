@@ -1,6 +1,8 @@
 package declaration.specifiers;
 
-public class TypedefDeclarationSpecifier implements DeclarationSpecifier {
+import astnode.ASTNode;
+
+public class TypedefDeclarationSpecifier implements DeclarationSpecifier, ASTNode {
 
 	@Override
 	public void accept(DeclarationSpecifierVisitor v) {

@@ -3,9 +3,11 @@ package types;
 import java.util.ArrayList;
 import java.util.List;
 
+import astnode.ASTNode;
+
 import declaration.ResolvedDeclaration;
 
-public class StructType implements Type {
+public class StructType implements Type, ASTNode {
 
 	public StructType(String tag, List<ResolvedDeclaration> members) {
 		this.tag=tag;

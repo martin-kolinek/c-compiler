@@ -1,7 +1,9 @@
 package declaration.specifiers;
 
+import astnode.ASTNode;
 
-public enum PrimitiveTypeSpecifier implements DeclarationSpecifier {
+
+public enum PrimitiveTypeSpecifier implements DeclarationSpecifier, ASTNode {
 	INT, LONG, FLOAT, DOUBLE, SHORT, CHAR, VOID, UNSIGNED, SIGNED;
 
 	@Override

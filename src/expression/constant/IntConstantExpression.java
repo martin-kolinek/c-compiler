@@ -1,8 +1,9 @@
 package expression.constant;
 
+import astnode.ASTNode;
 import expression.ExpressionVisitor;
 
-public class IntConstantExpression implements ConstantExpression{
+public class IntConstantExpression implements ConstantExpression, ASTNode{
 	
 	public IntConstantExpression(){
 	}

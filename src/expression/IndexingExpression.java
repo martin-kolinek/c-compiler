@@ -1,6 +1,8 @@
 package expression;
 
-public class IndexingExpression implements Expression {
+import astnode.ASTNode;
+
+public class IndexingExpression implements Expression, ASTNode {
 
 	public IndexingExpression(Expression target, Expression index){
 		this.target=target;

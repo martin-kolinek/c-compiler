@@ -1,8 +1,9 @@
 package expression.constant;
 
+import astnode.ASTNode;
 import expression.ExpressionVisitor;
 
-public class CharConstantExpression implements ConstantExpression{
+public class CharConstantExpression implements ConstantExpression, ASTNode{
 	
 	public char value;
 

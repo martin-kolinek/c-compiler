@@ -2,7 +2,9 @@ package expression;
 
 import java.util.ArrayList;
 
-public class FunctionCallExpression implements Expression {
+import astnode.ASTNode;
+
+public class FunctionCallExpression implements Expression, ASTNode {
 
 	public FunctionCallExpression(String name) {
 		args=new ArrayList<Expression>();

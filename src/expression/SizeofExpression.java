@@ -1,6 +1,8 @@
 package expression;
 
-public class SizeofExpression implements Expression{
+import astnode.ASTNode;
+
+public class SizeofExpression implements Expression, ASTNode{
 	
 	public Expression exp;
 

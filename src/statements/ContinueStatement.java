@@ -1,6 +1,8 @@
 package statements;
 
-public class ContinueStatement extends Statement {
+import astnode.ASTNode;
+
+public class ContinueStatement extends Statement implements ASTNode{
 	
 	@Override
 	public void accept(StatementVisitor v) {
