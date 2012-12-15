@@ -13,6 +13,7 @@ public class CodeGenTypeVisitor implements TypeVisitor {
 	private VisitPack pack;
 	private String Typ;
 	boolean unsig = false;
+	private boolean integer = false;
 
 	public CodeGenTypeVisitor(VisitPack pack) {
 		this.pack=pack;
@@ -43,6 +44,7 @@ public class CodeGenTypeVisitor implements TypeVisitor {
 		// TODO Auto-generated method stub
 		Typ = "i" + t.size;
 		if (!t.sign) unsig=true;
+		if (!t.floating) integer=true; 
 
 	}
 
@@ -66,6 +68,11 @@ public class CodeGenTypeVisitor implements TypeVisitor {
 	public boolean unsig() {
 		// TODO Auto-generated method stub
 		return unsig;
+	}
+
+	public boolean integer() {
+		// TODO Auto-generated method stub
+		return integer ;
 	}
 
 }

@@ -77,7 +77,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 			Typ=tv.GetTypeText();//TODO z typ1 a typ2
 			Register=pack.r.next();
 			
-			if(Typ == "")//TODO je integer
+			if(tv.integer())//TODO je integer
 				v=Register + "= add "+ Typ + " " + result1 + ", " + result2 + "\n";
 			else//je float
 				v=Register + "= fadd "+ Typ + " " + result1 + ", " + result2 + "\n";
