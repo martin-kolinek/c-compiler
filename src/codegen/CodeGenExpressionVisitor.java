@@ -66,10 +66,10 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 			Type t=pack.t.getExpressionType(e);
 			CodeGenTypeVisitor tv = new CodeGenTypeVisitor(pack);
 			t.accept(tv);
-			Typ=tv.GetTypeText();//TODO z typ1 a typ2
+			Typ=tv.GetTypeText();
 			Register=pack.r.next();
 			
-			if(tv.integer())//TODO je integer
+			if(tv.integer())
 				v=Register + "= add "+ Typ + " " + result1 + ", " + result2 + "\n";
 			else//je float
 				v=Register + "= fadd "+ Typ + " " + result1 + ", " + result2 + "\n";
@@ -81,10 +81,10 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 			t=pack.t.getExpressionType(e);
 			tv = new CodeGenTypeVisitor(pack);
 			t.accept(tv);
-			Typ=tv.GetTypeText();;//TODO z typ1 a typ2
+			Typ=tv.GetTypeText();;
 			Register=pack.r.next();
 			
-			if(Typ == "")//TODO je integer
+			if(tv.integer())
 				v=Register + "= sub "+ Typ + " " + result1 + ", " + result2 + "\n";
 			else
 				v=Register + "= fsub "+ Typ + " " + result1 + ", " + result2 + "\n";
@@ -96,10 +96,10 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 			t=pack.t.getExpressionType(e);
 			tv = new CodeGenTypeVisitor(pack);
 			t.accept(tv);
-			Typ=tv.GetTypeText();//TODO z typ1 a typ2
+			Typ=tv.GetTypeText();
 			Register=pack.r.next();
 			
-			if(Typ == "")//TODO je integer
+			if(tv.integer())
 				v=Register + "= mul "+ Typ + " " + result1 + ", " + result2 + "\n";
 			else
 				v=Register + "= fmul "+ Typ + " " + result1 + ", " + result2 + "\n";
@@ -110,9 +110,9 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 			t=pack.t.getExpressionType(e);
 			tv = new CodeGenTypeVisitor(pack);
 			t.accept(tv);
-			Typ=tv.GetTypeText();//TODO z typ1 a typ2
+			Typ=tv.GetTypeText();
 			Register=pack.r.next();
-			if(Typ == "")//TODO je integer
+			if(tv.integer())
 				v=Register + "= sdiv "+ Typ + " " + result1 + ", " + result2 + "\n";
 			else
 				v=Register + "= fdiv "+ Typ + " " + result1 + ", " + result2 + "\n";			pis(pack.wr,v);
@@ -122,7 +122,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 			t=pack.t.getExpressionType(e);
 			tv = new CodeGenTypeVisitor(pack);
 			t.accept(tv);
-			Typ=tv.GetTypeText();//TODO z typ1 a typ2
+			Typ=tv.GetTypeText();
 			Register=pack.r.next();
 			v=Register + "= srem "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
@@ -132,7 +132,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 			t=pack.t.getExpressionType(e);
 			tv = new CodeGenTypeVisitor(pack);
 			t.accept(tv);
-			Typ=tv.GetTypeText();//TODO z typ1 a typ2
+			Typ=tv.GetTypeText();
 			Register=pack.r.next();
 			v=Register + "= shl "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
@@ -142,7 +142,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 			t=pack.t.getExpressionType(e);
 			tv = new CodeGenTypeVisitor(pack);
 			t.accept(tv);
-			Typ=tv.GetTypeText();;//TODO z typ1 a typ2
+			Typ=tv.GetTypeText();
 			Register=pack.r.next();
 			v=Register + "= lshr "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
@@ -152,7 +152,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 			t=pack.t.getExpressionType(e);
 			tv = new CodeGenTypeVisitor(pack);
 			t.accept(tv);
-			Typ=tv.GetTypeText();//TODO z typ1 a typ2
+			Typ=tv.GetTypeText();
 			Register=pack.r.next();
 			v=Register + "= and "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
@@ -162,7 +162,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 			t=pack.t.getExpressionType(e);
 			tv = new CodeGenTypeVisitor(pack);
 			t.accept(tv);
-			Typ=tv.GetTypeText();//TODO z typ1 a typ2
+			Typ=tv.GetTypeText();
 			Register=pack.r.next();
 			v=Register + "= xor "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
@@ -172,7 +172,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 			t=pack.t.getExpressionType(e);
 			tv = new CodeGenTypeVisitor(pack);
 			t.accept(tv);
-			Typ=tv.GetTypeText();//TODO z typ1 a typ2
+			Typ=tv.GetTypeText();
 			Register=pack.r.next();
 			v=Register + "= or "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
@@ -182,7 +182,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 			t=pack.t.getExpressionType(e);
 			tv = new CodeGenTypeVisitor(pack);
 			t.accept(tv);
-			Typ=tv.GetTypeText();//TODO z typ1 a typ2
+			Typ=tv.GetTypeText();
 			Register=pack.r.next();
 			v=pack.r.next() + "= and "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
@@ -194,7 +194,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 			t=pack.t.getExpressionType(e);
 			tv = new CodeGenTypeVisitor(pack);
 			t.accept(tv);
-			Typ=tv.GetTypeText();//TODO z typ1 a typ2
+			Typ=tv.GetTypeText();
 			Register=pack.r.next();
 			v=pack.r.next() + "= or "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
@@ -206,7 +206,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 			t=pack.t.getExpressionType(e);
 			tv = new CodeGenTypeVisitor(pack);
 			t.accept(tv);
-			Typ=tv.GetTypeText();//TODO z typ1 a typ2
+			Typ=tv.GetTypeText();
 			Register=pack.r.next();
 			if(tv.unsig())
 				v=Register + "= icmp ugt "+ Typ + " " + result1 + ", " + result2 + "\n";
@@ -219,7 +219,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 			t=pack.t.getExpressionType(e);
 			tv = new CodeGenTypeVisitor(pack);
 			t.accept(tv);
-			Typ=tv.GetTypeText();//TODO z typ1 a typ2
+			Typ=tv.GetTypeText();
 			Register=pack.r.next();
 			v=Register + "= icmp eq "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
@@ -229,7 +229,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 			t=pack.t.getExpressionType(e);
 			tv = new CodeGenTypeVisitor(pack);
 			t.accept(tv);
-			Typ=tv.GetTypeText();//TODO z typ1 a typ2
+			Typ=tv.GetTypeText();
 			Register=pack.r.next();
 			v=Register + "= icmp nq "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
