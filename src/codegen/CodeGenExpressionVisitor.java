@@ -24,12 +24,13 @@ import expression.unop.UnaryExpression;
 public class CodeGenExpressionVisitor implements ExpressionVisitor {
 	
 	private String Register;
-	private String Typ;
+	private String Typ = "";
 //	private RegisterGenerator r;
 //	private LabelGenerator l;
 //	private OutputStreamWriter wr;
 	private VisitPack pack;
-	private boolean acces = false;
+	private boolean acces = false;//TODO
+	private String adress = "";//TODO
 	
 	private void pis(CodeGenStream o,String s){
 		o.writeLine(new String[]{s});
@@ -276,20 +277,57 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 		switch(e.op){
 			case PRE_INC :
 				Register=pack.r.next();
-				pack.wr.writeAssignment(Register, "add", "1", result1);
-				if (v1.acces()) pack.wr.store(v1.adress(),Register);
+				//pouzijeme prislusnu operaciu scitovania
+				if(tv.integer())
+					pack.wr.writeAssignment(Register, "add",Typ, "1", result1);
+				else
+					pack.wr.writeAssignment(Register, "fadd",Typ, "1", result1);
+				//ak islo o premennu z pamate, ulozime inkrementovanu hodnotu
+				if (v1.acces()) pack.wr.store(v1.adress(),Typ,Register);
 				break; //++
 			case PRE_DEC :
+				Register=pack.r.next();
+				//pouzijeme prislusnu operaciu odcitovania
+				if(tv.integer())
+					pack.wr.writeAssignment(Register, "sub",Typ, "1", result1);
+				else
+					pack.wr.writeAssignment(Register, "fsub",Typ, "1", result1);
+				//ak islo o premennu z pamate, ulozime dekrementovanu hodnotu
+				if (v1.acces()) pack.wr.store(v1.adress(),Typ,Register);
 				break; //--
 			case POST_INC :
+				Register=pack.r.next();
+				//posleme neinkrementovanu hodnotu
+				pack.wr.writeAssignment(Register, Typ,result1);
+				String res = pack.r.next();
+				//pouzijeme prislusnu operaciu scitovania
+				if(tv.integer())
+					pack.wr.writeAssignment(res, "add",Typ, "1", result1);
+				else
+					pack.wr.writeAssignment(res, "fadd",Typ, "1", result1);
+				//ak islo o premennu z pamate, ulozime inkrementovanu hodnotu
+				if (v1.acces()) pack.wr.store(v1.adress(),Typ,res);
 				break; //++
 			case POST_DEC :
+				Register=pack.r.next();
+				//posleme nedekrementovanu hodnotu
+				pack.wr.writeAssignment(Register, Typ,result1);
+				res = pack.r.next();
+				//pouzijeme prislusnu operaciu odcitovania
+				if(tv.integer())
+					pack.wr.writeAssignment(res, "sub",Typ, "1", result1);
+				else
+					pack.wr.writeAssignment(res, "fsub",Typ, "1", result1);
+				//ak islo o premennu z pamate, ulozime dekrementovanu hodnotu
+				if (v1.acces()) pack.wr.store(v1.adress(),Typ,res);
 				break; //--
 			case ADDR :
 				break; //&
 			case PTR :
 				break; //*
 			case COMP :
+				Register=pack.r.next();
+				pack.wr.writeAssignment(Register, "xor",Typ, "-1", result1);
 				break; //~ 
 			case NOT :
 				break; //!
@@ -300,7 +338,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 
 	private String adress() {
 		// TODO Auto-generated method stub
-		return null;
+		return adress;
 	}
 
 	private boolean acces() {
