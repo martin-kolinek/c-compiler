@@ -5,7 +5,7 @@ import astnode.ASTNode;
 public class MemberAccessExpression implements Expression, ASTNode {
 	
 	public Expression exp;
-	public String id;
+	public String id;//TODO sem treba dat LLVM typ + index
 
 	public MemberAccessExpression(Expression ex, String id) {
 		this.id = id;

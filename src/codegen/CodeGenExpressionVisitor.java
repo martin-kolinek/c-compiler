@@ -43,11 +43,11 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 //		this.wr=this.pack.wr;
 	}
 	
-	public String GetResultRegister(){//TODO
+	public String GetResultRegister(){
 		return Register;
 	}
 	
-	public String GetResultTyp(){//TODO
+	public String GetResultTyp(){
 		return Typ;
 	}
 
@@ -241,7 +241,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 			t=pack.t.getExpressionType(e);
 			tv = new CodeGenTypeVisitor(pack);
 			t.accept(tv);
-			Typ=tv.GetTypeText();//TODO z typ1 a typ2
+			Typ=tv.GetTypeText();
 			Register=pack.r.next();
 			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
 			pis(pack.wr,v);
@@ -321,15 +321,21 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 				//ak islo o premennu z pamate, ulozime dekrementovanu hodnotu
 				if (v1.acces()) pack.wr.store(v1.adress(),Typ,res);
 				break; //--
-			case ADDR :
+			case ADDR ://TODO
+				/*if(v1.acces())
+					pack.wr.writeAssignment(Register,Typ+"*", v1.adress());*/				
 				break; //&
-			case PTR :
+			case PTR ://TODO
+				/*if(v1.acces())
+					pack.wr.writeAssignment(Register,"load",Typ+"&", v1.adress());*/				
 				break; //*
 			case COMP :
 				Register=pack.r.next();
 				pack.wr.writeAssignment(Register, "xor",Typ, "-1", result1);
 				break; //~ 
 			case NOT :
+				Register=pack.r.next();
+				pack.wr.writeAssignment(Register, "icmp ne","0",result1);
 				break; //!
 		
 		}
@@ -348,7 +354,18 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visit(CastExpression e) {
-		// TODO Auto-generated method stub
+		CodeGenExpressionVisitor v1 = new CodeGenExpressionVisitor(pack);
+		e.exp.accept(v1);
+		String result1 = v1.GetResultRegister();
+		Type t = pack.t.getExpressionType(e);
+		CodeGenTypeVisitor tv = new CodeGenTypeVisitor(pack);
+		t.accept(tv);
+		Typ=tv.GetTypeText();
+		CodeGenTypeVisitor tv2 = new CodeGenTypeVisitor(pack);
+		e.type.accept(tv2);
+		String Typ2 = tv2.GetTypeText();
+		Register = pack.r.next();
+		pack.wr.writeAssignment(Register, "trunc",Typ, result1,",",Typ2);
 
 	}
 
@@ -366,7 +383,15 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visit(MemberAccessExpression e) {
-		// TODO Auto-generated method stub
+		CodeGenExpressionVisitor v1 = new CodeGenExpressionVisitor(pack);
+		e.exp.accept(v1);
+		String result1 = v1.GetResultRegister();
+		Type t = pack.t.getExpressionType(e);
+		CodeGenTypeVisitor tv = new CodeGenTypeVisitor(pack);
+		t.accept(tv);
+		Typ=tv.GetTypeText();
+		Register = pack.r.next();
+		pack.wr.writeAssignment(Register, "getelementptr",Typ,"*",result1,",",e.id);
 
 	}
 
