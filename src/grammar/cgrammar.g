@@ -35,15 +35,16 @@ program returns [Program ret]
 @init {
 $ret = new Program();
 }
-  : (ed=external_declaration {$ret.declarations.inBlock.add($ed.ret);})* EOF;
+  : (ed=external_declaration {$ret.declarations.inBlock.add($ed.ret);})* tok=EOF
+  {pos.setPosition($ret, $tok);};
 
 primary_expression returns [Expression ret]
 @init{
   $ret=null;
 }
-  : ID {$ret = new IDExpression($ID.getText());} |
+  : ID {$ret = new IDExpression($ID.getText()); pos.setPosition((IDExpression)$ret, $ID);} |
   con=constant {$ret = $con.ret;} | 
-  (ID {$ret = new FunctionCallExpression($ID.getText());})? 
+  (ID {$ret = new FunctionCallExpression($ID.getText()); pos.setPosition((FunctionCallExpression)$ret, $ID);})? 
     '(' exp=expression ')' {
       if ($ret != null){
         ((FunctionCallExpression)$ret).args = $exp.ret.expressions;
@@ -60,29 +61,29 @@ postfix_expression returns [Expression ret]
   ;
 
 postfix_expression_s [Expression e] returns [Expression ret]
-  : '[' e2=expression ']' {$ret=new IndexingExpression($e, $e2.ret);} |
-  '.' id=ID {$ret=new MemberAccessExpression($e, $id.getText());} | 
-  '->' id=ID {$ret=new MemberDereferenceExpression($e, $id.getText());} |
-  '++' {$ret=new UnaryExpression($e, UnaryOperator.POST_INC);} |
-  '--' {$ret=new UnaryExpression($e, UnaryOperator.POST_DEC);} 
+  : tok='[' e2=expression ']' {$ret=new IndexingExpression($e, $e2.ret); pos.setPosition((IndexingExpression)$ret, $tok); } |
+  tok='.' id=ID {$ret=new MemberAccessExpression($e, $id.getText()); pos.setPosition((MemberAccessExpression)$ret, $tok);} | 
+  tok='->' id=ID {$ret=new MemberDereferenceExpression($e, $id.getText()); pos.setPosition((MemberDereferenceExpression)$ret, $tok);} |
+  tok='++' {$ret=new UnaryExpression($e, UnaryOperator.POST_INC); pos.setPosition((UnaryExpression)$ret, $tok);} |
+  tok='--' {$ret=new UnaryExpression($e, UnaryOperator.POST_DEC); pos.setPosition((UnaryExpression)$ret, $tok);} 
   ;
 
 unary_expression returns [Expression ret] 
   : ('(' type_name ')' unary_expression)=>  c=cast {$ret=$c.ret;} |
   pexp=postfix_expression {$ret=$pexp.ret;}|
-  '++' exp=unary_expression {$ret=new UnaryExpression(); ((UnaryExpression)$ret).exp=$exp.ret; ((UnaryExpression)$ret).op=UnaryOperator.PRE_INC;} | //toto treba semanticky osetrit, ze ta unary expression nesmie byt cast
-  '--' exp=unary_expression {$ret=new UnaryExpression(); ((UnaryExpression)$ret).exp=$exp.ret; ((UnaryExpression)$ret).op=UnaryOperator.PRE_DEC;} | //toto treba semanticky osetrit, ze ta unary expression nesmie byt cast
+  tok='++' exp=unary_expression {$ret=new UnaryExpression(); ((UnaryExpression)$ret).exp=$exp.ret; ((UnaryExpression)$ret).op=UnaryOperator.PRE_INC; pos.setPosition((UnaryExpression)$ret, $tok);} | //toto treba semanticky osetrit, ze ta unary expression nesmie byt cast
+  tok='--' exp=unary_expression {$ret=new UnaryExpression(); ((UnaryExpression)$ret).exp=$exp.ret; ((UnaryExpression)$ret).op=UnaryOperator.PRE_DEC; pos.setPosition((UnaryExpression)$ret, $tok);} | //toto treba semanticky osetrit, ze ta unary expression nesmie byt cast
   SIZEOF soexp=sizeof_arg {$ret=$soexp.ret;} | 
-  op=unary_operator exp=unary_expression {$ret=new UnaryExpression();  ((UnaryExpression)$ret).exp=$exp.ret; ((UnaryExpression)$ret).op=$op.ret;} ;
+  op=unary_operator exp=unary_expression {$ret=new UnaryExpression();  ((UnaryExpression)$ret).exp=$exp.ret; ((UnaryExpression)$ret).op=$op.ret;  pos.setPosition((UnaryExpression)$ret, (UnaryExpression)$exp.ret);} ;
   
 cast returns [CastExpression ret] 
-  : '(' td=type_name')' exp=unary_expression {$ret=new CastExpression(); $ret.typedecl=$td.ret; $ret.exp=$exp.ret;} ;
+  : tok='(' td=type_name')' exp=unary_expression {$ret=new CastExpression(); $ret.typedecl=$td.ret; $ret.exp=$exp.ret; pos.setPosition($ret, $tok);} ;
 
 //tu treba potom osetrit, ze ak type_name moze byt aj expression (napr. ID
 //alebo ID [ expreesion ], tak treba vyskusat aj to
 sizeof_arg returns [Expression ret]
-  : ('(' type_name ')') => '(' td=type_name ')' {$ret=new SizeofType(); ((SizeofType)$ret).typedecl=$td.ret;} |
-   exp=unary_expression {$ret=new SizeofExpression(); ((SizeofExpression)$ret).exp=$exp.ret;};
+  : ('(' type_name ')') => tok='(' td=type_name ')' {$ret=new SizeofType(); ((SizeofType)$ret).typedecl=$td.ret; pos.setPosition((SizeofType)$ret, $tok);} |
+   exp=unary_expression {$ret=new SizeofExpression(); ((SizeofExpression)$ret).exp=$exp.ret; pos.setPosition((UnaryExpression)$ret, (UnaryExpression)$exp.ret);};
 
 unary_operator returns [UnaryOperator ret] :
   '&' {$ret=UnaryOperator.ADDR;} |
@@ -97,6 +98,7 @@ multiplicative_expression returns [Expression ret] :
   u=unary_expression {$ret = $u.ret;} 
     (o=multiplicative_operator u2=unary_expression {
       $ret = new BinaryExpression($ret, $o.ret, $u2.ret);
+      pos.setPosition((BinaryExpression)$ret, (UnaryExpression)$u.ret);
     })*
   ;
 
@@ -110,6 +112,7 @@ additive_expression returns [Expression ret]:
  m=multiplicative_expression {$ret=$m.ret;} 
  (o=additive_operator m2=multiplicative_expression{
   $ret=new BinaryExpression($ret,$o.ret,$m2.ret);
+  pos.setPosition((BinaryExpression)$ret, (BinaryExpression)$m.ret);
  })*
   ;
 
@@ -122,6 +125,7 @@ shift_expression  returns [Expression ret]:
   a=additive_expression {$ret=$a.ret;}
    (o=shift_operator a2=additive_expression{
     $ret=new BinaryExpression($ret,$o.ret,$a2.ret);
+    pos.setPosition((BinaryExpression)$ret, (BinaryExpression)$a.ret);
    })*
   ;
 
@@ -134,6 +138,7 @@ relational_expression returns [Expression ret]:
  s=shift_expression {$ret=$s.ret;} 
   (o=relational_operator s2=shift_expression{
   $ret=new BinaryExpression($ret,$o.ret,$s2.ret);
+  pos.setPosition((BinaryExpression)$ret, (BinaryExpression)$s.ret);
   })*
  ;
 
@@ -148,6 +153,7 @@ equality_expression returns [Expression ret]:
  r=relational_expression {$ret=$r.ret;} 
  (o=equality_operator r2=relational_expression{
   $ret=new BinaryExpression($ret,$o.ret,$r2.ret);
+  pos.setPosition((BinaryExpression)$ret, (BinaryExpression)$r.ret);
  })*
   ;
 
@@ -162,6 +168,7 @@ and_expression  returns [Expression ret]:
  ('&' 
  e2=equality_expression{
   $ret=new BinaryExpression($ret,BinaryOperator.BAND,$e2.ret);
+  pos.setPosition((BinaryExpression)$ret, (BinaryExpression)$e.ret);
  })*
   ;
 
@@ -170,6 +177,7 @@ exclusive_or_expression returns [Expression ret]:
  ('^'
  a2=and_expression{
     $ret=new BinaryExpression($ret,BinaryOperator.BXOR,$a2.ret);
+    pos.setPosition((BinaryExpression)$ret, (BinaryExpression)$a.ret);
   })*
   ;
 
@@ -178,6 +186,7 @@ inclusive_or_expression returns [Expression ret]:
  ('|' 
  e2=exclusive_or_expression{
   $ret=new BinaryExpression($ret,BinaryOperator.BOR,$e2.ret);
+  pos.setPosition((BinaryExpression)$ret, (BinaryExpression)$e.ret);
  })*
   ;
 
@@ -186,6 +195,7 @@ logical_and_expression  returns [Expression ret]:
  ('&&' 
  e2=inclusive_or_expression{
   $ret=new BinaryExpression($ret,BinaryOperator.AND,$e2.ret);
+  pos.setPosition((BinaryExpression)$ret, (BinaryExpression)$e.ret);
  })*
   ;
 
@@ -194,13 +204,14 @@ logical_or_expression returns [Expression ret]:
  ('||' 
  e2=logical_and_expression{
   $ret=new BinaryExpression($ret,BinaryOperator.OR,$e2.ret);
+  pos.setPosition((BinaryExpression)$ret, (BinaryExpression)$e.ret);
  })*
   ;
 
 conditional_expression returns [Expression ret] :
  cond=logical_or_expression {$ret = $cond.ret;}
- ('?' ontrue=expression ':'  onfalse=conditional_expression
- {$ret=new TernaryExpression($ret, $ontrue.ret, $onfalse.ret);} )?
+ (tok='?' ontrue=expression ':'  onfalse=conditional_expression
+ {$ret=new TernaryExpression($ret, $ontrue.ret, $onfalse.ret); pos.setPosition((TernaryExpression)$ret, $tok);} )?
   ;
 
 //tu treba semantickymi pravidlami skontrolovat, ze ak je tam assignment operator, 
@@ -210,6 +221,7 @@ assignment_expression returns [Expression ret]
   : e=conditional_expression {$ret=$e.ret;}
     (o=assignment_operator e2=assignment_expression{
       $ret = new BinaryExpression($ret, $o.ret, $e2.ret); 
+      pos.setPosition((BinaryExpression)$ret, (BinaryExpression)$e.ret);
     })? 
   ;
 
@@ -217,6 +229,7 @@ expression returns [CommaExpression ret]
   : e=assignment_expression {$ret = new CommaExpression($e.ret);} 
     (',' e2=assignment_expression {
       $ret.expressions.add($e2.ret);
+      pos.setPosition((BinaryExpression)$ret, (BinaryExpression)$e.ret);
     })*  
   ;
 
@@ -235,10 +248,10 @@ assignment_operator returns [BinaryOperator ret] :
   ;
 
 constant returns [Expression ret]
-  : INT {$ret = new IntConstantExpression(); ((IntConstantExpression)$ret).value = Integer.parseInt($INT.getText());} |
-   FLOAT {$ret = new FloatConstantExpression(); ((FloatConstantExpression)$ret).value = Float.parseFloat($FLOAT.getText());}| 
-   STRING {$ret = new StringConstantExpression(); ((StringConstantExpression)$ret).value = $STRING.getText();}| 
-   CHAR {$ret = new CharConstantExpression(); ((CharConstantExpression)$ret).value = $CHAR.getText().charAt(0);};
+  : INT {$ret = new IntConstantExpression(); ((IntConstantExpression)$ret).value = Integer.parseInt($INT.getText()); pos.setPosition((IntConstantExpression)$ret, $INT);} |
+   FLOAT {$ret = new FloatConstantExpression(); ((FloatConstantExpression)$ret).value = Float.parseFloat($FLOAT.getText()); pos.setPosition((FloatConstantExpression)$ret, $FLOAT);}| 
+   STRING {$ret = new StringConstantExpression(); ((StringConstantExpression)$ret).value = $STRING.getText(); pos.setPosition((StringConstantExpression)$ret, $STRING);}| 
+   CHAR {$ret = new CharConstantExpression(); ((CharConstantExpression)$ret).value = $CHAR.getText().charAt(0); pos.setPosition((CharConstantExpression)$ret, $CHAR);};
          
 //sadly this is required because otherwise we get an error from antlr
 external_declaration returns [InBlock ret]
@@ -255,7 +268,7 @@ external_declaration returns [InBlock ret]
           ( ',' i2=init_declarator {((Declaration)$ret).declarators.add($i2.ret);})*)? ';');
 
 block returns [BlockStatement ret]
-: '{' {$ret=new BlockStatement();} (ib=in_block {$ret.inBlock.add($ib.ret);})* '}';
+: tok='{' {$ret=new BlockStatement();} (ib=in_block {$ret.inBlock.add($ib.ret);})* '}' {pos.setPosition($ret, $tok);};
 
 //tu treba osetrit ak deklaracia moze byt aj statement (narp. ID alebo ID[expression])
 in_block returns [InBlock ret]: 
@@ -280,10 +293,10 @@ if_stat returns [IfStatement ret]
   ) {pos.setPosition($ret, $tok);};
 
 switch_stat returns [SwitchStatement ret]
-  : SWITCH {$ret=new SwitchStatement();} 
+  : tok=SWITCH {$ret=new SwitchStatement();} 
   '(' expr=expression {$ret.expr=$expr.ret;} ')' 
   '{' (cc=case_clause {$ret.cases.add($cc.ret);})* 
-  '}';
+  '}' {pos.setPosition($ret, $tok);};
 
 case_clause returns [Case ret]
 @init {
@@ -293,36 +306,40 @@ case_clause returns [Case ret]
   (st=statement {$ret.statements.add($st.ret);})*;
 
 while_stat returns [WhileStatement ret]
-  : WHILE '(' cond=expression ')' body=statement 
+  : tok=WHILE '(' cond=expression ')' body=statement 
   {
     $ret=new WhileStatement();
     $ret.condition=$cond.ret; 
     $ret.body=$body.ret; 
+    pos.setPosition($ret, $tok);
   };
 
 for_stat returns [ForStatement ret]
-  : FOR {$ret=new ForStatement();} 
+  : tok=FOR {$ret=new ForStatement();} 
   '(' ((declaration) => decl=declaration {$ret.decl=$decl.ret;} |  
   (init=expression {$ret.init=init.ret;})? ';' )
   (cond=expression {$ret.cond=cond.ret;})? ';' 
   (after=expression {$ret.after=after.ret;})? ')' 
-  body=statement {$ret.body=body.ret;};
+  body=statement {$ret.body=body.ret; pos.setPosition($ret, $tok);};
 
 dowhile_stat returns [DowhileStatement ret]
-  : DO body=statement WHILE '(' cond=expression ')' ';'
+  : tok=DO body=statement WHILE '(' cond=expression ')' ';'
   {
     $ret=new DowhileStatement(); 
     $ret.body=$body.ret; 
     $ret.condition=$cond.ret; 
+    pos.setPosition($ret, $tok);
   };
 
 jmp_stat returns [Statement ret]
-  : BREAK{$ret=new BreakStatement();} ';' 
-  | CONTINUE{$ret=new ContinueStatement();} ';' 
-  | RETURN{$ret=new ReturnStatement();} (e=expression {((ReturnStatement)$ret).exp=$e.ret;})? ';';
+  : tok=BREAK{$ret=new BreakStatement(); pos.setPosition((BreakStatement)$ret, $tok);} ';' 
+  | tok=CONTINUE{$ret=new ContinueStatement(); pos.setPosition((ContinueStatement)$ret, $tok);} ';' 
+  | tok=RETURN{$ret=new ReturnStatement();} (e=expression {((ReturnStatement)$ret).exp=$e.ret;})? ';' {pos.setPosition((ReturnStatement)$ret, $tok);};
 //** CONTROL STATEMENTS END **//
 
 //** DECLARATION START **//
+
+//@TODO: PositionTracker for declarations
 
 declaration returns [Declaration ret]
   : {$ret = new Declaration();} 
