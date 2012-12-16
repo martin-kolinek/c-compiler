@@ -19,22 +19,21 @@ import statements.WhileStatement;
 
 public class CodeGenStatementVisitor implements StatementVisitor {
 	
-	private VisitPack pack;
+	private BlockCodeGenerator cg;
 	private String BreakSkok;
 	private String ContinueSkok;
 	private CodeGenStream wr;
 	
-	public CodeGenStatementVisitor(VisitPack pack){
-		this.pack=pack;
-		wr=pack.wr;
+	public CodeGenStatementVisitor(BlockCodeGenerator cg){
+		this.cg=cg;
+		wr = cg.str;
 	}
 	
 	@Override
 	public void visit(ReturnStatement s) {
-		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(pack);
 		if(s.exp!=null) {
-			s.exp.accept(g);
-			wr.writeLine("ret", g.GetResultTyp(), g.GetResultRegister());
+			
+			wr.writeLine("ret", cg.getExpressionTypeStr(s.exp), cg.getExpressionRegister(s.exp));
 		}
 		else
 			wr.writeLine("ret");
@@ -67,7 +66,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	}
 
 	private void writeCondition(String resultRegister, String resultType, String iftrue, String iffalse) {
-		String condRes = pack.r.next();
+		String condRes = cg.getNextregister();
 		wr.writeAssignment(condRes, "icmp ne", resultType, "0, ",resultRegister);
 		wr.writeLine("br i1", condRes, ", label", iftrue, "label", iffalse);
 	}
@@ -75,17 +74,15 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	@Override
 	public void visit(WhileStatement s) {
 		//ziskame labely
-		String predCyklom = pack.l.next();
-		String zaCyklom = pack.l.next();
-		String zaPodmienkou = pack.l.next();
+		String predCyklom = cg.getNextLabel();
+		String zaCyklom = cg.getNextLabel();
+		String zaPodmienkou = cg.getNextLabel();
 		//zaciatok cyklu a podmienka
 		wr.writeLabel(predCyklom);
-		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(pack);
-		s.condition.accept(g);
-		writeCondition(g.GetResultRegister(), g.GetResultTyp(), zaPodmienkou, zaCyklom);
+		writeCondition(cg.getExpressionRegister(s.condition), cg.getExpressionTypeStr(s.condition), zaPodmienkou, zaCyklom);
 		//telo cyklu
 		wr.writeLabel(zaPodmienkou);
-		CodeGenStatementVisitor childVisitor = new CodeGenStatementVisitor(pack);
+		CodeGenStatementVisitor childVisitor = new CodeGenStatementVisitor(cg);
 		childVisitor.BreakSkok=zaCyklom;
 		childVisitor.ContinueSkok=predCyklom;
 		s.body.accept(childVisitor);
@@ -97,13 +94,13 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 
 	@Override
 	public void visit(SwitchStatement s) {
-		String zaSwitch = pack.l.next();
+		String zaSwitch = cg.getNextLabel();
 		ArrayList<String> caseLabels = new ArrayList<String>();
 		StringBuilder sb = new StringBuilder();
 		String defLabel = null;
 		for(Case c: s.cases) {
 			
-			String lbl = pack.l.next();
+			String lbl = cg.getNextLabel();
 			caseLabels.add(lbl);
 			if(c.cond!=null) {
 				assert c.cond instanceof IntConstantExpression;
@@ -117,10 +114,8 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		if(defLabel==null) {
 			defLabel=zaSwitch;
 		}
-		CodeGenExpressionVisitor g=new CodeGenExpressionVisitor(pack);
-		s.expr.accept(g);
-		wr.writeLine("switch", g.GetResultTyp(), g.GetResultRegister(), ", label ", defLabel, "[" + sb.toString() + "]");
-		CodeGenStatementVisitor childVis = new CodeGenStatementVisitor(pack);
+		wr.writeLine("switch", cg.getExpressionTypeStr(s.expr), cg.getExpressionRegister(s.expr), ", label ", defLabel, "[" + sb.toString() + "]");
+		CodeGenStatementVisitor childVis = new CodeGenStatementVisitor(cg);
 		childVis.BreakSkok=zaSwitch;
 		for(int i=0; i<s.cases.size(); i++) {
 			wr.writeLabel(caseLabels.get(i));
@@ -135,17 +130,15 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	public void visit(IfStatement s) {
 		
 		//podmienka ifu
-		CodeGenExpressionVisitor g = new CodeGenExpressionVisitor(pack);
-		s.cond.accept(g);
-		String result = g.GetResultRegister();
-		String typ = g.GetResultTyp(); 
+		String result = cg.getExpressionRegister(s.cond);
+		String typ = cg.getExpressionTypeStr(s.cond); 
 		
 		//inicializacia labelov
-		String Koniec = pack.l.next();
-		String PrvaVetva = pack.l.next();
+		String Koniec = cg.getNextLabel();
+		String PrvaVetva = cg.getNextLabel();
 		String DruhaVetva;
 		if(s.onfalse!=null)
-			DruhaVetva = pack.l.next();
+			DruhaVetva = cg.getNextLabel();
 		else
 			DruhaVetva = Koniec;
 		
@@ -170,8 +163,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 
 	@Override
 	public void visit(OneexpressionStatement s) {
-		CodeGenExpressionVisitor g = new CodeGenExpressionVisitor(pack);
-		s.expr.accept(g);
+		cg.getExpressionRegister(s.expr);
 	}
 
 	@Override

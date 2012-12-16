@@ -4,6 +4,7 @@ import java.io.OutputStreamWriter;
 
 import expression.Expression;
 
+import statements.Statement;
 import symbols.SymbolTable;
 import typeresolve.ExpressionTypeMapping;
 import types.Type;
@@ -54,5 +55,10 @@ public class BlockCodeGenerator {
 	
 	public String getIDAddress(String id) {
 		return idAddresses.get(id);
+	}
+	
+	public void generateStatement(Statement st) {
+		CodeGenStatementVisitor vis = new CodeGenStatementVisitor(this);
+		st.accept(vis);
 	}
 }
