@@ -23,8 +23,13 @@ tokens {
     import expression.constant.*;
     import statements.*;
     import toplevel.*;
+    import position.*;
+    import astnode.*;
 } 
 @lexer::header {package grammar.generated;}
+@members {
+  PositionTracker pos = new PositionTracker();
+}
 
 program returns [Program ret]
 @init {
@@ -261,7 +266,7 @@ in_block returns [InBlock ret]:
    
 statement returns [Statement ret]:
   bl=block {$ret=$bl.ret;} |
-  {$ret=new OneexpressionStatement();} (exp=expression {((OneexpressionStatement)$ret).expr=$exp.ret;})? ';' |
+  {$ret=new OneexpressionStatement();} (exp=expression {((OneexpressionStatement)$ret).expr=$exp.ret; pos.setPosition((OneexpressionStatement)$ret, $exp.ret);})? ';' |
   ifs=if_stat {$ret=$ifs.ret;} | switchs=switch_stat {$ret=$switchs.ret;} | whiles=while_stat {$ret=$whiles.ret;} |
   fors=for_stat {$ret=$fors.ret;} | dws=dowhile_stat {$ret=$dws.ret;} | jmps=jmp_stat {$ret=$jmps.ret;};
 
@@ -269,10 +274,10 @@ statement returns [Statement ret]:
 //** CONTROL STATEMENTS START **//
 
 if_stat returns [IfStatement ret]
-  : IF '(' cond=expression ')' ontrue=statement {$ret=new IfStatement(); $ret.cond=$cond.ret; $ret.ontrue=$ontrue.ret;} 
+  : tok=IF '(' cond=expression ')' ontrue=statement {$ret=new IfStatement(); $ret.cond=$cond.ret; $ret.ontrue=$ontrue.ret;} 
   ( (ELSE)=> ELSE onfalse=statement {$ret.onfalse=$onfalse.ret;}
     | ( ) // nothing
-  );
+  ) {pos.setPosition($ret, $tok);};
 
 switch_stat returns [SwitchStatement ret]
   : SWITCH {$ret=new SwitchStatement();} 
