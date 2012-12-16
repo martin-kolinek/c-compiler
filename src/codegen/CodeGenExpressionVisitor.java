@@ -1,6 +1,7 @@
 package codegen;
 
 import types.Type;
+import types.TypeClass;
 
 import expression.AssignmentExpression;
 import expression.CastExpression;
@@ -28,6 +29,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 //	private RegisterGenerator r;
 //	private LabelGenerator l;
 //	private OutputStreamWriter wr;
+	private BlockCodeGenerator cg;
 	private VisitPack pack;
 	private boolean acces = false;//TODO je to premenna z pamate, ktoru treba po uprave ulozit
 	private String adress = "";//TODO na tuto poziciu
@@ -455,10 +457,26 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 
 	}
 
+	private String getSizeExpr(Type t) {
+		return ""; //TODO
+	}
+	
 	@Override
 	public void visit(AssignmentExpression e) {
-		// TODO Auto-generated method stub
-		
+		Type t = cg.getExpressionType(e);
+		if(TypeClass.isStruct(t)) {
+			String s = getSizeExpr(t);
+			String laddr = cg.getExpressionAddress(e.left);
+			String raddr = cg.getExpressionAddress(e.right);
+			String ltmp = cg.getNextregister();
+			String rtmp = cg.getNextregister();
+			cg.str.writeAssignment(ltmp, "bitcast", cg.getTypeString(t)+"*", laddr, "to", "i8*");
+			cg.str.writeAssignment(rtmp, "bitcast", cg.getTypeString(t)+"*", raddr, "to", "i8*");
+			cg.str.writeLine("call", "void", "@llvm.memcpy.p0i8.p0i8.i64(i8*,", ltmp, ", i8*", rtmp, ", i64", s, ", i32 0, i1 false)");
+		}
+		else {
+			cg.str.store(cg.getExpressionAddress(e.left), cg.getExpressionTypeStr(e), cg.getExpressionRegister(e.right));
+		}
 	}
 
 }
