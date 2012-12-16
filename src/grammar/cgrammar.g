@@ -268,7 +268,9 @@ external_declaration returns [InBlock ret]
           ( ',' i2=init_declarator {((Declaration)$ret).declarators.add($i2.ret);})*)? ';');
 
 block returns [BlockStatement ret]
-: tok='{' {$ret=new BlockStatement();} (ib=in_block {$ret.inBlock.add($ib.ret);})* '}' {pos.setPosition($ret, $tok);};
+: tok='{' {$ret=new BlockStatement();} (ib=in_block {$ret.inBlock.add($ib.ret);})* '}' {pos.setPosition($ret, $tok
+
+);};
 
 //tu treba osetrit ak deklaracia moze byt aj statement (narp. ID alebo ID[expression])
 in_block returns [InBlock ret]: 
