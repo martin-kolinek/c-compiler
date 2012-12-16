@@ -74,7 +74,7 @@ unary_expression returns [Expression ret]
   tok='++' exp=unary_expression {$ret=new UnaryExpression(); ((UnaryExpression)$ret).exp=$exp.ret; ((UnaryExpression)$ret).op=UnaryOperator.PRE_INC; pos.setPosition((UnaryExpression)$ret, $tok);} | //toto treba semanticky osetrit, ze ta unary expression nesmie byt cast
   tok='--' exp=unary_expression {$ret=new UnaryExpression(); ((UnaryExpression)$ret).exp=$exp.ret; ((UnaryExpression)$ret).op=UnaryOperator.PRE_DEC; pos.setPosition((UnaryExpression)$ret, $tok);} | //toto treba semanticky osetrit, ze ta unary expression nesmie byt cast
   SIZEOF soexp=sizeof_arg {$ret=$soexp.ret;} | 
-  op=unary_operator exp=unary_expression {$ret=new UnaryExpression();  ((UnaryExpression)$ret).exp=$exp.ret; ((UnaryExpression)$ret).op=$op.ret;  pos.setPosition((UnaryExpression)$ret, (UnaryExpression)$exp.ret);} ;
+  op=unary_operator exp=unary_expression {$ret=new UnaryExpression();  ((UnaryExpression)$ret).exp=$exp.ret; ((UnaryExpression)$ret).op=$op.ret;  pos.setPosition((UnaryExpression)$ret, $exp.ret);} ;
   
 cast returns [CastExpression ret] 
   : tok='(' td=type_name')' exp=unary_expression {$ret=new CastExpression(); $ret.typedecl=$td.ret; $ret.exp=$exp.ret; pos.setPosition($ret, $tok);} ;
@@ -98,7 +98,7 @@ multiplicative_expression returns [Expression ret] :
   u=unary_expression {$ret = $u.ret;} 
     (o=multiplicative_operator u2=unary_expression {
       $ret = new BinaryExpression($ret, $o.ret, $u2.ret);
-      pos.setPosition((BinaryExpression)$ret, (UnaryExpression)$u.ret);
+      pos.setPosition($ret, $u.ret);
     })*
   ;
 
@@ -112,7 +112,7 @@ additive_expression returns [Expression ret]:
  m=multiplicative_expression {$ret=$m.ret;} 
  (o=additive_operator m2=multiplicative_expression{
   $ret=new BinaryExpression($ret,$o.ret,$m2.ret);
-  pos.setPosition((BinaryExpression)$ret, (BinaryExpression)$m.ret);
+  pos.setPosition($ret, $m.ret);
  })*
   ;
 
@@ -125,7 +125,7 @@ shift_expression  returns [Expression ret]:
   a=additive_expression {$ret=$a.ret;}
    (o=shift_operator a2=additive_expression{
     $ret=new BinaryExpression($ret,$o.ret,$a2.ret);
-    pos.setPosition((BinaryExpression)$ret, (BinaryExpression)$a.ret);
+    pos.setPosition($ret, $a.ret);
    })*
   ;
 
@@ -138,7 +138,7 @@ relational_expression returns [Expression ret]:
  s=shift_expression {$ret=$s.ret;} 
   (o=relational_operator s2=shift_expression{
   $ret=new BinaryExpression($ret,$o.ret,$s2.ret);
-  pos.setPosition((BinaryExpression)$ret, (BinaryExpression)$s.ret);
+  pos.setPosition($ret, $s.ret);
   })*
  ;
 
@@ -153,7 +153,7 @@ equality_expression returns [Expression ret]:
  r=relational_expression {$ret=$r.ret;} 
  (o=equality_operator r2=relational_expression{
   $ret=new BinaryExpression($ret,$o.ret,$r2.ret);
-  pos.setPosition((BinaryExpression)$ret, (BinaryExpression)$r.ret);
+  pos.setPosition($ret, $r.ret);
  })*
   ;
 
@@ -168,7 +168,7 @@ and_expression  returns [Expression ret]:
  ('&' 
  e2=equality_expression{
   $ret=new BinaryExpression($ret,BinaryOperator.BAND,$e2.ret);
-  pos.setPosition((BinaryExpression)$ret, (BinaryExpression)$e.ret);
+  pos.setPosition($ret, $e.ret);
  })*
   ;
 
@@ -177,7 +177,7 @@ exclusive_or_expression returns [Expression ret]:
  ('^'
  a2=and_expression{
     $ret=new BinaryExpression($ret,BinaryOperator.BXOR,$a2.ret);
-    pos.setPosition((BinaryExpression)$ret, (BinaryExpression)$a.ret);
+    pos.setPosition($ret, $a.ret);
   })*
   ;
 
@@ -186,7 +186,7 @@ inclusive_or_expression returns [Expression ret]:
  ('|' 
  e2=exclusive_or_expression{
   $ret=new BinaryExpression($ret,BinaryOperator.BOR,$e2.ret);
-  pos.setPosition((BinaryExpression)$ret, (BinaryExpression)$e.ret);
+  pos.setPosition($ret, $e.ret);
  })*
   ;
 
@@ -195,7 +195,7 @@ logical_and_expression  returns [Expression ret]:
  ('&&' 
  e2=inclusive_or_expression{
   $ret=new BinaryExpression($ret,BinaryOperator.AND,$e2.ret);
-  pos.setPosition((BinaryExpression)$ret, (BinaryExpression)$e.ret);
+  pos.setPosition($ret, $e.ret);
  })*
   ;
 
@@ -204,14 +204,15 @@ logical_or_expression returns [Expression ret]:
  ('||' 
  e2=logical_and_expression{
   $ret=new BinaryExpression($ret,BinaryOperator.OR,$e2.ret);
-  pos.setPosition((BinaryExpression)$ret, (BinaryExpression)$e.ret);
+  pos.setPosition($ret, $e.ret);
  })*
   ;
 
 conditional_expression returns [Expression ret] :
  cond=logical_or_expression {$ret = $cond.ret;}
  (tok='?' ontrue=expression ':'  onfalse=conditional_expression
- {$ret=new TernaryExpression($ret, $ontrue.ret, $onfalse.ret); pos.setPosition((TernaryExpression)$ret, $tok);} )?
+ {$ret=new TernaryExpression($ret, $ontrue.ret, $onfalse.ret); 
+ pos.setPosition((TernaryExpression)$ret, $tok);} )?
   ;
 
 //tu treba semantickymi pravidlami skontrolovat, ze ak je tam assignment operator, 
@@ -221,7 +222,7 @@ assignment_expression returns [Expression ret]
   : e=conditional_expression {$ret=$e.ret;}
     (o=assignment_operator e2=assignment_expression{
       $ret = new BinaryExpression($ret, $o.ret, $e2.ret); 
-      pos.setPosition((BinaryExpression)$ret, (BinaryExpression)$e.ret);
+      pos.setPosition($ret, $e.ret);
     })? 
   ;
 
@@ -229,7 +230,7 @@ expression returns [CommaExpression ret]
   : e=assignment_expression {$ret = new CommaExpression($e.ret);} 
     (',' e2=assignment_expression {
       $ret.expressions.add($e2.ret);
-      pos.setPosition((BinaryExpression)$ret, (BinaryExpression)$e.ret);
+      pos.setPosition($ret, $e.ret);
     })*  
   ;
 
