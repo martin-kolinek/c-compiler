@@ -29,8 +29,8 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 //	private LabelGenerator l;
 //	private OutputStreamWriter wr;
 	private VisitPack pack;
-	private boolean acces = false;//TODO
-	private String adress = "";//TODO
+	private boolean acces = false;//TODO je to premenna z pamate, ktoru treba po uprave ulozit
+	private String adress = "";//TODO na tuto poziciu
 	
 	private void pis(CodeGenStream o,String s){
 		o.writeLine(new String[]{s});
