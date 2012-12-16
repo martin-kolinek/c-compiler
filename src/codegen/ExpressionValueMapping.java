@@ -8,14 +8,13 @@ public class ExpressionValueMapping {
 	public ExpressionValueMapping() {
 		expRes = new HashMap<Expression, String>();
 	}
-	public CodeGenFactory fac;
+	
 	private HashMap<Expression, String> expRes;
-	public String getExpressionResult(Expression exp) {
+	public String getExpressionResult(Expression exp, CodeGenExpressionVisitor vis) {
 		String str = expRes.get(exp);
 		if(str==null) {
-			CodeGenExpressionVisitor expVis = fac.createExpVis();
-			exp.accept(expVis);
-			str = expVis.GetResultRegister();
+			exp.accept(vis);
+			str = vis.GetResultRegister();
 			expRes.put(exp, str);
 		}
 		return str;

@@ -1,7 +1,5 @@
 package codegen;
 
-import symbols.SymbolTable;
-import typeresolve.ExpressionTypeMapping;
 import types.StructType;
 import exceptions.SemanticException;
 import expression.AssignmentExpression;
@@ -25,12 +23,12 @@ import expression.unop.UnaryExpression;
 
 public class CodeGenExpressionAddress implements ExpressionVisitor {
 
-	private ExpressionValueMapping valmap;
-	private ExpressionTypeMapping typemap;
-	private SymbolTable<String> idAddr;
-	private VisitPack pack;
+	public CodeGenExpressionAddress(BlockCodeGenerator gen) {
+		cg=gen;
+	}
+	
 	private String result;
-	private CodeGenerator cg;
+	private BlockCodeGenerator cg;
 	
 	private void fail(){
 		throw new SemanticException("Unable to get address of this expression");
@@ -45,7 +43,7 @@ public class CodeGenExpressionAddress implements ExpressionVisitor {
 	public void visit(UnaryExpression e) {
 		switch(e.op){
 		case PTR:
-			result = valmap.getExpressionResult(e.exp);
+			result = cg.getExpressionRegister(e);
 		default:
 			fail();
 		}
@@ -77,9 +75,9 @@ public class CodeGenExpressionAddress implements ExpressionVisitor {
 	
 	@Override
 	public void visit(MemberAccessExpression e) {
-		result = pack.r.next();
-		StructType str = (StructType)typemap.getExpressionType(e.exp);
-		pack.wr.writeAssignment(result, "getelementptr", cg.getTypeString(str)+"*,", "i32 0,", "i32", Integer.toString(getMemberPosition(str, e.id)));
+		result = cg.getNextregister();
+		StructType str = (StructType)cg.getExpressionType(e.exp);
+		cg.str.writeAssignment(result, "getelementptr", cg.getTypeString(str)+"*,", "i32 0,", "i32", Integer.toString(getMemberPosition(str, e.id)));
 	}
 
 	@Override
@@ -94,7 +92,7 @@ public class CodeGenExpressionAddress implements ExpressionVisitor {
 
 	@Override
 	public void visit(IDExpression e) {
-		result = idAddr.get(e.id);
+		result = cg.getIDAddress(e.id);
 		assert result!=null;
 	}
 
@@ -138,4 +136,7 @@ public class CodeGenExpressionAddress implements ExpressionVisitor {
 		fail();
 	}
 
+	public String getResult() {
+		return result;
+	}
 }
