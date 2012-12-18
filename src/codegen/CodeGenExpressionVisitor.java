@@ -1,11 +1,13 @@
 package codegen;
 
+import types.PrimitiveType;
 import types.Type;
 import types.TypeClass;
 
 import expression.AssignmentExpression;
 import expression.CastExpression;
 import expression.CommaExpression;
+import expression.Expression;
 import expression.ExpressionVisitor;
 import expression.FunctionCallExpression;
 import expression.IDExpression;
@@ -53,305 +55,154 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 		return Typ;
 	}
 
+	public void writeAndOr(BinaryExpression e, boolean and) {
+		String leftLabel = cg.getNextLabel();
+		String rightLabel = cg.getNextLabel();
+		String finalLabel = cg.getNextLabel();
+		
+		cg.str.writeLabel(leftLabel);
+		String leftCompRes = cg.getNextregister();
+		String left = cg.getExpressionRegister(e.left);
+		cg.str.writeAssignment(leftCompRes, "icmp", "ne", cg.getExpressionTypeStr(e), left, ", 0");
+		if(and)
+			cg.str.writeLine("br", "i1", leftCompRes, ",", "label", rightLabel, ", label", finalLabel);
+		else
+			cg.str.writeLine("br", "i1", leftCompRes, ",", "label", finalLabel, ", label", rightLabel);
+		cg.str.writeLabel(rightLabel);
+		String right = cg.getExpressionRegister(e.right);
+		String rightCompRes = cg.getNextregister();
+		cg.str.writeAssignment(rightCompRes, "icmp", "ne", cg.getExpressionTypeStr(e), right, ", 0");
+		cg.str.writeLabel(finalLabel);
+		String tmp = cg.getNextregister();
+		cg.str.writeAssignment(tmp, "phi", "i1", "[", leftCompRes, ",", leftLabel, "], [", rightCompRes, ",", rightLabel, "]");
+		Register = cg.getNextregister();
+		cg.str.writeAssignment(Register, "sext", "i1", tmp, "to", cg.getExpressionTypeStr(e));
+	}
+	
 	@Override
 	public void visit(BinaryExpression e) {
-		// TODO Auto-generated method stub
-		String v=null;
-		CodeGenExpressionVisitor v1 = new CodeGenExpressionVisitor(pack);
-		CodeGenExpressionVisitor v2 = new CodeGenExpressionVisitor(pack);
-		e.left.accept(v1);
-		e.right.accept(v2);
-		String result1 = v1.GetResultRegister();
-		String result2 = v2.GetResultRegister();
-		
-		switch(e.operator){
-		
-		case PLUS :
-			Type t=pack.t.getExpressionType(e);
-			CodeGenTypeVisitor tv = new CodeGenTypeVisitor(pack);
-			t.accept(tv);
-			Typ=tv.GetTypeText();
-			Register=pack.r.next();
-			
-			if(tv.integer())
-				v=Register + "= add "+ Typ + " " + result1 + ", " + result2 + "\n";
-			else//je float
-				v=Register + "= fadd "+ Typ + " " + result1 + ", " + result2 + "\n";
-			
-			pis(pack.wr,v);
-			break; // +
-		
-		case MINUS : 
-			t=pack.t.getExpressionType(e);
-			tv = new CodeGenTypeVisitor(pack);
-			t.accept(tv);
-			Typ=tv.GetTypeText();;
-			Register=pack.r.next();
-			
-			if(tv.integer())
-				v=Register + "= sub "+ Typ + " " + result1 + ", " + result2 + "\n";
+		Type t = cg.getExpressionType(e);
+		assert t instanceof PrimitiveType;
+		PrimitiveType pt = (PrimitiveType)t;
+		String instruction = null;
+		boolean relational = false;
+		switch(e.operator) {
+		case PLUS:
+			instruction = pt.floating?"fadd":"add";
+			break;
+		case MINUS:
+			instruction = pt.floating?"fsub":"sub";
+			break;
+		case MULT:
+			instruction = pt.floating?"fmul":"mul";
+			break;
+		case DIV:
+			if(pt.floating)
+				instruction = "fdif";
 			else
-				v=Register + "= fsub "+ Typ + " " + result1 + ", " + result2 + "\n";
-			
-			pis(pack.wr,v);
-			break; // -
-		
-		case MULT :
-			t=pack.t.getExpressionType(e);
-			tv = new CodeGenTypeVisitor(pack);
-			t.accept(tv);
-			Typ=tv.GetTypeText();
-			Register=pack.r.next();
-			
-			if(tv.integer())
-				v=Register + "= mul "+ Typ + " " + result1 + ", " + result2 + "\n";
-			else
-				v=Register + "= fmul "+ Typ + " " + result1 + ", " + result2 + "\n";
-			pis(pack.wr,v);
-			break; // *
-		
-		case DIV :
-			t=pack.t.getExpressionType(e);
-			tv = new CodeGenTypeVisitor(pack);
-			t.accept(tv);
-			Typ=tv.GetTypeText();
-			Register=pack.r.next();
-			if(tv.integer())
-				v=Register + "= sdiv "+ Typ + " " + result1 + ", " + result2 + "\n";
-			else
-				v=Register + "= fdiv "+ Typ + " " + result1 + ", " + result2 + "\n";			pis(pack.wr,v);
-			break; // /
-		
-		case MOD :
-			t=pack.t.getExpressionType(e);
-			tv = new CodeGenTypeVisitor(pack);
-			t.accept(tv);
-			Typ=tv.GetTypeText();
-			Register=pack.r.next();
-			v=Register + "= srem "+ Typ + " " + result1 + ", " + result2 + "\n";
-			pis(pack.wr,v);
-			break; // %
-		
+				instruction = pt.sign?"sdiv":"udiv";
+			break;
+		case MOD:
+			instruction = pt.sign?"srem":"urem";
+			break;
 		case BSLEFT :
-			t=pack.t.getExpressionType(e);
-			tv = new CodeGenTypeVisitor(pack);
-			t.accept(tv);
-			Typ=tv.GetTypeText();
-			Register=pack.r.next();
-			v=Register + "= shl "+ Typ + " " + result1 + ", " + result2 + "\n";
-			pis(pack.wr,v);
+			instruction = "shl";
 			break; // <<
-		
 		case BSRIGHT :
-			t=pack.t.getExpressionType(e);
-			tv = new CodeGenTypeVisitor(pack);
-			t.accept(tv);
-			Typ=tv.GetTypeText();
-			Register=pack.r.next();
-			v=Register + "= lshr "+ Typ + " " + result1 + ", " + result2 + "\n";
-			pis(pack.wr,v);
+			instruction = "shr";
 			break; // >>
-		
 		case BAND :
-			t=pack.t.getExpressionType(e);
-			tv = new CodeGenTypeVisitor(pack);
-			t.accept(tv);
-			Typ=tv.GetTypeText();
-			Register=pack.r.next();
-			v=Register + "= and "+ Typ + " " + result1 + ", " + result2 + "\n";
-			pis(pack.wr,v);
+			instruction = "and";
 			break; // &
-			
 		case BXOR :
-			t=pack.t.getExpressionType(e);
-			tv = new CodeGenTypeVisitor(pack);
-			t.accept(tv);
-			Typ=tv.GetTypeText();
-			Register=pack.r.next();
-			v=Register + "= xor "+ Typ + " " + result1 + ", " + result2 + "\n";
-			pis(pack.wr,v);
+			instruction = "xor";
 			break; // ^
-			
 		case BOR :
-			t=pack.t.getExpressionType(e);
-			tv = new CodeGenTypeVisitor(pack);
-			t.accept(tv);
-			Typ=tv.GetTypeText();
-			Register=pack.r.next();
-			v=Register + "= or "+ Typ + " " + result1 + ", " + result2 + "\n";
-			pis(pack.wr,v);
+			instruction = "or";
 			break;  // |
-			
 		case AND :
-			t=pack.t.getExpressionType(e);
-			tv = new CodeGenTypeVisitor(pack);
-			t.accept(tv);
-			Typ=tv.GetTypeText();
-			Register=pack.r.next();
-			v=pack.r.next() + "= and "+ Typ + " " + result1 + ", " + result2 + "\n";
-			pis(pack.wr,v);
-			v = Register + "= icmp ne " + Typ + " " + Integer.toString(0) + ", " + pack.r.akt() + "\n";
-			pis(pack.wr,v);
-			break; // &&
-			
+			writeAndOr(e, true);
+			return; // && //tu musi byt return, lebo sa k nim spravame uplne inak
 		case OR :
-			t=pack.t.getExpressionType(e);
-			tv = new CodeGenTypeVisitor(pack);
-			t.accept(tv);
-			Typ=tv.GetTypeText();
-			Register=pack.r.next();
-			v=pack.r.next() + "= or "+ Typ + " " + result1 + ", " + result2 + "\n";
-			pis(pack.wr,v);
-			v = Register + "= icmp ne " + Typ + " " + Integer.toString(0) + ", " + pack.r.akt() + "\n";
-			pis(pack.wr,v);
-			break; // ||
-			
+			writeAndOr(e, false);
+			return; // || //tu musi byt return, lebo sa k nim spravame uplne inak
 		case GT :
-			t=pack.t.getExpressionType(e);
-			tv = new CodeGenTypeVisitor(pack);
-			t.accept(tv);
-			Typ=tv.GetTypeText();
-			Register=pack.r.next();
-			if(tv.unsig())
-				v=Register + "= icmp ugt "+ Typ + " " + result1 + ", " + result2 + "\n";
+			if(pt.floating)
+				instruction = "fcmp ogt";
 			else
-				v=Register + "= icmp sgt "+ Typ + " " + result1 + ", " + result2 + "\n";
-			pis(pack.wr,v);
+				instruction = "icmp "+(pt.sign?"sgt":"ugt");
+			relational = true;
 			break; // >
-			
 		case EQ :
-			t=pack.t.getExpressionType(e);
-			tv = new CodeGenTypeVisitor(pack);
-			t.accept(tv);
-			Typ=tv.GetTypeText();
-			Register=pack.r.next();
-			v=Register + "= icmp eq "+ Typ + " " + result1 + ", " + result2 + "\n";
-			pis(pack.wr,v);
+			instruction = pt.floating?"fcmp oeq":"icmp eq";
+			relational = true;
 			break; // ==
-		
-		case NEQ :
-			t=pack.t.getExpressionType(e);
-			tv = new CodeGenTypeVisitor(pack);
-			t.accept(tv);
-			Typ=tv.GetTypeText();
-			Register=pack.r.next();
-			v=Register + "= icmp nq "+ Typ + " " + result1 + ", " + result2 + "\n";
-			pis(pack.wr,v);
-			break; // !=
-		
-		case ASSIG ://TODO priradenie do pamate
-			t=pack.t.getExpressionType(e);
-			tv = new CodeGenTypeVisitor(pack);
-			t.accept(tv);
-			Typ=tv.GetTypeText();
-			Register=pack.r.next();
-			v=Register + "= TODO "+ Typ + " " + result1 + ", " + result2 + "\n";
-			pis(pack.wr,v);
-			break; //'='
-		
-		/*
-		AMULT, //'*=' 
-		ADIV, //'/=' 
-		AMOD, //'%=' 
-		APLUS, //'+=' 
-		AMINUS, //'-=' 
-		ABSLEFT, //'<<='
-		ABSRIGHT, //'>>='
-		ABAND, //'&=' 
-		ABXOR, // '^=' 
-		ABOR, */
+		default:
+			assert false;
 		}
-
+		
+		String tmp = cg.getNextregister();
+		cg.str.writeAssignment(tmp, instruction, cg.getTypeString(pt), cg.getExpressionRegister(e.left), cg.getExpressionRegister(e.right));
+		if(relational) {
+			Register = cg.getNextregister();
+			cg.str.writeAssignment(Register, "sext", "i1", tmp, "to", "i32");
+		}
+		else
+			Register = tmp;
 	}
 
+	String writeIncDec(Expression e, boolean inc) {
+		String tmp = cg.getNextregister();
+		String instruction = inc?"add":"sub";
+		Type t = cg.getExpressionType(e);
+		assert t instanceof PrimitiveType;
+		if(((PrimitiveType)t).floating) {
+			instruction = "f"+instruction;
+		}
+		cg.str.writeAssignment(tmp, instruction, cg.getTypeString(t), cg.getExpressionRegister(e), "1");
+		return tmp;
+	}
+	
 	@Override
 	public void visit(UnaryExpression e) {
-		// TODO Auto-generated method stub
-		
-		CodeGenExpressionVisitor v1 = new CodeGenExpressionVisitor(pack);
-		e.exp.accept(v1);
-		String result1 = v1.GetResultRegister();
-		Type t = pack.t.getExpressionType(e);
-		CodeGenTypeVisitor tv = new CodeGenTypeVisitor(pack);
-		t.accept(tv);
-		Typ=tv.GetTypeText();
-		
 		switch(e.op){
 			case PRE_INC :
-				Register=pack.r.next();
-				//pouzijeme prislusnu operaciu scitovania
-				if(tv.integer())
-					pack.wr.writeAssignment(Register, "add",Typ, "1", result1);
-				else
-					pack.wr.writeAssignment(Register, "fadd",Typ, "1", result1);
-				//ak islo o premennu z pamate, ulozime inkrementovanu hodnotu
-				if (v1.acces()) pack.wr.store(v1.adress(),Typ,Register);
+				Register = writeIncDec(e.exp, true);
 				break; //++
 			case PRE_DEC :
-				Register=pack.r.next();
-				//pouzijeme prislusnu operaciu odcitovania
-				if(tv.integer())
-					pack.wr.writeAssignment(Register, "sub",Typ, "1", result1);
-				else
-					pack.wr.writeAssignment(Register, "fsub",Typ, "1", result1);
-				//ak islo o premennu z pamate, ulozime dekrementovanu hodnotu
-				if (v1.acces()) pack.wr.store(v1.adress(),Typ,Register);
+				Register = writeIncDec(e.exp, false);
 				break; //--
 			case POST_INC :
-				Register=pack.r.next();
-				//posleme neinkrementovanu hodnotu
-				pack.wr.writeAssignment(Register, Typ,result1);
-				String res = pack.r.next();
-				//pouzijeme prislusnu operaciu scitovania
-				if(tv.integer())
-					pack.wr.writeAssignment(res, "add",Typ, "1", result1);
-				else
-					pack.wr.writeAssignment(res, "fadd",Typ, "1", result1);
-				//ak islo o premennu z pamate, ulozime inkrementovanu hodnotu
-				if (v1.acces()) pack.wr.store(v1.adress(),Typ,res);
+				Register = cg.getExpressionRegister(e.exp);
+				writeIncDec(e.exp, true);
 				break; //++
 			case POST_DEC :
-				Register=pack.r.next();
-				//posleme nedekrementovanu hodnotu
-				pack.wr.writeAssignment(Register, Typ,result1);
-				res = pack.r.next();
-				//pouzijeme prislusnu operaciu odcitovania
-				if(tv.integer())
-					pack.wr.writeAssignment(res, "sub",Typ, "1", result1);
-				else
-					pack.wr.writeAssignment(res, "fsub",Typ, "1", result1);
-				//ak islo o premennu z pamate, ulozime dekrementovanu hodnotu
-				if (v1.acces()) pack.wr.store(v1.adress(),Typ,res);
+				Register = cg.getExpressionRegister(e.exp);
+				writeIncDec(e.exp, false);
 				break; //--
-			case ADDR ://TODO
-				/*if(v1.acces())
-					pack.wr.writeAssignment(Register,Typ+"*", v1.adress());*/				
+			case ADDR :
+				Register = cg.getExpressionAddress(e.exp);
 				break; //&
-			case PTR ://TODO
-				/*if(v1.acces())
-					pack.wr.writeAssignment(Register,"load",Typ+"&", v1.adress());*/				
+			case PTR :
+				Register = cg.getNextregister();
+				cg.str.writeAssignment(Register, "load", cg.getExpressionTypeStr(e.exp), cg.getExpressionRegister(e.exp));
 				break; //*
 			case COMP :
-				Register=pack.r.next();
-				pack.wr.writeAssignment(Register, "xor",Typ, "-1", result1);
+				Register=cg.getNextregister();
+				pack.wr.writeAssignment(Register, "xor", cg.getExpressionTypeStr(e.exp), "-1", cg.getExpressionRegister(e.exp));
 				break; //~ 
 			case NOT :
-				Register=pack.r.next();
-				pack.wr.writeAssignment(Register, "icmp ne","0",result1);
+				String tmp = cg.getNextregister();
+				Type t = cg.getExpressionType(e.exp);
+				assert t instanceof PrimitiveType;
+				String instruction = ((PrimitiveType)t).floating?"fcmp one":"icmp ne";
+				cg.str.writeAssignment(tmp, instruction, cg.getExpressionTypeStr(e.exp), cg.getExpressionRegister(e.exp), ",", "0");
+				Register = cg.getNextregister();
+				cg.str.writeAssignment(Register, "sext", tmp, "to", "i32");
 				break; //!
 		
 		}
 
-	}
-
-	private String adress() {
-		// TODO Auto-generated method stub
-		return adress;
-	}
-
-	private boolean acces() {
-		// TODO Auto-generated method stub
-		return acces ;
 	}
 
 	@Override
@@ -399,20 +250,18 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visit(MemberDereferenceExpression e) {
-		// TODO Auto-generated method stub
-
+		assert false;
 	}
 
 	@Override
 	public void visit(IndexingExpression e) {
-		// TODO Auto-generated method stub
-
+		assert false;
 	}
 
 	@Override
 	public void visit(IDExpression e) {
-		// TODO Auto-generated method stub
-
+		Register = cg.getNextregister();
+		cg.str.writeAssignment(Register, "load", cg.getExpressionTypeStr(e)+"*", cg.getIDAddress(e.id));
 	}
 
 	@Override

@@ -183,6 +183,14 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 		}
 		else if(e.op==UnaryOperator.ADDR)
 			mapping.setType(e, new PointerType(t));
+		else if(TypeClass.isPointerOrArray(t)) {
+			Expression mid = AutomaticConversions.autoCast(e.exp, PrimitiveType.LONG, mapping);
+			Type ptr = AutomaticConversions.arrayToPtr(t);
+			result = new CastExpression(mid, ptr);
+			mapping.setType(e, ptr);
+		}
+		else if(e.op==UnaryOperator.NOT)
+			mapping.setType(e, PrimitiveType.INT);
 		else
 			mapping.setType(e, t);
 		result = e;
