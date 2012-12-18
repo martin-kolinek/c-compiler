@@ -70,10 +70,11 @@ public class CodeGenTypeVisitor implements TypeVisitor {
 	public void visit(PointerType t) {
 		// TODO Auto-generated method stub
 		CodeGenTypeVisitor tv = new CodeGenTypeVisitor(pack);
-		t.accept(tv);
+		t.pointedToType.accept(tv);
 		String Typ2 = tv.GetTypeText();
 		Typ="*" +Typ2;
 		integer=true;
+		unsig = true;
 
 	}
 
