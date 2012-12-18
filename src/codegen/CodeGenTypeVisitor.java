@@ -62,13 +62,11 @@ public class CodeGenTypeVisitor implements TypeVisitor {
 
 	@Override
 	public void visit(EnumType t) {
-		// TODO Auto-generated method stub
-
+		//riesi sa inde, tu uz neexistuje
 	}
 
 	@Override
 	public void visit(PointerType t) {
-		// TODO Auto-generated method stub
 		CodeGenTypeVisitor tv = new CodeGenTypeVisitor(pack);
 		t.pointedToType.accept(tv);
 		String Typ2 = tv.GetTypeText();
@@ -79,17 +77,14 @@ public class CodeGenTypeVisitor implements TypeVisitor {
 	}
 
 	public String GetTypeText() {
-		// TODO Auto-generated method stub
 		return this.Typ;
 	}
 
 	public boolean unsig() {
-		// TODO Auto-generated method stub
 		return unsig;
 	}
 
 	public boolean integer() {
-		// TODO Auto-generated method stub
 		return integer ;
 	}
 
