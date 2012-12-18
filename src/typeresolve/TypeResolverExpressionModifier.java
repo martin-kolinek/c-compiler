@@ -241,6 +241,15 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 
 	@Override
 	public void visit(IndexingExpression e) {
+		Type tt = mapping.getExpressionType(e.target);
+		Type it = mapping.getExpressionType(e.index);
+		if(!TypeClass.isInteger(it))
+			throw new SemanticException("Index in indexing expression must be integer");
+		if(!TypeClass.isPointerOrArray(tt))
+			throw new SemanticException("Target of indexation must be array or pointer");
+		PointerType ptr = AutomaticConversions.arrayToPtr(tt);
+		e.target = AutomaticConversions.arrayToPtr(e.target, mapping);
+		mapping.setType(e, ptr.pointedToType);
 		assert false; //these should have been removed by now
 	}
 
