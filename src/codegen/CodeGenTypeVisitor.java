@@ -5,6 +5,7 @@ import types.EnumType;
 import types.PointerType;
 import types.PrimitiveType;
 import types.StructType;
+import types.Type;
 import types.TypeVisitor;
 import types.TypedefType;
 
@@ -29,12 +30,17 @@ public class CodeGenTypeVisitor implements TypeVisitor {
 
 	@Override
 	public void visit(ArrayType t) {
-		// TODO Auto-generated method stub
+		CodeGenExpressionVisitor v = new CodeGenExpressionVisitor(pack);
+		t.size.accept(v);
+		String size = v.GetResultRegister();
+		CodeGenTypeVisitor tv2 = new CodeGenTypeVisitor(pack);
+		t.elementType.accept(tv2);
+		Typ="["+size+" x " +tv2.GetTypeText() + "]";
 
 	}
 
 	@Override
-	public void visit(TypedefType t) {
+	public void visit(TypedefType t) {//toto tipujem tiez netreba
 		// TODO Auto-generated method stub
 
 	}
