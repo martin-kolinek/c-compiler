@@ -10,12 +10,12 @@ public enum PrimitiveType implements Type, ASTNode {
 	UCHAR(1, false, false),
 	SHORT(2, true, false),
 	USHORT(2, false, false),
-	INT(3, true, false),
-	UINT(3, false, false),
-	LONG(4, true, false),
-	ULONG(4, false, false),
-	FLOAT(3, true, true),
-	DOUBLE(4, true, true);
+	INT(4, true, false),
+	UINT(4, false, false),
+	LONG(8, true, false),
+	ULONG(8, false, false),
+	FLOAT(4, true, true),
+	DOUBLE(8, true, true);
 
 	private PrimitiveType(int size, boolean sign, boolean floating) {
 		this.size=size;
