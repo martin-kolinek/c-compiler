@@ -77,48 +77,7 @@ public class InitializerFillModifier extends EmptyBlockModifier {
 				}
 			} else if (typ instanceof ArrayType){
 				//expect array
-				/*HashMap<String, Boolean> used_members = new HashMap<String, Boolean>(); 
-				HashMap<Integer, String> member_nums = new HashMap<Integer, String>();
-				HashMap<String, Integer> nums_member = new HashMap<String, Integer>(); 
-				//No member used yet, compute number for each member
-				int i = 0;
-				for (ResolvedDeclaration member : ((StructType) typ).members){
-					used_members.put(member.identifier, false);
-					member_nums.put(i, member.identifier);
-					nums_member.put(member.identifier, i);
-					i++;
-				}
-				
-				ArrayList<DesignatedInitializer> dis = new ArrayList<DesignatedInitializer>();
-				//create null initializers
-				for (int j=0; j<i; j++){
-					DesignatedInitializer di = new DesignatedInitializer();
-					di.designator = new Designator(member_nums.get(j));
-					di.initializer = null;
-					dis.add(di);
-				}
-				
-				//Iterate over initializers and insert into dis
-				for (DesignatedInitializer di : ((CompoundInitializer)init).initializers){
-					if (di.designator.id != null){
-						dis.set(nums_member.get(di.designator.id), di);
-						used_members.put(di.designator.id, true);
-					}
-				}
-				
-				//Not specified id's
-				int ind = 0;
-				for (DesignatedInitializer di : ((CompoundInitializer)init).initializers){
-					if (di.designator.id == null){
-						//find first next unused member
-						while (used_members.get(member_nums.get(ind))){ 
-							ind++;
-						}
-						di.designator.id = member_nums.get(ind); //set apropriate designator id
-						dis.set(ind, di); //replace
-						used_members.put(di.designator.id, true);
-					}
-				}*/
+				//@TODO: Ako zoradit initializery, ak ich index je expression?
 			}
 		}
 		return init;
