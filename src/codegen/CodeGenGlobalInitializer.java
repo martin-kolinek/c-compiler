@@ -10,7 +10,8 @@ public class CodeGenGlobalInitializer extends EmptyInBlockVisitor {
 	
 	@Override
 	public void visit(ResolvedDeclaration i) {
-		//cg.getex
+		String Typ=cg.getTypeString(i.type);
+		cg.
 	}
 
 }

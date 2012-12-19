@@ -40,4 +40,13 @@ public class CodeGenStream {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public void write(String s){
+		try {
+			sw.append(" " + s);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
