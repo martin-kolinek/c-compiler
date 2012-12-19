@@ -1,6 +1,7 @@
 package codegen;
 
 import types.StructType;
+import types.TypeClass;
 import exceptions.SemanticException;
 import expression.AssignmentExpression;
 import expression.CastExpression;
@@ -63,21 +64,16 @@ public class CodeGenExpressionAddress implements ExpressionVisitor {
 	public void visit(SizeofExpression e) {
 		fail();
 	}
-
-	private int getMemberPosition(StructType str, String member) {
-		for(int i=0; i<str.members.size(); i++) {
-			if(str.members.get(i).identifier.equals(member))
-				return i;
-		}
-		assert false;
-		return 0;
-	}
 	
 	@Override
 	public void visit(MemberAccessExpression e) {
 		result = cg.getNextregister();
 		StructType str = (StructType)cg.getExpressionType(e.exp);
-		cg.str.writeAssignment(result, "getelementptr", cg.getTypeString(str)+"*,", "i32 0,", "i32", Integer.toString(getMemberPosition(str, e.id)));
+		String addition = "";
+		int pos = str.getMemberPosition(e.id);
+		if(TypeClass.isArray(str.members.get(pos).type))
+			addition = ", i32 0";
+		cg.str.writeAssignment(result, "getelementptr", cg.getTypeString(str)+"*,", "i32 0,", "i32", Integer.toString(pos), addition);
 	}
 
 	@Override

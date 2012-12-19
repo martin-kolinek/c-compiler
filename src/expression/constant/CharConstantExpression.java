@@ -13,8 +13,8 @@ public class CharConstantExpression implements ConstantExpression, ASTNode{
 	}
 
 	@Override
-	public Float getNumericValue() {
-		return new Float(Character.getNumericValue(value));
+	public double getNumericValue() {
+		return new Double(Character.getNumericValue(value));
 	}
 
 }

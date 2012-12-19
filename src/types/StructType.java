@@ -27,6 +27,15 @@ public class StructType implements Type, ASTNode {
 	public List<ResolvedDeclaration> members;
 	public final String tag;
 	
+	public int getMemberPosition(String member) {
+		for(int i=0; i<members.size(); i++) {
+			if(members.get(i).identifier.equals(member))
+				return i;
+		}
+		assert false;
+		return 0;
+	}
+	
 	@Override
 	public void accept(TypeVisitor v) {
 		v.visit(this);

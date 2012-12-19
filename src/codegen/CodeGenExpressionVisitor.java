@@ -1,6 +1,10 @@
 package codegen;
 
+import typeresolve.AutomaticConversions;
+import types.ArrayType;
+import types.PointerType;
 import types.PrimitiveType;
+import types.StructType;
 import types.Type;
 import types.TypeClass;
 
@@ -27,32 +31,13 @@ import expression.unop.UnaryExpression;
 public class CodeGenExpressionVisitor implements ExpressionVisitor {
 	
 	private String Register;
-	private String Typ = "";
-//	private RegisterGenerator r;
-//	private LabelGenerator l;
-//	private OutputStreamWriter wr;
 	private BlockCodeGenerator cg;
-	private VisitPack pack;
-	private boolean acces = false;//TODO je to premenna z pamate, ktoru treba po uprave ulozit
-	private String adress = "";//TODO na tuto poziciu
-	
-	private void pis(CodeGenStream o,String s){
-		o.writeLine(new String[]{s});
-	}
-	
-	public CodeGenExpressionVisitor(VisitPack pack){
-		this.pack=pack;
-//		this.l=this.pack.l;
-//		this.r=this.pack.r;
-//		this.wr=this.pack.wr;
+	public CodeGenExpressionVisitor(BlockCodeGenerator cg){
+		this.cg=cg;
 	}
 	
 	public String GetResultRegister(){
 		return Register;
-	}
-	
-	public String GetResultTyp(){
-		return Typ;
 	}
 
 	public void writeAndOr(BinaryExpression e, boolean and) {
@@ -189,7 +174,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 				break; //*
 			case COMP :
 				Register=cg.getNextregister();
-				pack.wr.writeAssignment(Register, "xor", cg.getExpressionTypeStr(e.exp), "-1", cg.getExpressionRegister(e.exp));
+				cg.str.writeAssignment(Register, "xor", cg.getExpressionTypeStr(e.exp), "-1", cg.getExpressionRegister(e.exp));
 				break; //~ 
 			case NOT :
 				String tmp = cg.getNextregister();
@@ -207,45 +192,75 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visit(CastExpression e) {
-		CodeGenExpressionVisitor v1 = new CodeGenExpressionVisitor(pack);
-		e.exp.accept(v1);
-		String result1 = v1.GetResultRegister();
-		Type t = pack.t.getExpressionType(e);
-		CodeGenTypeVisitor tv = new CodeGenTypeVisitor(pack);
-		t.accept(tv);
-		Typ=tv.GetTypeText();
-		CodeGenTypeVisitor tv2 = new CodeGenTypeVisitor(pack);
-		e.type.accept(tv2);
-		String Typ2 = tv2.GetTypeText();
-		Register = pack.r.next();
-		pack.wr.writeAssignment(Register, "trunc",Typ, result1,",",Typ2);
-
+		Type orig = cg.getExpressionType(e.exp);
+		Type newt = e.type;
+		Register=cg.getExpressionAddress(e.exp);
+		if(orig instanceof ArrayType) {
+			orig=AutomaticConversions.arrayToPtr(orig);
+		}
+		if(orig instanceof PointerType) {
+			String res = cg.getNextregister();
+			cg.str.writeAssignment(res, "ptrtoint", cg.getTypeString(orig), Register, "to", cg.getTypeString(PrimitiveType.LONG));
+			Register = res;
+			orig = PrimitiveType.LONG;
+		}
+		if(newt instanceof PointerType) {
+			newt = PrimitiveType.LONG;
+		}
+		if(orig instanceof PrimitiveType && newt instanceof PrimitiveType && orig!=newt) {
+			PrimitiveType porig = (PrimitiveType)orig;
+			PrimitiveType pnew = (PrimitiveType)e.type;
+			String instruction = null;
+			if(porig.floating && pnew.floating) {
+				instruction = porig.size>pnew.size?"fptrunc":"fpext";
+			}
+			else if(porig.floating) {
+				instruction = pnew.sign?"fptosi":"fptoui";
+			}
+			else if(pnew.floating) {
+				instruction = porig.sign?"sitofp":"uitofp";
+			}
+			else if(porig.size<pnew.size) {
+				instruction = pnew.sign?"sext":"zext";
+			}
+			else {
+				instruction = "trunc";
+			}
+			String tmp = cg.getNextregister();
+			cg.str.writeAssignment(tmp, instruction, cg.getTypeString(orig), Register, "to", cg.getTypeString(pnew));
+		}
+		if(newt!=e.type) {
+			assert TypeClass.isPointer(e.type);
+			assert newt == PrimitiveType.LONG;
+			String res = cg.getNextregister();
+			cg.str.writeAssignment(res, "inttoptr", cg.getTypeString(PrimitiveType.LONG), Register, "to", cg.getTypeString(e.type));
+			Register = res;
+		}
 	}
 
 	@Override
 	public void visit(SizeofType e) {
-		// TODO Auto-generated method stub
-
+		assert false;
 	}
 
 	@Override
 	public void visit(SizeofExpression e) {
-		// TODO Auto-generated method stub
-
+		assert false;
 	}
 
 	@Override
 	public void visit(MemberAccessExpression e) {
-		CodeGenExpressionVisitor v1 = new CodeGenExpressionVisitor(pack);
-		e.exp.accept(v1);
-		String result1 = v1.GetResultRegister();
-		Type t = pack.t.getExpressionType(e);
-		CodeGenTypeVisitor tv = new CodeGenTypeVisitor(pack);
-		t.accept(tv);
-		Typ=tv.GetTypeText();
-		Register = pack.r.next();
-		pack.wr.writeAssignment(Register, "getelementptr",Typ,"*",result1,",",e.id);
-
+		String sptr = cg.getExpressionAddress(e.exp);
+		String ptr = cg.getNextregister();
+		Type t = cg.getExpressionType(e.exp);
+		assert t instanceof StructType;
+		int pos = ((StructType)t).getMemberPosition(e.id);
+		String addition = ""; 
+		if(TypeClass.isArray(((StructType)t).members.get(pos).type))
+			addition = ", i32 0";
+		cg.str.writeAssignment(ptr, "getelementptr", cg.getTypeString(t)+"*", sptr, ", i32 0, i32", Integer.toString(pos), addition);
+		Register = cg.getNextregister();
+		cg.str.writeAssignment(Register, "load", cg.getExpressionTypeStr(e), ptr);
 	}
 
 	@Override
@@ -266,44 +281,67 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visit(IntConstantExpression e) {
-		// TODO Auto-generated method stub
-
+		Register = Long.toString(e.value);
 	}
 
 	@Override
 	public void visit(FloatConstantExpression e) {
-		// TODO Auto-generated method stub
-
+		Register = Double.toHexString(e.value);
 	}
 
 	@Override
 	public void visit(StringConstantExpression e) {
-		// TODO Auto-generated method stub
-
+		//TODO
 	}
 
 	@Override
 	public void visit(CharConstantExpression e) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void visit(FunctionCallExpression e) {
-		// TODO Auto-generated method stub
-
+		Register = cg.getNextregister();
+		StringBuilder args = new StringBuilder();
+		StringBuilder types = new StringBuilder();
+		boolean first = true;
+		for(Expression a : e.args) {
+			if(!first) {
+				args.append(", ");
+				types.append(", ");
+				first = true;
+			}
+			args.append(cg.getExpressionTypeStr(a));
+			types.append(cg.getExpressionTypeStr(a));
+			args.append(" ");
+			args.append(cg.getExpressionRegister(a));
+		}
+		cg.str.writeAssignment(Register, "call", cg.getExpressionTypeStr(e) + "(" + types.toString() + ")" , "@"+e.name, "(", ")");
 	}
 
 	@Override
 	public void visit(TernaryExpression e) {
-		// TODO Auto-generated method stub
-
+		String trueLabel = cg.getNextLabel();
+		String falseLabel = cg.getNextLabel();
+		String jmpLabel = cg.getNextLabel();
+		String condRes = cg.getNextregister();
+		cg.str.writeAssignment(condRes, "icmp ne", cg.getExpressionTypeStr(e.condition), cg.getExpressionRegister(e.condition),  ", 0");
+		cg.str.writeLine("br i1", condRes, "label", trueLabel, ", label", falseLabel);
+		cg.str.writeLabel(trueLabel);
+		String trueRes = cg.getExpressionRegister(e.ontrue);
+		cg.str.writeLine("br label", jmpLabel);
+		cg.str.writeLabel(falseLabel);
+		String falseRes = cg.getExpressionRegister(e.onfalse);
+		cg.str.writeLine("br label", jmpLabel);
+		cg.str.writeLabel(jmpLabel);
+		Register = cg.getNextregister();
+		cg.str.writeAssignment(Register, "phi", cg.getExpressionTypeStr(e), "[", trueRes, ",", trueLabel, "], [", falseRes, ",", falseLabel, "]");
 	}
 
 	@Override
 	public void visit(CommaExpression e) {
-		// TODO Auto-generated method stub
-
+		for(Expression ee:e.expressions) {
+			Register = cg.getExpressionRegister(ee);
+		}
 	}
 
 	private String getSizeExpr(Type t) {

@@ -8,15 +8,15 @@ public class IntConstantExpression implements ConstantExpression, ASTNode{
 	public IntConstantExpression(){
 	}
 	
-	public IntConstantExpression(int val) {
+	public IntConstantExpression(long val) {
 		value=val;
 	}
 	
-	public IntConstantExpression(Float val) {
-		value=Math.round(val);
+	public IntConstantExpression(double val) {
+		value=(long)val;
 	}
 	
-	public int value;
+	public long value;
 
 	@Override
 	public void accept(ExpressionVisitor v) {
@@ -24,7 +24,7 @@ public class IntConstantExpression implements ConstantExpression, ASTNode{
 	}
 
 	@Override
-	public Float getNumericValue() {
+	public double getNumericValue() {
 		return new Float(value);
 	}
 

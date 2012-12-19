@@ -22,7 +22,7 @@ public class BlockCodeGenerator {
 	private RegisterGenerator rg;
 	
 	public String getExpressionRegister(Expression e){
-		return valmap.getExpressionResult(e, new CodeGenExpressionVisitor(new VisitPack(str, lg, rg)));
+		return valmap.getExpressionResult(e, new CodeGenExpressionVisitor(this));
 	}
 	
 	public String getNextLabel() {
@@ -54,11 +54,25 @@ public class BlockCodeGenerator {
 	}
 	
 	public String getIDAddress(String id) {
-		return idAddresses.get(id);
+		String addr = idAddresses.get(id);
+		if(isGlobalArray(id)) {
+			String tmp = getNextregister();
+			str.writeAssignment(tmp, "getelementptr", getGlobalArrayTypeString(id)+"*", getIDAddress(id), ",", "i32 0, i32 0");
+			addr = tmp;
+		}
+		return addr;
 	}
 	
 	public void generateStatement(Statement st) {
 		CodeGenStatementVisitor vis = new CodeGenStatementVisitor(this);
 		st.accept(vis);
+	}
+	
+	public boolean isGlobalArray(String id) {
+		return false; //TODO
+	}
+	
+	public String getGlobalArrayTypeString(String id) {
+		return ""; //TODO
 	}
 }

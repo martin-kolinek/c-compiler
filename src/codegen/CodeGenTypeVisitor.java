@@ -30,12 +30,12 @@ public class CodeGenTypeVisitor implements TypeVisitor {
 
 	@Override
 	public void visit(ArrayType t) {
-		CodeGenExpressionVisitor v = new CodeGenExpressionVisitor(pack);
+		/*CodeGenExpressionVisitor v = new CodeGenExpressionVisitor(pack);
 		t.size.accept(v);
 		String size = v.GetResultRegister();
 		CodeGenTypeVisitor tv2 = new CodeGenTypeVisitor(pack);
 		t.elementType.accept(tv2);
-		Typ="["+size+" x " +tv2.GetTypeText() + "]";
+		Typ="["+size+" x " +tv2.GetTypeText() + "]";*/
 
 	}
 

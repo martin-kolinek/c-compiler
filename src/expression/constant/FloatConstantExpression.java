@@ -5,13 +5,13 @@ import expression.ExpressionVisitor;
 
 public class FloatConstantExpression implements ConstantExpression, ASTNode{
 	
-	public float value;
+	public double value;
 	
 	public FloatConstantExpression(){
 		
 	}
 	
-	public FloatConstantExpression(Float val){
+	public FloatConstantExpression(double val){
 		value = val;
 	}
 
@@ -21,7 +21,7 @@ public class FloatConstantExpression implements ConstantExpression, ASTNode{
 	}
 
 	@Override
-	public Float getNumericValue() {
+	public double getNumericValue() {
 		return value;
 	}
 

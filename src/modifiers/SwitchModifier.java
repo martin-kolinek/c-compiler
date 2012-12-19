@@ -15,7 +15,7 @@ import transformers.TransformerUtil;
 public class SwitchModifier extends EmptyStatementModifier {
 	@Override
 	public void visit(SwitchStatement s) {
-		HashSet<Integer> values = new HashSet<Integer>();
+		HashSet<Long> values = new HashSet<Long>();
 		boolean def = false;
 		for(Case c:s.cases) {
 			if(c.cond!=null) {
@@ -27,7 +27,7 @@ public class SwitchModifier extends EmptyStatementModifier {
 				});
 				if(!(c.cond instanceof IntConstantExpression)) 
 					throw new SemanticException("Case value is not a constant integer expression");
-				int val = ((IntConstantExpression)c.cond).value;
+				long val = ((IntConstantExpression)c.cond).value;
 				if(values.contains(val))
 					throw new SemanticException("Same constant used more than once in switch cases");
 				values.add(val);

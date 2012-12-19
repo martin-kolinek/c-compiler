@@ -314,6 +314,7 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 	public void visit(TernaryExpression e) {
 		if(!TypeClass.isScalar(mapping.getExpressionType(e.condition)))
 			throw new SemanticException("Condition in ternary operator needs to be arithmetic");
+		e.condition=AutomaticConversions.autoCast(e.condition, PrimitiveType.LONG, mapping);
 		Type lt = mapping.getExpressionType(e.ontrue);
 		Type rt = mapping.getExpressionType(e.onfalse);
 		if(TypeClass.isArithmethic(lt) && TypeClass.isArithmethic(rt)) {

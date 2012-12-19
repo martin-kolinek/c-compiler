@@ -4,6 +4,6 @@ import expression.Expression;
 
 public interface ConstantExpression extends Expression {
 	
-	public Float getNumericValue();
+	public double getNumericValue();
 	
 }
