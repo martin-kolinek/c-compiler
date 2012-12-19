@@ -83,7 +83,7 @@ cast returns [CastExpression ret]
 //alebo ID [ expreesion ], tak treba vyskusat aj to
 sizeof_arg returns [Expression ret]
   : ('(' type_name ')') => tok='(' td=type_name ')' {$ret=new SizeofType(); ((SizeofType)$ret).typedecl=$td.ret; pos.setPosition((SizeofType)$ret, $tok);} |
-   exp=unary_expression {$ret=new SizeofExpression(); ((SizeofExpression)$ret).exp=$exp.ret; pos.setPosition((UnaryExpression)$ret, (UnaryExpression)$exp.ret);};
+   exp=unary_expression {$ret=new SizeofExpression(); ((SizeofExpression)$ret).exp=$exp.ret; pos.setPosition($ret, $exp.ret);};
 
 unary_operator returns [UnaryOperator ret] :
   '&' {$ret=UnaryOperator.ADDR;} |
