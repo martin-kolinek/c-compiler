@@ -32,7 +32,9 @@ public class InitializerModifier extends EmptyBlockModifier {
 	
 	private ArrayList<Statement> getStatements(Initializer init, Expression context){
 		ArrayList<Statement> stats = new ArrayList<Statement>();
-		if (init instanceof ExpressionInitializer){
+		if (init == null){
+			//do nothing
+		} else if (init instanceof ExpressionInitializer){
 			//expression
 			stats.add(new OneexpressionStatement(new BinaryExpression(context, BinaryOperator.ASSIG, ((ExpressionInitializer)init).exp)));
 		} else {
