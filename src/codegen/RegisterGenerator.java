@@ -2,18 +2,13 @@ package codegen;
 
 public class RegisterGenerator {
 	private int i; //pocitadlo kvoli unikatnosti
-	
-	public RegisterGenerator(){
+	String prefix;
+	public RegisterGenerator(String prefix){
 		this.i=0;
 	}
 	
 	public String next(){
 		i++;
-		return "%" +Integer.toString(i);
+		return prefix +Integer.toString(i);
 	}
-	
-	public String akt(){
-		return "%" +Integer.toString(i);
-	}
-
 }

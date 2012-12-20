@@ -1,7 +1,7 @@
 package codegen;
 
 import java.io.OutputStreamWriter;
-
+import java.util.HashMap;
 import expression.Expression;
 
 import statements.Statement;
@@ -15,16 +15,30 @@ public class BlockCodeGenerator {
 	}
 	
 	public BlockCodeGenerator(CodeGenStream str2,
-			ExpressionValueMapping valmap2, ExpressionTypeMapping typemap2,
-			SymbolTable<String> idAddresses2, LabelGenerator lg2,
-			RegisterGenerator rg2) {
+			ExpressionTypeMapping typemap2,
+			LabelGenerator lg2,
+			RegisterGenerator rg2,
+			RegisterGenerator grg2) {
 		this.str=str2;
 		this.lg=lg2;
 		this.rg=rg2;
 		this.typemap=typemap2;
-		this.valmap=valmap2;
-		this.idAddresses=new SymbolTable<String>(idAddresses2);
-		// TODO Auto-generated constructor stub
+		this.valmap=new ExpressionValueMapping();
+		this.idAddresses=new SymbolTable<String>();
+		this.strings = new StringConstantCodeGen(this);
+		this.globArrays=new HashMap<String, Type>();
+	}
+	
+	public BlockCodeGenerator(BlockCodeGenerator parent) {
+		this.str = parent.str;
+		this.valmap = parent.valmap;
+		this.typemap=parent.typemap;
+		this.idAddresses=parent.idAddresses;
+		this.lg=parent.lg;
+		this.rg=parent.rg;
+		this.grg=parent.grg;
+		this.strings=parent.strings;
+		this.globArrays=parent.globArrays;
 	}
 
 	public final CodeGenStream str;
@@ -35,6 +49,7 @@ public class BlockCodeGenerator {
 	private RegisterGenerator rg;
 	private RegisterGenerator grg;
 	private StringConstantCodeGen strings;
+	private HashMap<String, Type> globArrays;
 	
 	public String getExpressionRegister(Expression e){
 		return valmap.getExpressionResult(e, new CodeGenExpressionVisitor(this));
@@ -95,11 +110,15 @@ public class BlockCodeGenerator {
 	}
 	
 	public boolean isGlobalArray(String id) {
-		return false; //TODO
+		return globArrays.containsKey(idAddresses.get(id));
+	}
+	
+	public void setGlobalArray(String id, Type t) {
+		globArrays.put(idAddresses.get(id), t);
 	}
 	
 	public String getGlobalArrayTypeString(String id) {
-		return ""; //TODO
+		return getProperTypeString(globArrays.get(idAddresses.get(id)));
 	}
 	
 	public String getStringAddress(byte[] value) {
@@ -113,7 +132,10 @@ public class BlockCodeGenerator {
 	}
 
 	public BlockCodeGenerator getChild() {
-		// TODO Auto-generated method stub
-		return new BlockCodeGenerator(str,valmap,typemap,idAddresses,lg,rg);
+		return new BlockCodeGenerator(this);
+	}
+	
+	public void storeID(String id, String register) {
+		idAddresses.store(id, register);
 	}
 }

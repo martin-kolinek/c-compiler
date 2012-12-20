@@ -1,5 +1,9 @@
 package compiler;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+
 import modifiers.AssignmentModifier;
 import modifiers.CommaExpressionModifier;
 import modifiers.LoopModifier;
@@ -9,9 +13,12 @@ import modifiers.UnaryChargeModifier;
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.CommonTokenStream;
 
+import codegen.MainCodeGenVisitor;
+
 import declaration.DeclarationResolver;
 
 import toplevel.FunctionDefinition;
+import toplevel.InBlock;
 import toplevel.Program;
 import transformers.BlockModifier;
 import transformers.BlockModifierFactory;
@@ -30,11 +37,10 @@ import grammar.generated.cgrammarParser;
 
 public class Main {
 	public static void main(String[] args) throws Exception {
-		if(args.length!=1) {
-			System.out.println("Expecting file name");
+		if(args.length!=2) {
+			System.out.println("Expecting 2 file names");
 			System.exit(1);
 		}
-		System.out.println(new java.io.File( "." ).getCanonicalPath());
 		//read input using antlr
 		ANTLRFileStream in = new ANTLRFileStream(args[0]);
 		cgrammarLexer lex = new cgrammarLexer(in);
@@ -106,9 +112,17 @@ public class Main {
 		//link types
 		TransformerUtil.transformProgram(prog, new TypeCompletenessFactory());
 		
+		//resolve types
 		TypeResolverFactory fac = new TypeResolverFactory();
 		TransformerUtil.transformProgram(prog, fac);
 		
-		System.out.println(prog.declarations.inBlock.size());
+		OutputStreamWriter wr = new OutputStreamWriter(new FileOutputStream(new File(args[1])));
+		
+		//generate code
+		MainCodeGenVisitor cg = new MainCodeGenVisitor(wr, fac.getResultMapping());
+		for(InBlock ib:prog.declarations.inBlock)
+			ib.accept(cg);
+		
+		System.out.println("Done");
 	}
 }

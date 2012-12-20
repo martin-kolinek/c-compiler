@@ -16,6 +16,7 @@ import statements.Statement;
 import statements.StatementVisitor;
 import statements.SwitchStatement;
 import statements.WhileStatement;
+import toplevel.InBlock;
 
 public class CodeGenStatementVisitor implements StatementVisitor {
 	
@@ -23,7 +24,6 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	private String BreakSkok;
 	private String ContinueSkok;
 	private CodeGenStream wr;
-	private BlockStatement s =null;
 	
 	public CodeGenStatementVisitor(BlockCodeGenerator cg){
 		this.cg=cg;
@@ -169,15 +169,9 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 
 	@Override
 	public void visit(BlockStatement s) {
-		//ok riesi MainCodeGenvisitor
-		this.s =s;
+		BlockCodeGenerator icg = cg.getChild();
+		CodeGenInBlockVisitor vis = new CodeGenInBlockVisitor(icg);
+		for(InBlock ib:s.inBlock)
+			ib.accept(vis);
 	}
-	boolean isBlock(){
-		return s==null;
-	}
-
-	public BlockStatement getBlock() {
-		return s;
-	}
-
 }

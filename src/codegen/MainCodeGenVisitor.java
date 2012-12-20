@@ -1,58 +1,73 @@
 package codegen;
 
+import java.io.OutputStreamWriter;
 import declaration.Declaration;
 import declaration.ResolvedDeclaration;
 import declaration.TypedefDeclaration;
-import statements.BlockStatement;
 import statements.Statement;
 import toplevel.FunctionDefinition;
-import toplevel.InBlock;
+import toplevel.FunctionParameter;
 import toplevel.InBlockVisitor;
+import typeresolve.ExpressionTypeMapping;
 
 public class MainCodeGenVisitor implements InBlockVisitor {
 	public BlockCodeGenerator cg;
 
-	public MainCodeGenVisitor(BlockCodeGenerator cgch) {
-		this.cg=cgch;
+	public MainCodeGenVisitor(OutputStreamWriter sw, ExpressionTypeMapping mp) {
+		this.cg=new BlockCodeGenerator(new CodeGenStream(sw), mp, new LabelGenerator("%lbl."), new RegisterGenerator("%reg."), new RegisterGenerator("@glob."));
 	}
 
 	@Override
 	public void visit(Statement i) {
-		CodeGenStatementVisitor sv = new CodeGenStatementVisitor(cg);
-		i.accept(sv);
-		if(sv.isBlock()){
-			BlockStatement b=sv.getBlock();
-			BlockCodeGenerator cgch=cg.getChild();
-			MainCodeGenVisitor mv = new MainCodeGenVisitor(cgch);
-			for(InBlock  in: b.inBlock){
-				in.accept(mv);
-			}
-		}
-
+		assert false;//tieto by na globalnej urovni nemali byt
 	}
 
 	@Override
 	public void visit(Declaration i) {
-		// TODO Auto-generated method stub
-
+		assert false;
 	}
 
 	@Override
 	public void visit(FunctionDefinition i) {
-		// TODO Auto-generated method stub
-
+		cg.str.write(i.body==null?"declare":"define");
+		cg.str.write(cg.getTypeString(i.returnType));
+		cg.str.write("@"+i.name);
+		cg.str.write("(");
+		boolean f=true;
+		for(FunctionParameter p: i.parameters) {
+			if(!f)
+				cg.str.write(",");
+			f=false;
+			cg.str.write(cg.getTypeString(p.type));
+			if(i.body!=null) {
+				cg.str.write("%par."+p.id);
+			}
+		}
+		cg.str.write(")\n");
+		if(i.body!=null) {
+			cg.str.writeLine("{");
+			BlockCodeGenerator icg = new BlockCodeGenerator(cg);
+			for(FunctionParameter p:i.parameters) {
+				String reg = icg.getNextregister();
+				icg.storeID(p.id, reg);
+				icg.str.writeAssignment(reg, "alloca", icg.getTypeString(p.type));
+				icg.str.writeLine("store", icg.getTypeString(p.type), "%par."+p.id, ",", icg.getTypeString(p.type)+"*", reg);
+				
+			}
+			icg.generateStatement(i.body);
+			cg.str.writeLine("}");
+		}
 	}
 
 	@Override
 	public void visit(TypedefDeclaration i) {
-		// TODO Auto-generated method stub
-
+		assert false;
 	}
 
 	@Override
 	public void visit(ResolvedDeclaration i) {
-		// TODO Auto-generated method stub
-
+		CodeGenGlobalInitializer ini = new CodeGenGlobalInitializer();
+		i.accept(ini);
 	}
 
 }
