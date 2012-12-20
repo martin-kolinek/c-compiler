@@ -309,9 +309,9 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 		if(f==null) {
 			throw new SemanticException("Call to unknown function");
 		}
-		if(e.args.size()!=f.parameters.size())
+		if((!f.variadic && e.args.size()!=f.parameters.size()) || e.args.size()<f.parameters.size())
 			throw new SemanticException("Function call with wrong number of parameters");
-		for(int i=0; i<e.args.size(); i++){
+		for(int i=0; i<f.parameters.size(); i++){
 			Type t =f.parameters.get(i).type; 
 			assert !TypeClass.isArray(t);
 			if(TypeClass.isStruct(t)) {

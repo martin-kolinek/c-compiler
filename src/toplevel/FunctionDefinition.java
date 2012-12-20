@@ -17,6 +17,8 @@ public class FunctionDefinition implements InBlock, ASTNode{
 	public Type returnType;
 	
 	public ArrayList<FunctionParameter> parameters;
+
+	public boolean variadic;
 	
 	public String name;
 	

@@ -454,7 +454,7 @@ parameter_list [Declarator decl] returns [Declarator ret]
   : pd1=parameter_declaration {$ret=new FunctionDeclarator($decl); ((FunctionDeclarator)$ret).parameters.add($pd1.ret);} 
       (',' pd2=parameter_declaration {((FunctionDeclarator)$ret).parameters.add($pd2.ret);})* 
       (',' '...' {((FunctionDeclarator)$ret).variadic=true;})? 
-  | '...';
+  | '...' {$ret = new FunctionDeclarator($decl); ((FunctionDeclarator)$ret).variadic=true;};
 
 parameter_declaration returns [Declaration ret]
   : {$ret = new Declaration();} 

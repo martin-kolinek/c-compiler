@@ -79,9 +79,10 @@ public class DeclarationResolver implements BlockModifier {
 			d.declarator.accept(dr);
 			if(dr.isFunction()) {
 				FunctionDefinition fun = new FunctionDefinition();
-				fun.returnType=ex.getType();
+				fun.returnType=dr.wrapType(ex.getType());
 				fun.parameters=dr.funcParams;
 				fun.name=dr.getID();
+				fun.variadic=dr.isVariadic();
 				if(d.initializer!=null)
 					throw new SemanticException("Initizer for function");
 				result.add(fun);

@@ -43,6 +43,11 @@ public class MainCodeGenVisitor implements InBlockVisitor {
 				cg.str.write("%par."+p.id);
 			}
 		}
+		if(i.variadic) {
+			if(!f)
+				cg.str.write(",");
+			cg.str.write("...");
+		}
 		cg.str.write(")\n");
 		if(i.body!=null) {
 			cg.str.writeLine("{");

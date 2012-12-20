@@ -49,6 +49,11 @@ public class DeclaratorResolver implements DeclaratorVisitor, ASTNode{
 		return func;
 	}
 	
+	private boolean variad;
+	public boolean isVariadic() {
+		return variad;
+	}
+	
 	public ArrayList<FunctionParameter> funcParams;
 	
 	@Override
@@ -91,6 +96,8 @@ public class DeclaratorResolver implements DeclaratorVisitor, ASTNode{
 		if(d.declarator!=null) {
 			d.declarator.accept(this);
 		}
+		if(d.variadic)
+			variad=true;
 		for(Declaration decl : d.parameters)
 		{
 			DeclarationResolver res = new DeclarationResolver();
