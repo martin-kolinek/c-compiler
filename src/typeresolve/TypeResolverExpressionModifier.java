@@ -315,8 +315,12 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 			Type t =f.parameters.get(i).type; 
 			assert !TypeClass.isArray(t);
 			if(TypeClass.isStruct(t)) {
-				if(t!=mapping.getExpressionType(e.args.get(i)))
+				Type pt = mapping.getExpressionType(e.args.get(i));
+				if(t!=pt)
 					throw new SemanticException("Wrong parameter type");
+				Expression newExp = new UnaryExpression(e.args.get(i), UnaryOperator.ADDR);
+				mapping.setType(newExp, new PointerType(t));
+				e.args.set(i, newExp);
 			}
 			else {
 				e.args.set(i, AutomaticConversions.autoCast(e.args.get(i), t, mapping));

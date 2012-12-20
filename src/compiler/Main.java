@@ -6,6 +6,7 @@ import java.io.OutputStreamWriter;
 
 import modifiers.AssignmentModifier;
 import modifiers.CommaExpressionModifier;
+import modifiers.FunctionParameterModifier;
 import modifiers.LoopModifier;
 import modifiers.PointerModifier;
 import modifiers.UnaryChargeModifier;
@@ -111,12 +112,25 @@ public class Main {
 		
 		//link types
 		TransformerUtil.transformProgram(prog, new TypeCompletenessFactory());
-		
+				
 		//resolve types
 		TypeResolverFactory fac = new TypeResolverFactory();
 		TransformerUtil.transformProgram(prog, fac);
 		
 		OutputStreamWriter wr = new OutputStreamWriter(new FileOutputStream(new File(args[1])));
+		
+		//change function definitions to have pointers as parameters instead of arrays and structs
+		TransformerUtil.transformProgram(prog, new BlockModifierFactory() {
+			
+			@Override
+			public void popModifierStack() {
+			}
+			
+			@Override
+			public BlockModifier createModifier(FunctionDefinition def) {
+				return new FunctionParameterModifier();
+			}
+		});
 		
 		//generate code
 		MainCodeGenVisitor cg = new MainCodeGenVisitor(wr, fac.getResultMapping());
