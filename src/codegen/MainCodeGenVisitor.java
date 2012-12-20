@@ -6,19 +6,27 @@ import declaration.TypedefDeclaration;
 import statements.BlockStatement;
 import statements.Statement;
 import toplevel.FunctionDefinition;
+import toplevel.InBlock;
 import toplevel.InBlockVisitor;
 
 public class MainCodeGenVisitor implements InBlockVisitor {
 	public BlockCodeGenerator cg;
 
+	public MainCodeGenVisitor(BlockCodeGenerator cgch) {
+		this.cg=cgch;
+	}
+
 	@Override
 	public void visit(Statement i) {
-		// TODO Auto-generated method stub
 		CodeGenStatementVisitor sv = new CodeGenStatementVisitor(cg);
 		i.accept(sv);
 		if(sv.isBlock()){
 			BlockStatement b=sv.getBlock();
 			BlockCodeGenerator cgch=cg.getChild();
+			MainCodeGenVisitor mv = new MainCodeGenVisitor(cgch);
+			for(InBlock  in: b.inBlock){
+				in.accept(mv);
+			}
 		}
 
 	}
