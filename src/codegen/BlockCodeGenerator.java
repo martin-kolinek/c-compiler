@@ -21,7 +21,9 @@ public class BlockCodeGenerator {
 		this.str=str2;
 		this.lg=lg2;
 		this.rg=rg2;
-		
+		this.typemap=typemap2;
+		this.valmap=valmap2;
+		this.idAddresses=new SymbolTable<String>(idAddresses2);
 		// TODO Auto-generated constructor stub
 	}
 
