@@ -240,12 +240,12 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visit(SizeofType e) {
-		assert false;
+		Register = cg.getSizeOfResult(e.type);
 	}
 
 	@Override
 	public void visit(SizeofExpression e) {
-		assert false;
+		Register = cg.getSizeOfResult(cg.getExpressionType(e.exp));
 	}
 
 	@Override
@@ -346,15 +346,11 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 		}
 	}
 
-	private String getSizeExpr(Type t) {
-		return ""; //TODO
-	}
-	
 	@Override
 	public void visit(AssignmentExpression e) {
 		Type t = cg.getExpressionType(e);
 		if(TypeClass.isStruct(t)) {
-			String s = getSizeExpr(t);
+			String s = cg.getSizeOfResult(t);
 			String laddr = cg.getExpressionAddress(e.left);
 			String raddr = cg.getExpressionAddress(e.right);
 			String ltmp = cg.getNextregister();

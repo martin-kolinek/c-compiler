@@ -98,6 +98,12 @@ public class BlockCodeGenerator {
 	public String getStringAddress(byte[] value) {
 		return strings.addStringConstant(value);
 	}
+	
+	public String getSizeOfResult(Type t) {
+		CodeGenSizeOfVisitor sv = new CodeGenSizeOfVisitor(this);
+		t.accept(sv);
+		return sv.getResult();
+	}
 
 	public BlockCodeGenerator getChild() {
 		// TODO Auto-generated method stub
