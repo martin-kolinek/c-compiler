@@ -28,9 +28,10 @@ public class CodeGenGlobalInitializer extends EmptyInBlockVisitor {
 		}
 		else if(i.initializer instanceof CompoundInitializer)
 		{
-			CompoundInitializer k= (CompoundInitializer) i.initializer;
+			cg.str.write("{");
 			CodeGenInitializerVisitor iv = new CodeGenInitializerVisitor(cg);
-			k.accept(iv);
+			i.initializer.accept(iv);
+			cg.str.write("}\n");
 			
 		}
 	}

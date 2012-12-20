@@ -24,20 +24,28 @@ public class CodeGenInitializerVisitor implements InitializerVisitor {
 	@Override
 	public void visit(CompoundInitializer compoundInitializer) {
 		// TODO Auto-generated method stub
+		boolean neprvy=false;
 		
-		for(DesignatedInitializer  s: compoundInitializer.initializers ){
+		for(DesignatedInitializer  s: compoundInitializer.initializers ){//cyklus po jednotlivych initializeroch
+			if(neprvy) cg.str.write(",");
 			String Typ = cg.getExpressionTypeStr(s.designator.expr);
 			cg.str.write(Typ);
 			if(s.initializer == null){
-				CodeGenInitializerVisitor iv = new CodeGenInitializerVisitor(cg);
-				s.initializer.accept(iv);
+				cg.str.write("zeroinitializer");
+				/*CodeGenInitializerVisitor iv = new CodeGenInitializerVisitor(cg);
+				s.initializer.accept(iv);*/
 			}else if(s.initializer instanceof ExpressionInitializer){
 				ExpressionInitializer e = (ExpressionInitializer) s.initializer;
 				String Konst = cg.getExpressionRegister(e.exp);
 				cg.str.write(Konst);
+			}else if(s.initializer instanceof CompoundInitializer){
+				cg.str.write("{");
+				CodeGenInitializerVisitor iv = new CodeGenInitializerVisitor(cg);
+				s.initializer.accept(iv);
+				cg.str.write("}");
 			}
 			
-			
+		neprvy=true;	
 		}
 			
 
