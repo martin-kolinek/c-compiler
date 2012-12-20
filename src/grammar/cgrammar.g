@@ -249,10 +249,10 @@ assignment_operator returns [BinaryOperator ret] :
   ;
 
 constant returns [Expression ret]
-  : INT {$ret = new IntConstantExpression(); ((IntConstantExpression)$ret).value = Integer.parseInt($INT.getText()); pos.setPosition((IntConstantExpression)$ret, $INT);} |
-   FLOAT {$ret = new FloatConstantExpression(); ((FloatConstantExpression)$ret).value = Float.parseFloat($FLOAT.getText()); pos.setPosition((FloatConstantExpression)$ret, $FLOAT);}| 
+  : INT {$ret = new IntConstantExpression($INT.getText()); pos.setPosition((IntConstantExpression)$ret, $INT);} |
+   FLOAT {$ret = new FloatConstantExpression($FLOAT.getText()); pos.setPosition((FloatConstantExpression)$ret, $FLOAT);}| 
    STRING {$ret = new StringConstantExpression($STRING.getText()); pos.setPosition((StringConstantExpression)$ret, $STRING);}| 
-   CHAR {$ret = new CharConstantExpression(); ((CharConstantExpression)$ret).value = $CHAR.getText().charAt(0); pos.setPosition((CharConstantExpression)$ret, $CHAR);};
+   CHAR {$ret = new IntConstantExpression($CHAR.getText()); pos.setPosition((IntConstantExpression)$ret, $CHAR);};
          
 //sadly this is required because otherwise we get an error from antlr
 external_declaration returns [InBlock ret]
