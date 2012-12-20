@@ -14,7 +14,6 @@ import expression.SizeofExpression;
 import expression.SizeofType;
 import expression.TernaryExpression;
 import expression.binop.BinaryExpression;
-import expression.constant.CharConstantExpression;
 import expression.constant.FloatConstantExpression;
 import expression.constant.IntConstantExpression;
 import expression.constant.StringConstantExpression;
@@ -97,11 +96,7 @@ public class ExpressionTransformer implements ExpressionVisitor {
 	@Override
 	public void visit(StringConstantExpression stringConstantExpression) {
 	}
-
-	@Override
-	public void visit(CharConstantExpression charConstantExpression) {
-	}
-
+	
 	@Override
 	public void visit(FunctionCallExpression functionCallExpression) {
 		for(int i=0; i<functionCallExpression.args.size(); ++i) {

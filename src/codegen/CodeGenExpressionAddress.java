@@ -16,7 +16,6 @@ import expression.SizeofExpression;
 import expression.SizeofType;
 import expression.TernaryExpression;
 import expression.binop.BinaryExpression;
-import expression.constant.CharConstantExpression;
 import expression.constant.FloatConstantExpression;
 import expression.constant.IntConstantExpression;
 import expression.constant.StringConstantExpression;
@@ -104,11 +103,6 @@ public class CodeGenExpressionAddress implements ExpressionVisitor {
 
 	@Override
 	public void visit(StringConstantExpression e) {
-		fail();
-	}
-
-	@Override
-	public void visit(CharConstantExpression e) {
 		fail();
 	}
 

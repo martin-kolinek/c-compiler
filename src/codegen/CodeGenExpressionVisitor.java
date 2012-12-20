@@ -22,7 +22,6 @@ import expression.SizeofExpression;
 import expression.SizeofType;
 import expression.TernaryExpression;
 import expression.binop.BinaryExpression;
-import expression.constant.CharConstantExpression;
 import expression.constant.FloatConstantExpression;
 import expression.constant.IntConstantExpression;
 import expression.constant.StringConstantExpression;
@@ -294,10 +293,6 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 		String addr = cg.getStringAddress(e.value);
 		Register = cg.getNextregister();
 		cg.str.writeAssignment(Register, "getelementptr", cg.getExpressionTypeStr(e)+"*", addr, ", i32 0, i32 0");
-	}
-
-	@Override
-	public void visit(CharConstantExpression e) {
 	}
 
 	@Override

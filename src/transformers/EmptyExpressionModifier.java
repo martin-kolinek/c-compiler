@@ -13,7 +13,6 @@ import expression.SizeofExpression;
 import expression.SizeofType;
 import expression.TernaryExpression;
 import expression.binop.BinaryExpression;
-import expression.constant.CharConstantExpression;
 import expression.constant.FloatConstantExpression;
 import expression.constant.IntConstantExpression;
 import expression.constant.StringConstantExpression;
@@ -80,11 +79,6 @@ public class EmptyExpressionModifier implements ExpressionModifier {
 
 	@Override
 	public void visit(StringConstantExpression e) {
-		result = e;
-	}
-
-	@Override
-	public void visit(CharConstantExpression e) {
 		result = e;
 	}
 

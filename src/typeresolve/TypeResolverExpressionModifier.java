@@ -298,12 +298,6 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 	}
 
 	@Override
-	public void visit(CharConstantExpression e) {
-		mapping.setType(e, PrimitiveType.CHAR);
-		result = e;
-	}
-
-	@Override
 	public void visit(FunctionCallExpression e) {
 		FunctionDefinition f = funcs.get(e.name);
 		if(f==null) {

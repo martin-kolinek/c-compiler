@@ -1,5 +1,10 @@
 package expression.constant;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import types.PrimitiveType;
+
 import astnode.ASTNode;
 import expression.ExpressionVisitor;
 
@@ -9,15 +14,14 @@ public class FloatConstantExpression implements ConstantExpression, ASTNode{
 	public double value;
 	
 	public FloatConstantExpression(String val){
-		if (val.matches("^([0-9\\.]+f)$")){
-			//float
-			typ = types.PrimitiveType.FLOAT;
-			value = Float.parseFloat(val.replaceAll("f", ""));
-		} else {
-			//double
-			typ = types.PrimitiveType.DOUBLE;
-			value = Double.parseDouble(val);
-		}
+		val=val.toUpperCase();
+		Pattern p = Pattern.compile("([^FL]+)(F|L)?");
+		Matcher m = p.matcher(val);
+		assert m.matches();
+		typ=PrimitiveType.DOUBLE;
+		if(m.groupCount()>2 && m.group(2)=="F")
+			typ=PrimitiveType.FLOAT;
+		value = Double.parseDouble(m.group(1));
 	}
 	
 	public FloatConstantExpression(){

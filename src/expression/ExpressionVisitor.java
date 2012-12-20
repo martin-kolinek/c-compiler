@@ -18,7 +18,6 @@ public interface ExpressionVisitor {
 	void visit(IntConstantExpression e);
 	void visit(FloatConstantExpression e);
 	void visit(StringConstantExpression e);
-	void visit(CharConstantExpression e);
 	void visit(FunctionCallExpression e);
 	void visit(TernaryExpression e);
 	void visit(CommaExpression e);

@@ -4,7 +4,6 @@ import typeresolve.ExpressionTypeMapping;
 import types.ConstTypeSizeVisitor;
 import types.Type;
 import expression.binop.BinaryExpression;
-import expression.constant.CharConstantExpression;
 import expression.constant.FloatConstantExpression;
 import expression.constant.IntConstantExpression;
 import expression.constant.StringConstantExpression;
@@ -92,11 +91,6 @@ public class ConstVisitor implements ExpressionVisitor {
 	@Override
 	public void visit(StringConstantExpression stringConstantExpression) {
 		this.constant = false; //nevieme kde konkretne v pamati bude a teda nie je to konstanta
-	}
-
-	@Override
-	public void visit(CharConstantExpression charConstantExpression) {
-		//ok, je konstanta
 	}
 
 	@Override
