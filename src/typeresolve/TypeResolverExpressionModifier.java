@@ -50,6 +50,14 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 		result = e;
 	}
 	
+	private Expression createSizeOf(Type t) {
+		assert t instanceof PointerType;
+		SizeofType soex = new SizeofType();
+		soex.type=((PointerType)t).pointedToType;
+		mapping.setType(soex, PrimitiveType.INT);
+		return AutomaticConversions.autoCast(soex, PrimitiveType.LONG, mapping);
+	}
+	
 	@Override
 	public void visit(BinaryExpression e) {
 		Type lt = mapping.getExpressionType(e.left);
@@ -64,14 +72,22 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 				e.right = AutomaticConversions.autoCast(e.right, PrimitiveType.LONG, mapping);
 				mapping.setType(e, PrimitiveType.LONG);
 				if(TypeClass.isPointerOrArray(lt) && TypeClass.isPointerOrArray(rt) && e.operator == BinaryOperator.MINUS) {
-					result = e;
+					PointerType plt = AutomaticConversions.arrayToPtr(lt);
+					Expression so = createSizeOf(plt.pointedToType);
+					result = new BinaryExpression(e, BinaryOperator.DIV, so);
+					mapping.setType(result, PrimitiveType.LONG);
 				}
 				else if(TypeClass.isPointerOrArray(lt)) {
-					lt = AutomaticConversions.arrayToPtr(lt);
+					PointerType plt = AutomaticConversions.arrayToPtr(lt);
+					lt = plt;
+					e.right = new BinaryExpression(e.right, BinaryOperator.MULT, createSizeOf(plt.pointedToType));
+					mapping.setType(e.right, PrimitiveType.LONG);
 					result = AutomaticConversions.autoCast(e, lt, mapping);
 				}
 				else {
-					rt = AutomaticConversions.arrayToPtr(rt);
+					PointerType prt = AutomaticConversions.arrayToPtr(rt);
+					rt = prt;
+					e.left = new BinaryExpression(e.left, BinaryOperator.MULT, createSizeOf(prt.pointedToType));
 					result = AutomaticConversions.autoCast(e, rt, mapping);
 				}
 			}
