@@ -14,6 +14,17 @@ public class BlockCodeGenerator {
 		str = new CodeGenStream(sw);
 	}
 	
+	public BlockCodeGenerator(CodeGenStream str2,
+			ExpressionValueMapping valmap2, ExpressionTypeMapping typemap2,
+			SymbolTable<String> idAddresses2, LabelGenerator lg2,
+			RegisterGenerator rg2) {
+		this.str=str2;
+		this.lg=lg2;
+		this.rg=rg2;
+		
+		// TODO Auto-generated constructor stub
+	}
+
 	public final CodeGenStream str;
 	private ExpressionValueMapping valmap;
 	private ExpressionTypeMapping typemap;
@@ -74,5 +85,10 @@ public class BlockCodeGenerator {
 	
 	public String getGlobalArrayTypeString(String id) {
 		return ""; //TODO
+	}
+
+	public BlockCodeGenerator getChild() {
+		// TODO Auto-generated method stub
+		return new BlockCodeGenerator(str,valmap,typemap,idAddresses,lg,rg);
 	}
 }

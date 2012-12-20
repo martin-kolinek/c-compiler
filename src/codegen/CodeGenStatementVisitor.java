@@ -23,6 +23,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	private String BreakSkok;
 	private String ContinueSkok;
 	private CodeGenStream wr;
+	private BlockStatement s =null;
 	
 	public CodeGenStatementVisitor(BlockCodeGenerator cg){
 		this.cg=cg;
@@ -168,7 +169,15 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 
 	@Override
 	public void visit(BlockStatement s) {
-		// TODO bloky treba riesit inym visitorom
+		//ok riesi MainCodeGenvisitor
+		this.s =s;
+	}
+	boolean isBlock(){
+		return s==null;
+	}
+
+	public BlockStatement getBlock() {
+		return s;
 	}
 
 }
