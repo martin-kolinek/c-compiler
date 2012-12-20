@@ -7,6 +7,8 @@ import java.io.OutputStreamWriter;
 import modifiers.AssignmentModifier;
 import modifiers.CommaExpressionModifier;
 import modifiers.FunctionParameterModifier;
+import modifiers.InitializerFillModifier;
+import modifiers.InitializerModifier;
 import modifiers.LoopModifier;
 import modifiers.PointerModifier;
 import modifiers.UnaryChargeModifier;
@@ -23,6 +25,7 @@ import toplevel.InBlock;
 import toplevel.Program;
 import transformers.BlockModifier;
 import transformers.BlockModifierFactory;
+import transformers.EmptyBlockModifier;
 import transformers.ExpressionModifier;
 import transformers.ExpressionModifierFactory;
 import transformers.StatementModifier;
@@ -109,6 +112,38 @@ public class Main {
 		
 		//remove enums
 		TransformerUtil.transformProgram(prog, new EnumRemoverFactory());
+		
+		//fill initializers
+		TransformerUtil.transformProgram(prog, new BlockModifierFactory() {
+			
+			@Override
+			public void popModifierStack() {
+			}
+			
+			@Override
+			public BlockModifier createModifier(FunctionDefinition def) {
+				return new InitializerFillModifier();
+			}
+		});
+		
+		//unfold local initializers
+		TransformerUtil.transformProgram(prog, new BlockModifierFactory() {
+			
+			int depth = 0;
+			
+			@Override
+			public void popModifierStack() {
+				depth --;
+			}
+			
+			@Override
+			public BlockModifier createModifier(FunctionDefinition def) {
+				if(depth++>0)
+					return new InitializerModifier();
+				else
+					return new EmptyBlockModifier();
+			}
+		});
 		
 		//link types
 		TransformerUtil.transformProgram(prog, new TypeCompletenessFactory());
