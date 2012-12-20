@@ -5,7 +5,6 @@ import types.EnumType;
 import types.PointerType;
 import types.PrimitiveType;
 import types.StructType;
-import types.Type;
 import types.TypeVisitor;
 import types.TypedefType;
 

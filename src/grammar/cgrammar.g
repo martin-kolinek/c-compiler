@@ -251,7 +251,7 @@ assignment_operator returns [BinaryOperator ret] :
 constant returns [Expression ret]
   : INT {$ret = new IntConstantExpression(); ((IntConstantExpression)$ret).value = Integer.parseInt($INT.getText()); pos.setPosition((IntConstantExpression)$ret, $INT);} |
    FLOAT {$ret = new FloatConstantExpression(); ((FloatConstantExpression)$ret).value = Float.parseFloat($FLOAT.getText()); pos.setPosition((FloatConstantExpression)$ret, $FLOAT);}| 
-   STRING {$ret = new StringConstantExpression(); ((StringConstantExpression)$ret).value = $STRING.getText(); pos.setPosition((StringConstantExpression)$ret, $STRING);}| 
+   STRING {$ret = new StringConstantExpression($STRING.getText()); pos.setPosition((StringConstantExpression)$ret, $STRING);}| 
    CHAR {$ret = new CharConstantExpression(); ((CharConstantExpression)$ret).value = $CHAR.getText().charAt(0); pos.setPosition((CharConstantExpression)$ret, $CHAR);};
          
 //sadly this is required because otherwise we get an error from antlr

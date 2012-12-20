@@ -3,7 +3,6 @@ package codegen;
 import symbols.SymbolTable;
 import toplevel.EmptyInBlockVisitor;
 import types.StructType;
-import types.Type;
 import declaration.ResolvedDeclaration;
 import declaration.initializer.CompoundInitializer;
 import declaration.initializer.ExpressionInitializer;

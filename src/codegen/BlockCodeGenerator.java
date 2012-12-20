@@ -33,6 +33,8 @@ public class BlockCodeGenerator {
 	private SymbolTable<String> idAddresses;
 	private LabelGenerator lg;
 	private RegisterGenerator rg;
+	private RegisterGenerator grg;
+	private StringConstantCodeGen strings;
 	
 	public String getExpressionRegister(Expression e){
 		return valmap.getExpressionResult(e, new CodeGenExpressionVisitor(this));
@@ -44,6 +46,10 @@ public class BlockCodeGenerator {
 	
 	public String getNextregister() {
 		return rg.next();
+	}
+	
+	public String getNextGlobalRegister() {
+		return grg.next();
 	}
 	
 	public String getExpressionAddress(Expression ex) {
@@ -87,6 +93,10 @@ public class BlockCodeGenerator {
 	
 	public String getGlobalArrayTypeString(String id) {
 		return ""; //TODO
+	}
+	
+	public String getStringAddress(byte[] value) {
+		return strings.addStringConstant(value);
 	}
 
 	public BlockCodeGenerator getChild() {

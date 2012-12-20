@@ -277,7 +277,7 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 
 	@Override
 	public void visit(StringConstantExpression e) {
-		mapping.setType(e, new ArrayType(PrimitiveType.CHAR, new IntConstantExpression(e.value.length())));
+		mapping.setType(e, new ArrayType(PrimitiveType.CHAR, new IntConstantExpression(e.value.length)));
 		result = e;
 	}
 

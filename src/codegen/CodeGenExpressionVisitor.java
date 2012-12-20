@@ -291,7 +291,9 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visit(StringConstantExpression e) {
-		//TODO
+		String addr = cg.getStringAddress(e.value);
+		Register = cg.getNextregister();
+		cg.str.writeAssignment(Register, "getelementptr", cg.getExpressionTypeStr(e)+"*", addr, ", i32 0, i32 0");
 	}
 
 	@Override
