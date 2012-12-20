@@ -63,7 +63,14 @@ public class BlockCodeGenerator {
 	}
 	
 	public String getTypeString(Type t) {
-		CodeGenTypeVisitor tv = new CodeGenTypeVisitor(new VisitPack(str, lg, rg));
+		CodeGenTypeVisitor tv = new CodeGenTypeVisitor(this, false);
+		t.accept(tv);
+		return tv.GetTypeText();
+	}
+	
+	//this one makes real arrays instead of pointers
+	public String getProperTypeString(Type t) { 
+		CodeGenTypeVisitor tv = new CodeGenTypeVisitor(this, true);
 		t.accept(tv);
 		return tv.GetTypeText();
 	}

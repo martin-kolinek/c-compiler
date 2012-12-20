@@ -1,5 +1,7 @@
 package codegen;
 
+import declaration.ResolvedDeclaration;
+import typeresolve.AutomaticConversions;
 import types.ArrayType;
 import types.EnumType;
 import types.PointerType;
@@ -10,87 +12,72 @@ import types.TypedefType;
 
 public class CodeGenTypeVisitor implements TypeVisitor {
 
-	private VisitPack pack;
+	BlockCodeGenerator cg;
+	boolean arr;
 	private String Typ;
-	boolean unsig = false;
-	private boolean integer = false;
 
-	public CodeGenTypeVisitor(VisitPack pack) {
-		this.pack=pack;
+	public CodeGenTypeVisitor(BlockCodeGenerator cg, boolean properArrays) {
+		this.cg=cg;
+		arr = properArrays;
 	}
 
 	@Override
 	public void visit(StructType t) {
-		
-		
-		// TODO Auto-generated method stub
-
+		StringBuilder sb = new StringBuilder();
+		sb.append("{");
+		boolean f = true;
+		for(ResolvedDeclaration r:t.members) {
+			if(!f) {
+				sb.append(",");
+			}
+			f=false;
+			sb.append(cg.getProperTypeString(r.type));
+		}
+		sb.append("}");
 	}
 
 	@Override
 	public void visit(ArrayType t) {
-		/*CodeGenExpressionVisitor v = new CodeGenExpressionVisitor(pack);
-		t.size.accept(v);
-		String size = v.GetResultRegister();
-		CodeGenTypeVisitor tv2 = new CodeGenTypeVisitor(pack);
-		t.elementType.accept(tv2);
-		Typ="["+size+" x " +tv2.GetTypeText() + "]";*/
-
+		if(!arr) {
+			visit(AutomaticConversions.arrayToPtr(t));
+		}
+		else {
+			String subt = cg.getProperTypeString(t.elementType);
+			String size = cg.getExpressionRegister(t.size);
+			Typ="["+size+" x " +subt + "]";
+		}
 	}
 
 	@Override
-	public void visit(TypedefType t) {//toto tipujem tiez netreba
-		// TODO Auto-generated method stub
-
+	public void visit(TypedefType t) {
+		assert false; //uz nie su
 	}
 
 	@Override
 	public void visit(PrimitiveType t) {
 		
-		if (!t.sign) unsig=true;
 		if (!t.floating){
-			integer=true;
 			Typ = "i" + Integer.toString(t.size*8);
 		}
-		else{
-			integer=false;
-			switch(t.size){
-			case 3 :
-				Typ="float";
-				break;
-			case 4 :
-				Typ="double";
-				break;
-			}			
+		else {
+			if(t==PrimitiveType.DOUBLE)
+				Typ = "double";
+			else
+				Typ = "float";
 		}
 	}
 
 	@Override
 	public void visit(EnumType t) {
-		//riesi sa inde, tu uz neexistuje
+		assert false; //uz nie su
 	}
 
 	@Override
 	public void visit(PointerType t) {
-		CodeGenTypeVisitor tv = new CodeGenTypeVisitor(pack);
-		t.pointedToType.accept(tv);
-		String Typ2 = tv.GetTypeText();
-		Typ="*" +Typ2;
-		integer=true;
-		unsig = true;
-
+		Typ = cg.getTypeString(t.pointedToType)+"*";
 	}
 
 	public String GetTypeText() {
 		return this.Typ;
 	}
-
-	public boolean unsig() {
-		return unsig;
-	}
-
-	public boolean integer() {
-		return integer ;
-	}
-
 }
