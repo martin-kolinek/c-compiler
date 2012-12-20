@@ -1,5 +1,7 @@
 package codegen;
 
+import types.StructType;
+import types.Type;
 import declaration.initializer.CompoundInitializer;
 import declaration.initializer.DesignatedInitializer;
 import declaration.initializer.ExpressionInitializer;
@@ -8,10 +10,12 @@ import declaration.initializer.InitializerVisitor;
 public class CodeGenInitializerVisitor implements InitializerVisitor {
 
 	private BlockCodeGenerator cg;
+	StructType i_typ;
 
-	public CodeGenInitializerVisitor(BlockCodeGenerator cg) {
+	public CodeGenInitializerVisitor(BlockCodeGenerator cg,StructType t) {
 		// TODO Auto-generated constructor stub
 		this.cg=cg;
+		this.i_typ=t;
 	}
 
 	@Override
@@ -25,10 +29,13 @@ public class CodeGenInitializerVisitor implements InitializerVisitor {
 	public void visit(CompoundInitializer compoundInitializer) {
 		// TODO Auto-generated method stub
 		boolean neprvy=false;
-		
+		//Type x=i_typ;
+		StructIteratorTypeVisitor stv = new StructIteratorTypeVisitor();
+		i_typ.accept(stv);
 		for(DesignatedInitializer  s: compoundInitializer.initializers ){//cyklus po jednotlivych initializeroch
 			if(neprvy) cg.str.write(",");
-			String Typ = cg.getExpressionTypeStr(s.designator.expr);
+			Type y=stv.iter();
+			String Typ = cg.getTypeString(y);//cg.getExpressionTypeStr(s.designator.expr);
 			cg.str.write(Typ);
 			if(s.initializer == null){
 				cg.str.write("zeroinitializer");
@@ -40,7 +47,8 @@ public class CodeGenInitializerVisitor implements InitializerVisitor {
 				cg.str.write(Konst);
 			}else if(s.initializer instanceof CompoundInitializer){
 				cg.str.write("{");
-				CodeGenInitializerVisitor iv = new CodeGenInitializerVisitor(cg);
+				StructType x=(StructType) y;
+				CodeGenInitializerVisitor iv = new CodeGenInitializerVisitor(cg,x);
 				s.initializer.accept(iv);
 				cg.str.write("}");
 			}
