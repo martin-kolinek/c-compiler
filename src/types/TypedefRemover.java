@@ -46,7 +46,7 @@ class TypedefTypeChecker extends EmptyTypeModifier{
 	public void visit(TypedefType t) {
 		result = symbTable.get(t.identifier);
 		if(result==null) {
-			throw new SemanticException("Unknown typedef-name");
+			throw new SemanticException("Unknown typedef-name", t);
 		}
 	}
 }

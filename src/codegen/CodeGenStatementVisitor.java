@@ -43,7 +43,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	@Override
 	public void visit(BreakStatement s) {
 		String BreakSkok = cg.getBreakLabel();
-		if(BreakSkok == null) throw new SemanticException("Break mimo cyklu.");
+		if(BreakSkok == null) throw new SemanticException("Break mimo cyklu.", s);
 		wr.writeLine("br", "label", BreakSkok);
 
 	}
@@ -51,7 +51,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	@Override
 	public void visit(ContinueStatement s) {
 		String ContinueSkok = cg.getContLabel();
-		if(ContinueSkok == null) throw new SemanticException("Continue mimo cyklu.");
+		if(ContinueSkok == null) throw new SemanticException("Continue mimo cyklu.", s);
 		wr.writeLine("br", "label", ContinueSkok);
 
 	}

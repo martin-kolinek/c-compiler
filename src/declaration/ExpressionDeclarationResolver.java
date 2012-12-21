@@ -12,7 +12,7 @@ public class ExpressionDeclarationResolver extends EmptyExpressionModifier {
 		DeclarationResolver res = new DeclarationResolver();
 		d.accept(res);
 		if(res.resultDecls.size()==0 || res.resultDecls.get(0).identifier!=null)
-			throw new SemanticException("Invalid type argument to sizeof");
+			throw new SemanticException("Invalid type argument to sizeof", d);
 		return res.resultDecls.get(0).type;
 	}
 	

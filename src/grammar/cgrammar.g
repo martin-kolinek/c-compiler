@@ -28,7 +28,7 @@ tokens {
 } 
 @lexer::header {package grammar.generated;}
 @members {
-  PositionTracker pos = new PositionTracker();
+  public PositionTracker pos = new PositionTracker();
 }
 
 program returns [Program ret]
@@ -262,11 +262,12 @@ external_declaration returns [InBlock ret]
           ((FunctionDefinition)$ret).declaration = new Declaration();
           ((FunctionDefinition)$ret).declaration.declSpecs=$ds.ret;
           ((FunctionDefinition)$ret).declaration.declarators.add(new InitDeclarator($d.ret));
-          ((FunctionDefinition)$ret).body=$b.ret; 
+          ((FunctionDefinition)$ret).body=$b.ret;
+           
         } 
       | {$ret = new Declaration($ds.ret);} 
         (i1=init_declarator {((Declaration)$ret).declarators.add($i1.ret);} 
-          ( ',' i2=init_declarator {((Declaration)$ret).declarators.add($i2.ret);})*)? ';');
+          ( ',' i2=init_declarator {((Declaration)$ret).declarators.add($i2.ret);})*)? ';') {pos.setPosition($ret, ds.start);};
 
 block returns [BlockStatement ret]
 : tok='{' {$ret=new BlockStatement();} (ib=in_block {$ret.inBlock.add($ib.ret);})* '}' {pos.setPosition($ret, $tok
@@ -346,9 +347,9 @@ jmp_stat returns [Statement ret]
 
 declaration returns [Declaration ret]
   : {$ret = new Declaration();} 
-    ds=decl_specs {$ret.declSpecs = $ds.ret;} 
+    ds=decl_specs {$ret.declSpecs = $ds.ret;} {pos.setPosition($ret, $ds.start);} 
     (i1=init_declarator {$ret.declarators.add($i1.ret);} 
-      (',' i2=init_declarator {$ret.declarators.add($i2.ret);})* )? ';' ; 
+      (',' i2=init_declarator {$ret.declarators.add($i2.ret);})* )? ';'  ; 
 
 decl_specs returns [ArrayList<DeclarationSpecifier> ret]
 @init {

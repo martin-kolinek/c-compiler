@@ -1,5 +1,7 @@
 package declaration.specifiers;
 
-public interface DeclarationSpecifier {
+import astnode.ASTNode;
+
+public interface DeclarationSpecifier extends ASTNode {
 	void accept(DeclarationSpecifierVisitor v);
 }

@@ -1,5 +1,6 @@
 package codegen;
 
+import astnode.ASTNode;
 import types.StructType;
 import types.TypeClass;
 import exceptions.SemanticException;
@@ -30,13 +31,13 @@ public class CodeGenExpressionAddress implements ExpressionVisitor {
 	private String result;
 	private BlockCodeGenerator cg;
 	
-	private void fail(){
-		throw new SemanticException("Unable to get address of this expression");
+	private void fail(ASTNode pos){
+		throw new SemanticException("Unable to get address of this expression", pos);
 	}
 	
 	@Override
 	public void visit(BinaryExpression e) {
-		fail();
+		fail(e);
 	}
 
 	@Override
@@ -46,23 +47,23 @@ public class CodeGenExpressionAddress implements ExpressionVisitor {
 			result = cg.getExpressionRegister(e.exp);
 			break;
 		default:
-			fail();
+			fail(e);
 		}
 	}
 
 	@Override
 	public void visit(CastExpression e) {
-		fail();
+		fail(e);
 	}
 
 	@Override
 	public void visit(SizeofType e) {
-		fail();
+		fail(e);
 	}
 
 	@Override
 	public void visit(SizeofExpression e) {
-		fail();
+		fail(e);
 	}
 	
 	@Override
@@ -95,37 +96,37 @@ public class CodeGenExpressionAddress implements ExpressionVisitor {
 
 	@Override
 	public void visit(IntConstantExpression e) {
-		fail();
+		fail(e);
 	}
 
 	@Override
 	public void visit(FloatConstantExpression e) {
-		fail();
+		fail(e);
 	}
 
 	@Override
 	public void visit(StringConstantExpression e) {
-		fail();
+		fail(e);
 	}
 
 	@Override
 	public void visit(FunctionCallExpression e) {
-		fail();
+		fail(e);
 	}
 
 	@Override
 	public void visit(TernaryExpression e) {
-		fail();
+		fail(e);
 	}
 
 	@Override
 	public void visit(CommaExpression e) {
-		fail();
+		fail(e);
 	}
 
 	@Override
 	public void visit(AssignmentExpression e) {
-		fail();
+		fail(e);
 	}
 
 	public String getResult() {

@@ -25,7 +25,7 @@ public class TypeLinkModifier extends EmptyTypeModifier {
 		}
 		else {
 			if(st.members!=null && t.members!=null) {
-				throw new SemanticException("Redeclaration of struct");
+				throw new SemanticException("Redeclaration of struct",t);
 			}
 			if(st.members==null)
 				st.members=t.members;

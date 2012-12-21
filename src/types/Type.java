@@ -1,6 +1,8 @@
 package types;
 
-public interface Type {
+import astnode.ASTNode;
+
+public interface Type extends ASTNode{
 	void accept(TypeVisitor v);
 	
 }

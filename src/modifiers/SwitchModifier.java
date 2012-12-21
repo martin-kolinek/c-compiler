@@ -26,15 +26,15 @@ public class SwitchModifier extends EmptyStatementModifier {
 					}
 				});
 				if(!(c.cond instanceof IntConstantExpression)) 
-					throw new SemanticException("Case value is not a constant integer expression");
+					throw new SemanticException("Case value is not a constant integer expression", s);
 				long val = ((IntConstantExpression)c.cond).value;
 				if(values.contains(val))
-					throw new SemanticException("Same constant used more than once in switch cases");
+					throw new SemanticException("Same constant used more than once in switch cases", s);
 				values.add(val);
 			}
 			else {
 				if(def)
-					throw new SemanticException("Multiple defaults in a switch");
+					throw new SemanticException("Multiple defaults in a switch", s);
 				def = true;
 			}
 		}

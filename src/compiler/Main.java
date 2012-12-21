@@ -19,6 +19,8 @@ import modifiers.UnaryChargeModifier;
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.CommonTokenStream;
 
+import position.GlobalPositionTracker;
+
 import codegen.MainCodeGenVisitor;
 
 import declaration.DeclarationResolver;
@@ -54,6 +56,7 @@ public class Main {
 		CommonTokenStream tokens = new CommonTokenStream(lex);
 		cgrammarParser pars = new cgrammarParser(tokens);
 		Program prog = pars.program().ret;
+		GlobalPositionTracker.pos=pars.pos;
 
 		//remove other loops than while
 		TransformerUtil.transformProgram(prog, new StatementModifierFactory() {

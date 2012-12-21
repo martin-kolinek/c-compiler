@@ -2,6 +2,8 @@ package modifiers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import astnode.ASTNode;
 import declaration.ResolvedDeclaration;
 import declaration.initializer.CompoundInitializer;
 import declaration.initializer.DesignatedInitializer;
@@ -27,12 +29,12 @@ import types.Type;
 public class InitializerFillModifier extends EmptyBlockModifier {
 	@Override
 	public void visit(ResolvedDeclaration i) {
-		i.initializer = fillSortInitializer(i.initializer, i.type);
+		i.initializer = fillSortInitializer(i.initializer, i.type, i);
 		
 		result.add(i);
 	}
 	
-	private Initializer createCompoundForStruct(CompoundInitializer ci, StructType typ) {
+	private Initializer createCompoundForStruct(CompoundInitializer ci, StructType typ, ASTNode pos) {
 		ArrayList<DesignatedInitializer> dis = new ArrayList<DesignatedInitializer>();
 		HashMap<String, Initializer> original = new HashMap<String, Initializer>();
 		ArrayList<Initializer> undesignated = new ArrayList<Initializer>();
@@ -40,7 +42,7 @@ public class InitializerFillModifier extends EmptyBlockModifier {
 			if(di.designator==null)
 				undesignated.add(di.initializer);
 			if(di.designator.expr!=null)
-				throw new SemanticException("Array designator in struct initialization");
+				throw new SemanticException("Array designator in struct initialization", pos);
 			assert di.designator.id!=null;
 			original.put(di.designator.id, di.initializer);
 		}
@@ -56,7 +58,7 @@ public class InitializerFillModifier extends EmptyBlockModifier {
 			else if(undesignated.size()>undesignatedIndex) {
 				initial = undesignated.get(undesignatedIndex++);
 			}
-			initial = fillSortInitializer(initial, member.type);
+			initial = fillSortInitializer(initial, member.type, pos);
 			dis.add(new DesignatedInitializer(desig, initial));
 		}
 		CompoundInitializer ret = new CompoundInitializer();
@@ -64,7 +66,7 @@ public class InitializerFillModifier extends EmptyBlockModifier {
 		return ret;
 	}
 	
-	private Initializer createCompoundForArray(CompoundInitializer ci, ArrayType typ) {
+	private Initializer createCompoundForArray(CompoundInitializer ci, ArrayType typ, ASTNode pos) {
 		ArrayList<DesignatedInitializer> dis = new ArrayList<DesignatedInitializer>();
 		ArrayList<Initializer> undesignated = new ArrayList<Initializer>();
 		HashMap<Long, Initializer> original = new HashMap<Long, Initializer>();
@@ -72,9 +74,9 @@ public class InitializerFillModifier extends EmptyBlockModifier {
 		for(DesignatedInitializer di:ci.initializers) {
 			if(di.designator!=null) {
 				if(di.designator.id!=null)
-					throw new SemanticException("Struct designator for array");
+					throw new SemanticException("Struct designator for array", pos);
 				if(!(di.designator.expr instanceof IntConstantExpression))
-					throw new SemanticException("Array designator must be a constant int expression");
+					throw new SemanticException("Array designator must be a constant int expression", pos);
 				long val = ((IntConstantExpression)di.designator.expr).value;
 				if(val>size)
 					size=val+1;
@@ -98,7 +100,7 @@ public class InitializerFillModifier extends EmptyBlockModifier {
 			else if(undesignated.size()>undesIndex) {
 				init = undesignated.get(undesIndex++);
 			}
-			init = fillSortInitializer(init, typ.elementType);
+			init = fillSortInitializer(init, typ.elementType, pos);
 			dis.add(i, new DesignatedInitializer(desig, init));
 		}
 		
@@ -107,7 +109,7 @@ public class InitializerFillModifier extends EmptyBlockModifier {
 		return ret;
 	}
 	
-	private Initializer fillSortInitializer(Initializer init, Type typ){
+	private Initializer fillSortInitializer(Initializer init, Type typ, ASTNode pos){
 		if (init == null){
 			return init;
 		} else if (init instanceof ExpressionInitializer){
@@ -115,16 +117,16 @@ public class InitializerFillModifier extends EmptyBlockModifier {
 		} else {
 			CompoundInitializer ci = (CompoundInitializer)init;
 			if (typ instanceof StructType){
-				return createCompoundForStruct(ci, (StructType)typ);
+				return createCompoundForStruct(ci, (StructType)typ, pos);
 			} 
 			else if (typ instanceof ArrayType){
 				ArrayType t = (ArrayType)typ;
 				if(t.size == null || t.size instanceof IntConstantExpression)
-					return createCompoundForArray(ci, t);
+					return createCompoundForArray(ci, t, pos);
 				return init;
 			}
 			else
-				throw new SemanticException("Compound initializer for non comound type");
+				throw new SemanticException("Compound initializer for non comound type", pos);
 		}
 	}
 }

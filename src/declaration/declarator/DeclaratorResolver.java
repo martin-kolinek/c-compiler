@@ -2,6 +2,8 @@ package declaration.declarator;
 
 import java.util.ArrayList;
 
+import position.GlobalPositionTracker;
+
 import astnode.ASTNode;
 
 import declaration.Declaration;
@@ -18,8 +20,10 @@ import types.Type;
 
 public class DeclaratorResolver implements DeclaratorVisitor, ASTNode{
 
-	public DeclaratorResolver(){
+	private ASTNode pos;
+	public DeclaratorResolver(ASTNode pos){
 		func=false;
+		this.pos=pos;
 		funcParams=new ArrayList<FunctionParameter>();
 		wrappers = new ArrayList<TypeWrapper>();
 	}
@@ -32,7 +36,9 @@ public class DeclaratorResolver implements DeclaratorVisitor, ASTNode{
 	
 	public Type wrapType(Type base) {
 		for(TypeWrapper w : wrappers) {
-			base = w.wrapType(base);
+			Type n = w.wrapType(base);
+			GlobalPositionTracker.pos.setPosition(n, base);
+			base = n;
 		}
 		return base;
 	}
@@ -59,7 +65,7 @@ public class DeclaratorResolver implements DeclaratorVisitor, ASTNode{
 	@Override
 	public void visit(ArrayDeclarator d) {
 		if(func)
-			throw new SemanticException("Function subtypes are not supported");
+			throw new SemanticException("Function subtypes are not supported", pos);
 		if(d.declarator!=null) {
 			d.declarator.accept(this);
 		}
@@ -77,7 +83,7 @@ public class DeclaratorResolver implements DeclaratorVisitor, ASTNode{
 	@Override
 	public void visit(PointerDeclarator d) {
 		if(func)
-			throw new SemanticException("Function subtypes are not supported");
+			throw new SemanticException("Function subtypes are not supported", pos);
 		if(d.declarator!=null) {
 			d.declarator.accept(this);
 		}
@@ -92,7 +98,7 @@ public class DeclaratorResolver implements DeclaratorVisitor, ASTNode{
 	@Override
 	public void visit(FunctionDeclarator d) {
 		if(func)
-			throw new SemanticException("Function subtypes are not supported");
+			throw new SemanticException("Function subtypes are not supported", pos);
 		if(d.declarator!=null) {
 			d.declarator.accept(this);
 		}
@@ -103,7 +109,7 @@ public class DeclaratorResolver implements DeclaratorVisitor, ASTNode{
 			DeclarationResolver res = new DeclarationResolver();
 			decl.accept(res);
 			if(res.resultDecls.size()==0)
-				throw new SemanticException("Invalid parameter declaration");
+				throw new SemanticException("Invalid parameter declaration",pos);
 			ResolvedDeclaration rd=res.resultDecls.get(0);
 			funcParams.add(new FunctionParameter(rd.identifier, rd.type));
 		}

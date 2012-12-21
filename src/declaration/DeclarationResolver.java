@@ -3,6 +3,8 @@ package declaration;
 import java.util.ArrayList;
 import java.util.List;
 
+import position.GlobalPositionTracker;
+
 import declaration.declarator.DeclaratorResolver;
 import declaration.specifiers.DeclarationSpecifier;
 import declaration.specifiers.SpecifierTypeExtractor;
@@ -60,7 +62,7 @@ public class DeclarationResolver implements BlockModifier {
 
 	@Override
 	public void visit(Declaration declaration) {
-		SpecifierTypeExtractor ex = new SpecifierTypeExtractor();
+		SpecifierTypeExtractor ex = new SpecifierTypeExtractor(declaration);
 		for(DeclarationSpecifier sp : declaration.declSpecs) {
 			sp.accept(ex);
 		}
@@ -73,7 +75,7 @@ public class DeclarationResolver implements BlockModifier {
 			}
 		}
 		for(InitDeclarator d : declaration.declarators) {
-			DeclaratorResolver dr = new DeclaratorResolver();
+			DeclaratorResolver dr = new DeclaratorResolver(declaration);
 			if(d.initializer!=null) 
 				d.initializer=TransformerUtil.transformInitializer(d.initializer, emf);
 			d.declarator.accept(dr);
@@ -83,8 +85,9 @@ public class DeclarationResolver implements BlockModifier {
 				fun.parameters=dr.funcParams;
 				fun.name=dr.getID();
 				fun.variadic=dr.isVariadic();
+				GlobalPositionTracker.pos.setPosition(fun, declaration);
 				if(d.initializer!=null)
-					throw new SemanticException("Initizer for function");
+					throw new SemanticException("Initizer for function", declaration);
 				result.add(fun);
 				resultFuncs.add(fun);
 			}
@@ -92,8 +95,9 @@ public class DeclarationResolver implements BlockModifier {
 				TypedefDeclaration td = new TypedefDeclaration();
 				td.id=dr.getID();
 				td.type=dr.wrapType(ex.getType());
+				GlobalPositionTracker.pos.setPosition(td, declaration);
 				if(d.initializer!=null)
-					throw new SemanticException("Initializer for typedef");
+					throw new SemanticException("Initializer for typedef", declaration);
 				result.add(td);
 			}
 			else {
@@ -103,6 +107,7 @@ public class DeclarationResolver implements BlockModifier {
 				decl.initializer=d.initializer;
 				result.add(decl);
 				resultDecls.add(decl);
+				GlobalPositionTracker.pos.setPosition(decl, declaration);
 			}
 		}
 	}
@@ -112,7 +117,7 @@ public class DeclarationResolver implements BlockModifier {
 		DeclarationResolver res =new DeclarationResolver();
 		functionDefinition.declaration.accept(res);
 		if(res.resultFuncs.size()==0)
-			throw new SemanticException("Declaration if function definition wrong");
+			throw new SemanticException("Declaration of function definition wrong", functionDefinition);
 		FunctionDefinition def =res.resultFuncs.get(0);
 		def.body=functionDefinition.body;
 		result.add(def);

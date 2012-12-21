@@ -1,5 +1,7 @@
 package toplevel;
 
-public interface InBlock {
+import astnode.ASTNode;
+
+public interface InBlock extends ASTNode {
 	public void accept(InBlockVisitor v);
 }

@@ -40,12 +40,12 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 		}
 		else if(TypeClass.isScalar(lt) && TypeClass.isScalar(rt)) {
 			if(TypeClass.isArray(lt))
-				throw new SemanticException("Unable to assign to array");
+				throw new SemanticException("Unable to assign to array", e);
 			e.right=AutomaticConversions.autoCast(e.right, lt, mapping);
 			mapping.setType(e,  lt);
 		}
 		else {
-			throw new SemanticException("Wrong types in assignment");
+			throw new SemanticException("Wrong types in assignment", e);
 		}
 		result = e;
 	}
@@ -138,7 +138,7 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 		case BXOR:
 		case MOD:
 			if(!TypeClass.isInteger(lt) || !TypeClass.isInteger(rt))
-				throw new SemanticException("Only integral types allowed");
+				throw new SemanticException("Only integral types allowed", e);
 			break;
 		case ABAND:
 		case ABOR:
@@ -164,12 +164,12 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 		case GT:
 		case GET:
 			if(!TypeClass.isScalar(lt) || !TypeClass.isScalar(rt))
-				throw new SemanticException("Expected scalar type");
+				throw new SemanticException("Expected scalar type", e);
 			break;
 		case DIV:
 		case MULT:
 			if(!TypeClass.isArithmethic(lt) || !TypeClass.isArithmethic(rt))
-				throw new SemanticException("Expected arithmethic types");
+				throw new SemanticException("Expected arithmethic types", e);
 			break;
 		}
 	}
@@ -184,14 +184,14 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 				|| e.op==UnaryOperator.POST_INC
 				|| e.op==UnaryOperator.NOT)
 				&& !TypeClass.isScalar(t)) 
-			throw new SemanticException("Prefix increment or decrement has invalid operand type");
+			throw new SemanticException("Prefix increment or decrement has invalid operand type", e);
 		if((e.op==UnaryOperator.PLUS || e.op==UnaryOperator.MINUS) && !TypeClass.isArithmethic(t))
-			throw new SemanticException("Unary +,- not having arithmetic operand");
+			throw new SemanticException("Unary +,- not having arithmetic operand", e);
 		if(e.op==UnaryOperator.COMP && !TypeClass.isInteger(t))
-			throw new SemanticException("Complement not having integer operand");
+			throw new SemanticException("Complement not having integer operand", e);
 		if(e.op==UnaryOperator.PTR){
 			if(!TypeClass.isPointerOrArray(t))
-				throw new SemanticException("Dereference of non pointer type");
+				throw new SemanticException("Dereference of non pointer type", e);
 			e.exp=AutomaticConversions.arrayToPtr(e.exp, mapping);
 			t=mapping.getExpressionType(e.exp);
 			mapping.setType(e, ((PointerType)t).pointedToType);
@@ -214,10 +214,10 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 	@Override
 	public void visit(CastExpression e) {
 		if(!TypeClass.isScalar(e.type) || !TypeClass.isScalar(mapping.getExpressionType(e.exp))){
-			throw new SemanticException("Casts support only scalar types");
+			throw new SemanticException("Casts support only scalar types", e);
 		}
 		if(TypeClass.isArray(e.type))
-			throw new SemanticException("Unable to cast to array");
+			throw new SemanticException("Unable to cast to array", e);
 		e.exp=AutomaticConversions.autoCast(e.exp, e.type, mapping);
 		mapping.setType(e, e.type);
 		result = e;
@@ -240,11 +240,11 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 		Type t = mapping.getExpressionType(e.exp);
 		assert t!=null;
 		if(!TypeClass.isStruct(t))
-			throw new SemanticException("Only structs have members");
+			throw new SemanticException("Only structs have members", e);
 		StructType st = (StructType)t;
 		ResolvedDeclaration m = st.getMember(e.id);
 		if(m==null)
-			throw new SemanticException("No such member");
+			throw new SemanticException("No such member", e);
 		mapping.setType(e, m.type);
 		result = e;
 	}
@@ -259,9 +259,9 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 		Type tt = mapping.getExpressionType(e.target);
 		Type it = mapping.getExpressionType(e.index);
 		if(!TypeClass.isInteger(it))
-			throw new SemanticException("Index in indexing expression must be integer");
+			throw new SemanticException("Index in indexing expression must be integer", e);
 		if(!TypeClass.isPointerOrArray(tt))
-			throw new SemanticException("Target of indexation must be array or pointer");
+			throw new SemanticException("Target of indexation must be array or pointer", e);
 		PointerType ptr = AutomaticConversions.arrayToPtr(tt);
 		e.target = AutomaticConversions.arrayToPtr(e.target, mapping);
 		mapping.setType(e, ptr.pointedToType);
@@ -272,7 +272,7 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 	public void visit(IDExpression e) {
 		Type t = symb.get(e.id);
 		if(t==null)
-			throw new SemanticException("Identifier not declared");
+			throw new SemanticException("Identifier not declared", e);
 		mapping.setType(e, t);
 		result = e;
 	}
@@ -300,17 +300,17 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 	public void visit(FunctionCallExpression e) {
 		FunctionDefinition f = funcs.get(e.name);
 		if(f==null) {
-			throw new SemanticException("Call to unknown function");
+			throw new SemanticException("Call to unknown function", e);
 		}
 		if((!f.variadic && e.args.size()!=f.parameters.size()) || e.args.size()<f.parameters.size())
-			throw new SemanticException("Function call with wrong number of parameters");
+			throw new SemanticException("Function call with wrong number of parameters", e);
 		for(int i=0; i<f.parameters.size(); i++){
 			Type t =f.parameters.get(i).type; 
 			assert !TypeClass.isArray(t);
 			if(TypeClass.isStruct(t)) {
 				Type pt = mapping.getExpressionType(e.args.get(i));
 				if(t!=pt)
-					throw new SemanticException("Wrong parameter type");
+					throw new SemanticException("Wrong parameter type", e);
 			}
 			else {
 				e.args.set(i, AutomaticConversions.autoCast(e.args.get(i), t, mapping));
@@ -324,7 +324,7 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 	@Override
 	public void visit(TernaryExpression e) {
 		if(!TypeClass.isScalar(mapping.getExpressionType(e.condition)))
-			throw new SemanticException("Condition in ternary operator needs to be arithmetic");
+			throw new SemanticException("Condition in ternary operator needs to be arithmetic", e);
 		e.condition=AutomaticConversions.autoCast(e.condition, PrimitiveType.LONG, mapping);
 		Type lt = mapping.getExpressionType(e.ontrue);
 		Type rt = mapping.getExpressionType(e.onfalse);
@@ -349,7 +349,7 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 			result = e;
 			return;
 		}
-		throw new SemanticException("Ternary operator options have incompatible types");
+		throw new SemanticException("Ternary operator options have incompatible types", e);
 	}
 
 	@Override

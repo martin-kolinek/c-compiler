@@ -1,5 +1,7 @@
 package declaration.declarator;
 
-public interface Declarator {
+import astnode.ASTNode;
+
+public interface Declarator extends ASTNode {
 	void accept(DeclaratorVisitor v);
 }

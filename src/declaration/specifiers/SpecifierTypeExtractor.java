@@ -5,6 +5,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import position.GlobalPositionTracker;
+
+import astnode.ASTNode;
+
 import declaration.Declaration;
 import declaration.DeclarationResolver;
 import declaration.ResolvedDeclaration;
@@ -18,7 +22,9 @@ import types.TypedefType;
 
 public class SpecifierTypeExtractor implements DeclarationSpecifierVisitor {
 
-	public SpecifierTypeExtractor(){
+	private ASTNode pos;
+	public SpecifierTypeExtractor(ASTNode pos){
+		this.pos=pos;
 		typeMap = new HashMap<List<PrimitiveTypeSpecifier>, Type>();
 		primitiveTypes = new ArrayList<PrimitiveTypeSpecifier>();
 		//void
@@ -90,14 +96,14 @@ public class SpecifierTypeExtractor implements DeclarationSpecifierVisitor {
 		if(typedef!=null)
 			types++;
 		if(types>1)
-			throw new SemanticException("Multiple types defined"); 
+			throw new SemanticException("Multiple types defined", pos); 
 		if(types==0)
-			throw new SemanticException("No type defined");
+			throw new SemanticException("No type defined", pos);
 		if(primitiveTypes.size()!=0){
 			if(typeMap.containsKey(primitiveTypes)) {
 				return typeMap.get(primitiveTypes);
 			}
-			throw new SemanticException("Not a known primitive type specifier combination");
+			throw new SemanticException("Not a known primitive type specifier combination", pos);
 		}
 		if(struct!=null)
 			return struct;
@@ -146,12 +152,13 @@ public class SpecifierTypeExtractor implements DeclarationSpecifierVisitor {
 				DeclarationResolver res = new DeclarationResolver();
 				d.accept(res);
 				if(res.resultDecls.size()==0) {
-					throw new SemanticException("Member declaration not valid");
+					throw new SemanticException("Member declaration not valid", pos);
 				}
 				decls.add(res.resultDecls.get(0));
 			}
 		}
 		struct = new StructType(structSpecifier.tag, decls);
+		GlobalPositionTracker.pos.setPosition(struct, pos);
 	}
 
 	@Override

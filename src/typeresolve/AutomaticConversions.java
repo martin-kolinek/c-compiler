@@ -1,5 +1,6 @@
 package typeresolve;
 
+import position.GlobalPositionTracker;
 import expression.Expression;
 import expression.CastExpression;
 import types.ArrayType;
@@ -33,11 +34,13 @@ public class AutomaticConversions {
 		}
 		if(TypeClass.isArithmethic(from) && TypeClass.isArithmethic(to)){
 			Expression ret = new CastExpression(orig, to);
+			GlobalPositionTracker.pos.setPosition(ret, orig);
 			map.setType(ret, to);
 			return ret;
 		}
 		if(TypeClass.isPointer(from) && TypeClass.isPointer(to)){
 			Expression ret = new CastExpression(orig, to);
+			GlobalPositionTracker.pos.setPosition(ret, orig);
 			map.setType(ret, to);
 			return ret;
 		}
@@ -45,6 +48,7 @@ public class AutomaticConversions {
 			if(from == PrimitiveType.LONG){
 				Expression ret = new CastExpression(orig, to);
 				map.setType(ret, to);
+				GlobalPositionTracker.pos.setPosition(ret, orig);
 				return ret;
 			}
 			Expression inner = new CastExpression(orig, PrimitiveType.LONG);
@@ -54,12 +58,14 @@ public class AutomaticConversions {
 		if(TypeClass.isPointer(from) && TypeClass.isArithmethic(to)){
 			Expression inner = new CastExpression(orig, PrimitiveType.LONG);
 			map.setType(inner, PrimitiveType.LONG);
+			GlobalPositionTracker.pos.setPosition(inner, orig);
 			return autoCast(inner, to, map);
 		}
 		if(TypeClass.isArray(from) && TypeClass.isScalar(to)){
 			PointerType ptr = new PointerType(((ArrayType)from).elementType);
 			Expression inner = new CastExpression(orig, ptr);
 			map.setType(inner, ptr);
+			GlobalPositionTracker.pos.setPosition(inner, orig);
 			return autoCast(inner, to, map);
 		}
 		//invalid auto cast
@@ -70,7 +76,9 @@ public class AutomaticConversions {
 		if(TypeClass.isPointer(t))
 			return (PointerType)t;
 		assert TypeClass.isArray(t);
-		return new PointerType(((ArrayType)t).elementType);
+		PointerType ret = new PointerType(((ArrayType)t).elementType);
+		GlobalPositionTracker.pos.setPosition(ret, t);
+		return ret;
 	}
 	
 	public static Expression arrayToPtr(Expression orig, ExpressionTypeMapping map) {
@@ -80,6 +88,7 @@ public class AutomaticConversions {
 			return orig;
 		Type ptr = arrayToPtr(t);
 		Expression ret = new CastExpression(orig, ptr);
+		GlobalPositionTracker.pos.setPosition(ret, orig);
 		map.setType(ret, ptr);
 		return ret;
 	}
