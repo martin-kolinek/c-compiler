@@ -1,6 +1,9 @@
 package codegen;
 
 import java.util.ArrayList;
+
+import position.GlobalErrorCounter;
+import position.GlobalPositionTracker;
 import exceptions.SemanticException;
 import expression.Expression;
 import expression.constant.IntConstantExpression;
@@ -174,7 +177,18 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	public void visit(BlockStatement s) {
 		BlockCodeGenerator icg = cg.getChild();
 		CodeGenInBlockVisitor vis = new CodeGenInBlockVisitor(icg);
-		for(InBlock ib:s.inBlock)
-			ib.accept(vis);
+		for(InBlock ib:s.inBlock) {
+			try {
+				ib.accept(vis);
+			}
+			catch(SemanticException ex) {
+				System.err.println(ex.getMessage(GlobalPositionTracker.pos));
+				GlobalErrorCounter.errors++;
+			}
+			catch(NullPointerException ex){
+				GlobalErrorCounter.errors++;
+			}
+		}
+			
 	}
 }

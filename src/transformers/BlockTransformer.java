@@ -2,6 +2,11 @@ package transformers;
 
 import java.util.ArrayList;
 
+import position.GlobalErrorCounter;
+import position.GlobalPositionTracker;
+
+import exceptions.SemanticException;
+
 import statements.*;
 import toplevel.EmptyInBlockVisitor;
 import toplevel.FunctionDefinition;
@@ -85,7 +90,16 @@ public class BlockTransformer implements StatementVisitor {
 						descend(i.body);
 				}
 			});
-			ib.accept(m);
+			try {
+				ib.accept(m);
+			}
+			catch(SemanticException ex) {
+				System.err.println(ex.getMessage(GlobalPositionTracker.pos));
+				GlobalErrorCounter.errors++;
+			}
+			catch(NullPointerException ex){
+				GlobalErrorCounter.errors++;
+			}
 		}
 		blockStatement.inBlock=new ArrayList<InBlock>(m.getModified());
 		modFac.popModifierStack();
