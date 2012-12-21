@@ -6,7 +6,6 @@ public class RegisterGenerator {
 	public RegisterGenerator(String prefix){
 		this.prefix=prefix;
 		this.i=0;
-		this.prefix=prefix;
 	}
 	
 	public String next(){

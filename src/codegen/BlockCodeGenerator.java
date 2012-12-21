@@ -36,7 +36,7 @@ public class BlockCodeGenerator {
 		this.str = parent.str;
 		this.valmap = parent.valmap;
 		this.typemap=parent.typemap;
-		this.idAddresses=parent.idAddresses;//??? nema tu byt: new SymbolTable<String>(parent.idAddresses); ???
+		this.idAddresses=new SymbolTable<String>(parent.idAddresses); 
 		this.lg=parent.lg;
 		this.rg=parent.rg;
 		this.grg=parent.grg;
