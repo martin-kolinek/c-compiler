@@ -11,6 +11,11 @@ public class CodeGenGlobalInitializer extends EmptyInBlockVisitor {
 
 	BlockCodeGenerator cg;
 	
+	public CodeGenGlobalInitializer(BlockCodeGenerator cg2) {
+		this.cg=cg2;
+		// TODO Auto-generated constructor stub
+	}
+
 	@Override
 	public void visit(ResolvedDeclaration i) {// TODO aby sa nezabudlo
 												// pouzatvarat zatvorky

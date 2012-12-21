@@ -71,7 +71,7 @@ public class MainCodeGenVisitor implements InBlockVisitor {
 
 	@Override
 	public void visit(ResolvedDeclaration i) {
-		CodeGenGlobalInitializer ini = new CodeGenGlobalInitializer();
+		CodeGenGlobalInitializer ini = new CodeGenGlobalInitializer(cg);
 		i.accept(ini);
 	}
 
