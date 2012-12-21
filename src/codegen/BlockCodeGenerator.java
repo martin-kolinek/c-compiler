@@ -125,7 +125,7 @@ public class BlockCodeGenerator {
 		String addr = idAddresses.get(id);
 		if(isGlobalArray(id)) {
 			String tmp = getNextregister();
-			str.writeAssignment(tmp, "getelementptr", getGlobalArrayTypeString(id)+"*", getIDAddress(id), ",", "i32 0, i32 0");
+			str.writeAssignment(tmp, "getelementptr", getGlobalArrayTypeString(id)+"*", addr, ",", "i32 0, i32 0");
 			addr = tmp;
 		}
 		return addr;

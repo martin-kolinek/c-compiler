@@ -19,7 +19,7 @@ enum testen
     CCC
 };
 
-//int test_glob_arr[][] = { {1,2,3}, {4,5,6}};
+int test_glob_arr[2][3];
 
 int main(int args, char** argv)
 {
@@ -158,7 +158,9 @@ int main(int args, char** argv)
     ok = (4,5,6);
     //ok should be 6
     printf("28. %d should be 6\n", ok);
-    //recurse(10);
+    recurse(10);
+    test_glob_arr[1][3]=10;
+    printf("29. %d should be 19\n", test_glob_arr[1][3]);
     return 0;
 }
 
