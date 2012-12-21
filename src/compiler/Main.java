@@ -222,6 +222,10 @@ public class Main {
 			cg.finalize();
 			if(GlobalErrorCounter.errors==0)
 				System.out.println("Success");
+			 {
+				if(wr!=null) 
+					wr.close();
+			}
 		/*}
 		catch(SemanticException ex) {
 			System.err.println(ex.getMessage(GlobalPositionTracker.pos));
