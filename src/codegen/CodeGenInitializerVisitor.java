@@ -38,7 +38,7 @@ public class CodeGenInitializerVisitor implements InitializerVisitor {
 			String Typ = cg.getTypeString(y);//cg.getExpressionTypeStr(s.designator.expr);
 			cg.str.write(Typ);
 			if(s.initializer == null){
-				cg.str.write("zeroinitializer");
+				cg.str.write(" zeroinitializer ");
 				/*CodeGenInitializerVisitor iv = new CodeGenInitializerVisitor(cg);
 				s.initializer.accept(iv);*/
 			}else if(s.initializer instanceof ExpressionInitializer){

@@ -26,7 +26,7 @@ public class CodeGenGlobalInitializer extends EmptyInBlockVisitor {
 		String Typ = cg.getTypeString(i.type);
 		cg.str.write(Typ);
 		if (i.initializer == null) {
-			cg.str.writeLine("zeroinitializer");
+			cg.str.writeLine(" zeroinitializer ");
 		} else if (i.initializer instanceof ExpressionInitializer) {
 			ExpressionInitializer j = (ExpressionInitializer) i.initializer;
 			String exp = cg.getExpressionRegister(j.exp);
