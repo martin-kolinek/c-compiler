@@ -321,6 +321,7 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 			}
 		}
 		mapping.setType(e, f.returnType);
+		e.func=f;
 		result = e;
 	}
 

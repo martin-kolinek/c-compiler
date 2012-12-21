@@ -21,7 +21,7 @@ public class StringConstantCodeGen {
 	private String getByteString(byte[] bs) {
 		StringBuilder sb = new StringBuilder();
 		for(byte b : bs) {
-			sb.append(String.format("%x", b));
+			sb.append("\\"+String.format("%02X", b));
 		}
 		return sb.toString();
 	}

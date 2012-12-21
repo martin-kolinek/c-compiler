@@ -18,7 +18,13 @@ public class StringConstantExpression implements Expression, ASTNode{
 		for(String k:replacements.keySet()) {
 			input = input.replace(k, replacements.get(k));
 		}
-		value = input.getBytes();
+		byte[] orig = input.getBytes();
+		value = new byte[orig.length+1];
+		for(int i=0; i<orig.length; i++) {
+			value[i]=orig[i];
+		}
+		value[value.length-1]=0;
+		
 	}
 
 	@Override

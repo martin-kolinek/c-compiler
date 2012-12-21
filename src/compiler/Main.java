@@ -152,26 +152,35 @@ public class Main {
 		TypeResolverFactory fac = new TypeResolverFactory();
 		TransformerUtil.transformProgram(prog, fac);
 		
-		OutputStreamWriter wr = new OutputStreamWriter(new FileOutputStream(new File(args[1])));
-		
-		//change function definitions to have pointers as parameters instead of arrays and structs
-		TransformerUtil.transformProgram(prog, new BlockModifierFactory() {
+		OutputStreamWriter wr = null;
+		//try {
+			wr = new OutputStreamWriter(new FileOutputStream(new File(args[1])));
 			
-			@Override
-			public void popModifierStack() {
-			}
+			//change function definitions to have pointers as parameters instead of arrays and structs
+			TransformerUtil.transformProgram(prog, new BlockModifierFactory() {
+				
+				@Override
+				public void popModifierStack() {
+				}
+				
+				@Override
+				public BlockModifier createModifier(FunctionDefinition def) {
+					return new FunctionParameterModifier();
+				}
+			});
 			
-			@Override
-			public BlockModifier createModifier(FunctionDefinition def) {
-				return new FunctionParameterModifier();
-			}
-		});
+			//generate code
+			MainCodeGenVisitor cg = new MainCodeGenVisitor(wr, fac.getResultMapping());
+			for(InBlock ib:prog.declarations.inBlock)
+				ib.accept(cg);
+			cg.finalize();
+			System.out.println("Done");
+			wr.close();
+		/*}
+		finally {
+			if(wr!=null)
+				wr.close();
+		}*/
 		
-		//generate code
-		MainCodeGenVisitor cg = new MainCodeGenVisitor(wr, fac.getResultMapping());
-		for(InBlock ib:prog.declarations.inBlock)
-			ib.accept(cg);
-		
-		System.out.println("Done");
 	}
 }

@@ -193,7 +193,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 	public void visit(CastExpression e) {
 		Type orig = cg.getExpressionType(e.exp);
 		Type newt = e.type;
-		Register=cg.getExpressionAddress(e.exp);
+		Register=cg.getExpressionRegister(e.exp);
 		if(orig instanceof ArrayType) {
 			orig=AutomaticConversions.arrayToPtr(orig);
 		}
@@ -292,27 +292,25 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 	public void visit(StringConstantExpression e) {
 		String addr = cg.getStringAddress(e.value);
 		Register = cg.getNextregister();
-		cg.str.writeAssignment(Register, "getelementptr", cg.getExpressionTypeStr(e)+"*", addr, ", i32 0, i32 0");
+		cg.str.writeAssignment(Register, "getelementptr", cg.getProperTypeString(cg.getExpressionType(e))+"*", addr, ", i32 0, i32 0");
 	}
 
 	@Override
 	public void visit(FunctionCallExpression e) {
 		Register = cg.getNextregister();
 		StringBuilder args = new StringBuilder();
-		StringBuilder types = new StringBuilder();
 		boolean first = true;
 		for(Expression a : e.args) {
 			if(!first) {
 				args.append(", ");
-				types.append(", ");
-				first = true;
 			}
+			first = false;
 			args.append(cg.getExpressionTypeStr(a));
-			types.append(cg.getExpressionTypeStr(a));
 			args.append(" ");
 			args.append(cg.getExpressionRegister(a));
 		}
-		cg.str.writeAssignment(Register, "call", cg.getExpressionTypeStr(e) + "(" + types.toString() + ")" , "@"+e.name, "(", ")");
+		
+		cg.str.writeAssignment(Register, "call", cg.generateFunctionType(e.func) , "@"+e.name, "(", args.toString(), ")");
 	}
 
 	@Override

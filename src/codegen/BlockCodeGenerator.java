@@ -6,6 +6,8 @@ import expression.Expression;
 
 import statements.Statement;
 import symbols.SymbolTable;
+import toplevel.FunctionDefinition;
+import toplevel.FunctionParameter;
 import typeresolve.ExpressionTypeMapping;
 import types.Type;
 
@@ -22,6 +24,7 @@ public class BlockCodeGenerator {
 		this.str=str2;
 		this.lg=lg2;
 		this.rg=rg2;
+		this.grg=grg2;
 		this.typemap=typemap2;
 		this.valmap=new ExpressionValueMapping();
 		this.idAddresses=new SymbolTable<String>();
@@ -137,5 +140,29 @@ public class BlockCodeGenerator {
 	
 	public void storeID(String id, String register) {
 		idAddresses.store(id, register);
+	}
+	
+	public void generateStrings() {
+		strings.writeOutput();
+	}
+	
+	public String generateFunctionType(FunctionDefinition def) {
+		StringBuilder ret = new StringBuilder();
+		ret.append(getTypeString(def.returnType));
+		ret.append("(");
+		boolean first = true;
+		for(FunctionParameter p:def.parameters) {
+			if(!first)
+				ret.append(", ");
+			first = false;
+			ret.append(getTypeString(p.type));
+		}
+		if(def.variadic) {
+			if(!first)
+				ret.append(", ");
+			ret.append("...");
+		}
+		ret.append(")*");
+		return ret.toString();
 	}
 }

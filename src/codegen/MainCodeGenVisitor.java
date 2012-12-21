@@ -74,5 +74,9 @@ public class MainCodeGenVisitor implements InBlockVisitor {
 		CodeGenGlobalInitializer ini = new CodeGenGlobalInitializer(cg);
 		i.accept(ini);
 	}
+	
+	public void finalize() {
+		cg.generateStrings();
+	}
 
 }

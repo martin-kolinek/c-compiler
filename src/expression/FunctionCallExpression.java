@@ -2,6 +2,8 @@ package expression;
 
 import java.util.ArrayList;
 
+import toplevel.FunctionDefinition;
+
 import astnode.ASTNode;
 
 public class FunctionCallExpression implements Expression, ASTNode {
@@ -13,6 +15,7 @@ public class FunctionCallExpression implements Expression, ASTNode {
 	
 	public String name;
 	public ArrayList<Expression> args;
+	public FunctionDefinition func;
 	
 	public void addExp(Expression exp){
 		args.add(exp);
