@@ -1,6 +1,7 @@
 package codegen;
 
 import toplevel.EmptyInBlockVisitor;
+import types.ArrayType;
 import types.StructType;
 import types.TypeClass;
 import declaration.ResolvedDeclaration;
@@ -34,8 +35,14 @@ public class CodeGenGlobalInitializer extends EmptyInBlockVisitor {
 			cg.str.write(exp);
 		} else if (i.initializer instanceof CompoundInitializer) {
 			cg.str.write("{");
-			StructType t = (StructType) i.type;
-			CodeGenInitializerVisitor iv = new CodeGenInitializerVisitor(cg,t);
+			CodeGenInitializerVisitor iv = null;
+			if(i.type instanceof StructType){
+				StructType t = (StructType) i.type;
+				iv = new CodeGenInitializerVisitor(cg,t);
+			}else if(i.type instanceof ArrayType){
+				ArrayType t = (ArrayType) i.type;
+				iv = new CodeGenInitializerVisitor(cg,t);				
+			}
 			i.initializer.accept(iv);
 			cg.str.write("}\n");
 

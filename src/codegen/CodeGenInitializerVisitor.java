@@ -1,5 +1,6 @@
 package codegen;
 
+import types.ArrayType;
 import types.StructType;
 import types.Type;
 import declaration.initializer.CompoundInitializer;
@@ -11,11 +12,18 @@ public class CodeGenInitializerVisitor implements InitializerVisitor {
 
 	private BlockCodeGenerator cg;
 	StructType i_typ;
+	ArrayType a_typ;//TODO
 
 	public CodeGenInitializerVisitor(BlockCodeGenerator cg,StructType t) {
 		// TODO Auto-generated constructor stub
 		this.cg=cg;
 		this.i_typ=t;
+	}
+
+	public CodeGenInitializerVisitor(BlockCodeGenerator cg2, ArrayType t) {
+		// TODO Auto-generated constructor stub
+		this.a_typ=t;
+		this.cg=cg2;
 	}
 
 	@Override
