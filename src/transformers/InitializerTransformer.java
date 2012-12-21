@@ -24,7 +24,8 @@ public class InitializerTransformer implements InitializerVisitor {
 			if(i.designator!=null && i.designator.expr!=null) {
 				i.designator.expr=TransformerUtil.transformExpression(i.designator.expr, fac);
 			}
-			i.initializer.accept(this);
+			if(i.initializer!=null)
+				i.initializer.accept(this);
 		}
 	}
 

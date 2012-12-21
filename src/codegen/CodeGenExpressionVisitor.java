@@ -144,6 +144,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 			instruction = "f"+instruction;
 		}
 		cg.str.writeAssignment(tmp, instruction, cg.getTypeString(t), cg.getExpressionRegister(e), ",", "1");
+		cg.str.store(cg.getExpressionAddress(e), cg.getExpressionTypeStr(e), tmp);
 		return tmp;
 	}
 	

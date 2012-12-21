@@ -12,7 +12,8 @@ public class ExpressionTypeModifier extends EmptyTypeModifier {
 	
 	@Override
 	public void visit(ArrayType t) {
-		t.size=TransformerUtil.transformExpression(t.size, fac);
+		if(t.size!=null)
+			t.size=TransformerUtil.transformExpression(t.size, fac);
 		super.visit(t);
 	}
 

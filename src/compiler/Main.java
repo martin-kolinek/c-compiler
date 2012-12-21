@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 
+import modifiers.ArraySizeInitializerModifier;
 import modifiers.AssignmentModifier;
 import modifiers.CommaExpressionModifier;
 import modifiers.FunctionParameterModifier;
@@ -153,6 +154,18 @@ public class Main {
 					return new InitializerModifier();
 				else
 					return new EmptyBlockModifier();
+			}
+		});
+		
+		TransformerUtil.transformProgram(prog, new BlockModifierFactory() {
+			
+			@Override
+			public void popModifierStack() {
+			}
+			
+			@Override
+			public BlockModifier createModifier(FunctionDefinition def) {
+				return new ArraySizeInitializerModifier();
 			}
 		});
 		

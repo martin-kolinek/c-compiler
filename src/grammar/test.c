@@ -19,6 +19,8 @@ enum testen
     CCC
 };
 
+//int test_glob_arr[][] = { {1,2,3}, {4,5,6}};
+
 int main(int args, char** argv)
 {
     int x,y;
@@ -28,11 +30,11 @@ int main(int args, char** argv)
     y=+1;
     str1test s;
     s.a=x;
-    /*for(int i = 0; i<10; i++)
+    for(int i = 0; i<10; i++)
     {
         s.b[i]=y;
         y+=1;
-    }*/
+    }
     struct str1tests s2;
     s2=s;
     int q = s2.a;
@@ -56,24 +58,24 @@ int main(int args, char** argv)
     //q should be 4
     printf("6. %d should be 4\n", q);
     int j=0;
-    int result=0;
-    /*do
+    int result=1;
+    do
     {
         result *= s.b[j];
         j++;
-    } while(j<10);*/
+    } while(j<10);
     int *resultptr = &result;
     int res2 =*resultptr;
     *resultptr = res2 - 3;
-    //result should be 2*3*4*5*6*7*8*9*10*11 - 3
-    printf("7. %d should be 39916797\n", result);
+    //result should be 2*3*4*5*6*7*8*9*10 - 3
+    printf("7. %d should be 3628797\n", result);
     //s.a should be 10
     printf("8. %d should be 10\n", s.a);
     int b=function(resultptr);
     //result should be 3
     printf("9. %d should be 3\n",result);
     //b should be 6
-    printf("10. %d should be 6\n", b);
+    printf("10. %d should be 2\n", b);
     int c = result==4;
     //c should be 0
     printf("11. %d should be 0\n", c);
@@ -110,14 +112,14 @@ int main(int args, char** argv)
     printf("15. %d should be 5\n", result);
     result = 1;
     c = 1;
-    /*while(1)
+    while(1)
     {
         if(result++==1)
             continue;
         c++;
-        if(result==2)
+        if(result==3)
             break;
-    }*/
+    }
     //result should be 2
     printf("16. %d should be 2\n", result);
     //c should be 2
@@ -164,7 +166,7 @@ int function(int* ptr)
 {
     int x = 1;
     *ptr = ((x<<3>>2)^1);
-    int ret = (*ptr | 4) & ~6;
+    int ret = (*ptr | 4) & ~5;
     return ret;
 }
 
