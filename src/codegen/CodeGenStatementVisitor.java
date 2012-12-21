@@ -21,8 +21,6 @@ import toplevel.InBlock;
 public class CodeGenStatementVisitor implements StatementVisitor {
 	
 	private BlockCodeGenerator cg;
-	private String BreakSkok;
-	private String ContinueSkok;
 	private CodeGenStream wr;
 	
 	public CodeGenStatementVisitor(BlockCodeGenerator cg){
@@ -43,6 +41,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 
 	@Override
 	public void visit(BreakStatement s) {
+		String BreakSkok = cg.getBreakLabel();
 		if(BreakSkok == null) throw new SemanticException("Break mimo cyklu.");
 		wr.writeLine("br", "label", BreakSkok);
 
@@ -50,6 +49,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 
 	@Override
 	public void visit(ContinueStatement s) {
+		String ContinueSkok = cg.getContLabel();
 		if(ContinueSkok == null) throw new SemanticException("Continue mimo cyklu.");
 		wr.writeLine("br", "label", ContinueSkok);
 
@@ -83,10 +83,8 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		writeCondition(cg.getExpressionRegister(s.condition), cg.getExpressionTypeStr(s.condition), zaPodmienkou, zaCyklom);
 		//telo cyklu
 		wr.writeLabel(zaPodmienkou);
-		CodeGenStatementVisitor childVisitor = new CodeGenStatementVisitor(cg);
-		childVisitor.BreakSkok=zaCyklom;
-		childVisitor.ContinueSkok=predCyklom;
-		s.body.accept(childVisitor);
+		BlockCodeGenerator icg = new BlockCodeGenerator(cg, zaCyklom, predCyklom);
+		icg.generateStatement(s.body);
 		//skok na zaciatok
 		wr.writeLine("br", "label", predCyklom);
 		//label za cyklom
@@ -116,12 +114,11 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 			defLabel=zaSwitch;
 		}
 		wr.writeLine("switch", cg.getExpressionTypeStr(s.expr), cg.getExpressionRegister(s.expr), ", label ", defLabel, "[" + sb.toString() + "]");
-		CodeGenStatementVisitor childVis = new CodeGenStatementVisitor(cg);
-		childVis.BreakSkok=zaSwitch;
+		BlockCodeGenerator icg = new BlockCodeGenerator(cg, zaSwitch, null);
 		for(int i=0; i<s.cases.size(); i++) {
 			wr.writeLabel(caseLabels.get(i));
 			for(Statement s2 :s.cases.get(i).statements) {
-				s2.accept(childVis);
+				icg.generateStatement(s2);
 			}
 		}
 		wr.writeLabel(zaSwitch);

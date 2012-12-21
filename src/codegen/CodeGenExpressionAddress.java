@@ -44,6 +44,7 @@ public class CodeGenExpressionAddress implements ExpressionVisitor {
 		switch(e.op){
 		case PTR:
 			result = cg.getExpressionRegister(e);
+			break;
 		default:
 			fail();
 		}

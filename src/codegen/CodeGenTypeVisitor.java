@@ -55,7 +55,10 @@ public class CodeGenTypeVisitor implements TypeVisitor {
 
 	@Override
 	public void visit(PrimitiveType t) {
-		
+		if(t==PrimitiveType.VOID) {
+			Typ="void";
+			return;
+		}
 		if (!t.floating){
 			Typ = "i" + Integer.toString(t.size*8);
 		}

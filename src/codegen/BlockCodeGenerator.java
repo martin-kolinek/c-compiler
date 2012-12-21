@@ -42,6 +42,28 @@ public class BlockCodeGenerator {
 		this.grg=parent.grg;
 		this.strings=parent.strings;
 		this.globArrays=parent.globArrays;
+		this.breakSkok=parent.breakSkok;
+		this.continueSkok=parent.continueSkok;
+	}
+	
+	public BlockCodeGenerator(BlockCodeGenerator parent, String breakSkok, String continueSkok) {
+		this.str = parent.str;
+		this.valmap = parent.valmap;
+		this.typemap=parent.typemap;
+		this.idAddresses=parent.idAddresses;
+		this.lg=parent.lg;
+		this.rg=parent.rg;
+		this.grg=parent.grg;
+		this.strings=parent.strings;
+		this.globArrays=parent.globArrays;
+		if(breakSkok!=null)
+			this.breakSkok=breakSkok;
+		else
+			this.breakSkok=parent.breakSkok;
+		if(continueSkok!=null)
+			this.continueSkok=continueSkok;
+		else
+			this.continueSkok=parent.continueSkok;
 	}
 
 	public final CodeGenStream str;
@@ -53,6 +75,8 @@ public class BlockCodeGenerator {
 	private RegisterGenerator grg;
 	private StringConstantCodeGen strings;
 	private HashMap<String, Type> globArrays;
+	private String breakSkok;
+	private String continueSkok;
 	
 	public String getExpressionRegister(Expression e){
 		return valmap.getExpressionResult(e, new CodeGenExpressionVisitor(this));
@@ -164,5 +188,13 @@ public class BlockCodeGenerator {
 		}
 		ret.append(")*");
 		return ret.toString();
+	}
+	
+	public String getContLabel() {
+		return continueSkok;
+	}
+	
+	public String getBreakLabel() {
+		return breakSkok;
 	}
 }

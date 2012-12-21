@@ -7,12 +7,11 @@ import declaration.initializer.CompoundInitializer;
 import declaration.initializer.DesignatedInitializer;
 import declaration.initializer.ExpressionInitializer;
 import declaration.initializer.Initializer;
+import expression.AssignmentExpression;
 import expression.Expression;
 import expression.IDExpression;
 import expression.IndexingExpression;
 import expression.MemberAccessExpression;
-import expression.binop.BinaryExpression;
-import expression.binop.BinaryOperator;
 import statements.OneexpressionStatement;
 import statements.Statement;
 import transformers.EmptyBlockModifier;
@@ -36,7 +35,7 @@ public class InitializerModifier extends EmptyBlockModifier {
 			//do nothing
 		} else if (init instanceof ExpressionInitializer){
 			//expression
-			stats.add(new OneexpressionStatement(new BinaryExpression(context, BinaryOperator.ASSIG, ((ExpressionInitializer)init).exp)));
+			stats.add(new OneexpressionStatement(new AssignmentExpression(context, ((ExpressionInitializer)init).exp)));
 		} else {
 			//compound
 			for (DesignatedInitializer di : ((CompoundInitializer)init).initializers){

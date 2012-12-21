@@ -11,6 +11,7 @@ import modifiers.InitializerFillModifier;
 import modifiers.InitializerModifier;
 import modifiers.LoopModifier;
 import modifiers.PointerModifier;
+import modifiers.RelationalExpressionModifier;
 import modifiers.UnaryChargeModifier;
 
 import org.antlr.runtime.ANTLRFileStream;
@@ -95,6 +96,15 @@ public class Main {
 			@Override
 			public ExpressionModifier create() {
 				return new AssignmentModifier();
+			}
+		});
+		
+		//remove all relational operators but == and >
+		TransformerUtil.transformProgram(prog, new ExpressionModifierFactory() {
+			
+			@Override
+			public ExpressionModifier create() {
+				return new RelationalExpressionModifier();
 			}
 		});
 		
