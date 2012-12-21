@@ -40,10 +40,12 @@ public class CodeGenInitializerVisitor implements InitializerVisitor {
 		// TODO Auto-generated method stub
 		boolean neprvy=false;
 		//Type x=i_typ;
-		StructIteratorTypeVisitor stv =null;//TODO pre pole
-		if(a_typ == null){
-		stv = new StructIteratorTypeVisitor();
-		i_typ.accept(stv);
+		StructIteratorTypeVisitor stv = new StructIteratorTypeVisitor();//TODO pre pole
+		if(a_typ == null){			
+			i_typ.accept(stv);
+		}
+		else{
+			a_typ.accept(stv);			
 		}
 		for(DesignatedInitializer  s: compoundInitializer.initializers ){//cyklus po jednotlivych initializeroch
 			if(neprvy) cg.str.write(",");

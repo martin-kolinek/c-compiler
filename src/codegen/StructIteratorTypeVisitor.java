@@ -17,6 +17,7 @@ public class StructIteratorTypeVisitor implements TypeVisitor {
 	
 	public List<ResolvedDeclaration> members;
 	Iterator<ResolvedDeclaration> it;
+	private Type arraymember;
 	
 	@Override
 	public void visit(StructType t) {
@@ -29,6 +30,8 @@ public class StructIteratorTypeVisitor implements TypeVisitor {
 	@Override
 	public void visit(ArrayType t) {//nic
 		// TODO Auto-generated method stub
+		this.members=null;
+		this.arraymember=t.elementType;
 
 	}
 
@@ -59,7 +62,10 @@ public class StructIteratorTypeVisitor implements TypeVisitor {
 
 	public Type iter() {
 		// TODO Auto-generated method stub
-		return it.next().type;
+		if(this.members == null)
+			return this.arraymember;
+		else
+			return it.next().type;
 	}
 
 }
