@@ -43,7 +43,7 @@ public class CodeGenExpressionAddress implements ExpressionVisitor {
 	public void visit(UnaryExpression e) {
 		switch(e.op){
 		case PTR:
-			result = cg.getExpressionRegister(e);
+			result = cg.getExpressionRegister(e.exp);
 			break;
 		default:
 			fail();
@@ -68,12 +68,13 @@ public class CodeGenExpressionAddress implements ExpressionVisitor {
 	@Override
 	public void visit(MemberAccessExpression e) {
 		result = cg.getNextregister();
+		String addr = cg.getExpressionAddress(e.exp);
 		StructType str = (StructType)cg.getExpressionType(e.exp);
 		String addition = "";
 		int pos = str.getMemberPosition(e.id);
 		if(TypeClass.isArray(str.members.get(pos).type))
 			addition = ", i32 0";
-		cg.str.writeAssignment(result, "getelementptr", cg.getTypeString(str)+"*,", "i32 0,", "i32", Integer.toString(pos), addition);
+		cg.str.writeAssignment(result, "getelementptr", cg.getTypeString(str)+"*", addr, ", i32 0,", "i32", Integer.toString(pos), addition);
 	}
 
 	@Override

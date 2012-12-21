@@ -12,6 +12,7 @@ import modifiers.InitializerModifier;
 import modifiers.LoopModifier;
 import modifiers.PointerModifier;
 import modifiers.RelationalExpressionModifier;
+import modifiers.ReturnModifierFactory;
 import modifiers.UnaryChargeModifier;
 
 import org.antlr.runtime.ANTLRFileStream;
@@ -161,6 +162,9 @@ public class Main {
 		//resolve types
 		TypeResolverFactory fac = new TypeResolverFactory();
 		TransformerUtil.transformProgram(prog, fac);
+		
+		//fix returns
+		TransformerUtil.transformProgram(prog, new ReturnModifierFactory(fac.getResultMapping()));
 		
 		OutputStreamWriter wr = null;
 		//try {

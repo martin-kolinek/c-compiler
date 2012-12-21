@@ -1,5 +1,7 @@
 package codegen;
 
+import types.Type;
+
 import declaration.ResolvedDeclaration;
 import typeresolve.AutomaticConversions;
 import types.ArrayType;
@@ -34,6 +36,7 @@ public class CodeGenTypeVisitor implements TypeVisitor {
 			sb.append(cg.getProperTypeString(r.type));
 		}
 		sb.append("}");
+		Typ=sb.toString();
 	}
 
 	@Override
@@ -77,7 +80,10 @@ public class CodeGenTypeVisitor implements TypeVisitor {
 
 	@Override
 	public void visit(PointerType t) {
-		Typ = cg.getTypeString(t.pointedToType)+"*";
+		Type t2 = t.pointedToType;
+		if(t2==PrimitiveType.VOID)
+			t2=PrimitiveType.UCHAR;
+		Typ = cg.getTypeString(t2)+"*";
 	}
 
 	public String GetTypeText() {

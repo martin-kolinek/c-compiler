@@ -16,8 +16,9 @@ public class CodeGenGlobalInitializer extends EmptyInBlockVisitor {
 	}
 
 	@Override
-	public void visit(ResolvedDeclaration i) {// TODO aby sa nezabudlo
-												// pouzatvarat zatvorky
+	public void visit(ResolvedDeclaration i) {
+		if(i.identifier==null)
+			return;
 		String adr = cg.getNextGlobalRegister();
 		cg.str.write(adr + "= global");
 		cg.storeID(i.identifier, adr);

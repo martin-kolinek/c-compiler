@@ -67,6 +67,8 @@ public class AutomaticConversions {
 	}
 	
 	public static PointerType arrayToPtr(Type t) {
+		if(TypeClass.isPointer(t))
+			return (PointerType)t;
 		assert TypeClass.isArray(t);
 		return new PointerType(((ArrayType)t).elementType);
 	}

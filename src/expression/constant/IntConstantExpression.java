@@ -13,6 +13,7 @@ public class IntConstantExpression implements ConstantExpression, ASTNode{
 	public IntConstantExpression(String val){
 		Pattern p1 = Pattern.compile("([0-9]+)(\\w*)");
 		Pattern p2 = Pattern.compile("\\'(.)\\'");
+		typ = PrimitiveType.INT;
 		Matcher m1 = p1.matcher(val);
 		if(m1.matches()) {
 			value = Long.parseLong(m1.group(1));

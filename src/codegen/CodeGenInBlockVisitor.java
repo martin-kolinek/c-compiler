@@ -54,6 +54,8 @@ public class CodeGenInBlockVisitor implements InBlockVisitor {
 	
 	@Override
 	public void visit(ResolvedDeclaration i) {
+		if(i.identifier==null)
+			return;
 		String reg = cg.getNextregister();
 		String tp = cg.getTypeString(i.type);
 		String size = "";

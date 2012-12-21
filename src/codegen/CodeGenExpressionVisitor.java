@@ -60,12 +60,12 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 		String tmp = cg.getNextregister();
 		cg.str.writeAssignment(tmp, "phi", "i1", "[", leftCompRes, ",", leftLabel, "], [", rightCompRes, ",", rightLabel, "]");
 		Register = cg.getNextregister();
-		cg.str.writeAssignment(Register, "sext", "i1", tmp, "to", cg.getExpressionTypeStr(e));
+		cg.str.writeAssignment(Register, "zext", "i1", tmp, "to", cg.getExpressionTypeStr(e));
 	}
 	
 	@Override
 	public void visit(BinaryExpression e) {
-		Type t = cg.getExpressionType(e);
+		Type t = cg.getExpressionType(e.left);
 		assert t instanceof PrimitiveType;
 		PrimitiveType pt = (PrimitiveType)t;
 		String instruction = null;
@@ -82,7 +82,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 			break;
 		case DIV:
 			if(pt.floating)
-				instruction = "fdif";
+				instruction = "fdiv";
 			else
 				instruction = pt.sign?"sdiv":"udiv";
 			break;
@@ -93,7 +93,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 			instruction = "shl";
 			break; // <<
 		case BSRIGHT :
-			instruction = "shr";
+			instruction = pt.sign?"ashr":"lshr";
 			break; // >>
 		case BAND :
 			instruction = "and";
@@ -126,10 +126,10 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 		}
 		
 		String tmp = cg.getNextregister();
-		cg.str.writeAssignment(tmp, instruction, cg.getTypeString(pt), cg.getExpressionRegister(e.left), cg.getExpressionRegister(e.right));
+		cg.str.writeAssignment(tmp, instruction, cg.getTypeString(pt), cg.getExpressionRegister(e.left), ",", cg.getExpressionRegister(e.right));
 		if(relational) {
 			Register = cg.getNextregister();
-			cg.str.writeAssignment(Register, "sext", "i1", tmp, "to", "i32");
+			cg.str.writeAssignment(Register, "zext", "i1", tmp, "to", "i32");
 		}
 		else
 			Register = tmp;
@@ -143,7 +143,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 		if(((PrimitiveType)t).floating) {
 			instruction = "f"+instruction;
 		}
-		cg.str.writeAssignment(tmp, instruction, cg.getTypeString(t), cg.getExpressionRegister(e), "1");
+		cg.str.writeAssignment(tmp, instruction, cg.getTypeString(t), cg.getExpressionRegister(e), ",", "1");
 		return tmp;
 	}
 	
@@ -173,16 +173,16 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 				break; //*
 			case COMP :
 				Register=cg.getNextregister();
-				cg.str.writeAssignment(Register, "xor", cg.getExpressionTypeStr(e.exp), "-1", cg.getExpressionRegister(e.exp));
+				cg.str.writeAssignment(Register, "xor", cg.getExpressionTypeStr(e.exp), "-1, ", cg.getExpressionRegister(e.exp));
 				break; //~ 
 			case NOT :
 				String tmp = cg.getNextregister();
 				Type t = cg.getExpressionType(e.exp);
 				assert t instanceof PrimitiveType;
-				String instruction = ((PrimitiveType)t).floating?"fcmp one":"icmp ne";
+				String instruction = ((PrimitiveType)t).floating?"fcmp oeq":"icmp eq";
 				cg.str.writeAssignment(tmp, instruction, cg.getExpressionTypeStr(e.exp), cg.getExpressionRegister(e.exp), ",", "0");
 				Register = cg.getNextregister();
-				cg.str.writeAssignment(Register, "sext", tmp, "to", "i32");
+				cg.str.writeAssignment(Register, "zext", "i1", tmp, "to", "i32");
 				break; //!
 		
 		}
@@ -227,6 +227,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 			}
 			String tmp = cg.getNextregister();
 			cg.str.writeAssignment(tmp, instruction, cg.getTypeString(orig), Register, "to", cg.getTypeString(pnew));
+			Register = tmp;
 		}
 		if(newt!=e.type) {
 			assert TypeClass.isPointer(e.type);
@@ -254,12 +255,17 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 		Type t = cg.getExpressionType(e.exp);
 		assert t instanceof StructType;
 		int pos = ((StructType)t).getMemberPosition(e.id);
-		String addition = ""; 
-		if(TypeClass.isArray(((StructType)t).members.get(pos).type))
+		String addition = "";
+		boolean array = TypeClass.isArray(((StructType)t).members.get(pos).type);
+		if(array)
 			addition = ", i32 0";
 		cg.str.writeAssignment(ptr, "getelementptr", cg.getTypeString(t)+"*", sptr, ", i32 0, i32", Integer.toString(pos), addition);
-		Register = cg.getNextregister();
-		cg.str.writeAssignment(Register, "load", cg.getExpressionTypeStr(e), ptr);
+		if(array)
+			Register = ptr;
+		else {
+			Register = cg.getNextregister();
+			cg.str.writeAssignment(Register, "load", cg.getExpressionTypeStr(e)+"*", ptr);
+		}
 	}
 
 	@Override
@@ -285,7 +291,10 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visit(FloatConstantExpression e) {
-		Register = Double.toHexString(e.value);
+		double val = e.value;
+		if(cg.getExpressionType(e)==PrimitiveType.FLOAT)
+			val=(float)val;
+		Register = Double.toString(val);
 	}
 
 	@Override
@@ -309,8 +318,10 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 			args.append(" ");
 			args.append(cg.getExpressionRegister(a));
 		}
-		
-		cg.str.writeAssignment(Register, "call", cg.generateFunctionType(e.func) , "@"+e.name, "(", args.toString(), ")");
+		if(e.func.returnType==PrimitiveType.VOID)
+			cg.str.writeLine("call", cg.generateFunctionType(e.func) , "@"+e.name, "(", args.toString(), ")");
+		else
+			cg.str.writeAssignment(Register, "call", cg.generateFunctionType(e.func) , "@"+e.name, "(", args.toString(), ")");
 	}
 
 	@Override
@@ -341,20 +352,7 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visit(AssignmentExpression e) {
-		Type t = cg.getExpressionType(e);
-		if(TypeClass.isStruct(t)) {
-			String s = cg.getSizeOfResult(t);
-			String laddr = cg.getExpressionAddress(e.left);
-			String raddr = cg.getExpressionAddress(e.right);
-			String ltmp = cg.getNextregister();
-			String rtmp = cg.getNextregister();
-			cg.str.writeAssignment(ltmp, "bitcast", cg.getTypeString(t)+"*", laddr, "to", "i8*");
-			cg.str.writeAssignment(rtmp, "bitcast", cg.getTypeString(t)+"*", raddr, "to", "i8*");
-			cg.str.writeLine("call", "void", "@llvm.memcpy.p0i8.p0i8.i64(i8*,", ltmp, ", i8*", rtmp, ", i64", s, ", i32 0, i1 false)");
-		}
-		else {
-			cg.str.store(cg.getExpressionAddress(e.left), cg.getExpressionTypeStr(e), cg.getExpressionRegister(e.right));
-		}
+		cg.str.store(cg.getExpressionAddress(e.left), cg.getExpressionTypeStr(e), cg.getExpressionRegister(e.right));
 	}
 
 }

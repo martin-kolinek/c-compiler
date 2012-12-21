@@ -279,13 +279,13 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 
 	@Override
 	public void visit(IntConstantExpression e) {
-		mapping.setType(e, PrimitiveType.INT);
+		mapping.setType(e, e.typ);
 		result = e;
 	}
 
 	@Override
 	public void visit(FloatConstantExpression e) {
-		mapping.setType(e, PrimitiveType.INT);
+		mapping.setType(e, e.typ);
 		result = e;
 		
 	}
@@ -311,9 +311,6 @@ public class TypeResolverExpressionModifier implements ExpressionModifier {
 				Type pt = mapping.getExpressionType(e.args.get(i));
 				if(t!=pt)
 					throw new SemanticException("Wrong parameter type");
-				Expression newExp = new UnaryExpression(e.args.get(i), UnaryOperator.ADDR);
-				mapping.setType(newExp, new PointerType(t));
-				e.args.set(i, newExp);
 			}
 			else {
 				e.args.set(i, AutomaticConversions.autoCast(e.args.get(i), t, mapping));

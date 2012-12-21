@@ -23,6 +23,8 @@ public class CodeGenStream {
 	}
 	
 	public void writeLabel(String l) {
+		writeLine("br label", l);
+		l=l.substring(1);
 		writeLine(l+":");
 	}
 	

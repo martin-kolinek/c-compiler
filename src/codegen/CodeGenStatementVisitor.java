@@ -36,7 +36,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 			wr.writeLine("ret", cg.getExpressionTypeStr(s.exp), cg.getExpressionRegister(s.exp));
 		}
 		else
-			wr.writeLine("ret");
+			wr.writeLine("ret void");
 				
 	}
 
@@ -89,7 +89,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	private void writeCondition(String resultRegister, String resultType, String iftrue, String iffalse) {
 		String condRes = cg.getNextregister();
 		wr.writeAssignment(condRes, "icmp ne", resultType, "0, ",resultRegister);
-		wr.writeLine("br i1", condRes, ", label", iftrue, "label", iffalse);
+		wr.writeLine("br i1", condRes, ", label", iftrue, ", label", iffalse);
 	}
 	
 	@Override

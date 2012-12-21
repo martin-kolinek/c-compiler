@@ -18,7 +18,7 @@ public class EnumRemoverTypeMod extends EmptyTypeModifier {
 	
 	@Override
 	public void visit(EnumType t) {
-		Expression last = new IntConstantExpression(0);
+		Expression last = new IntConstantExpression(-1);
 		if(t.enumerators!=null) {
 			for(Enumerator e:t.enumerators) {
 				if(e.expression!=null) {
