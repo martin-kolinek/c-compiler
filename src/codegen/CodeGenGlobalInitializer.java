@@ -13,7 +13,6 @@ public class CodeGenGlobalInitializer extends EmptyInBlockVisitor {
 	
 	public CodeGenGlobalInitializer(BlockCodeGenerator cg2) {
 		this.cg=cg2;
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override

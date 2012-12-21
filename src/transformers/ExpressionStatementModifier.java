@@ -50,7 +50,8 @@ public class ExpressionStatementModifier extends EmptyStatementModifier {
 	public void visit(SwitchStatement s) {
 		s.expr = TransformerUtil.transformExpression(s.expr, emf);
 		for(Case c : s.cases) {
-			c.cond = TransformerUtil.transformExpression(c.cond, emf);
+			if(c.cond!=null)
+				c.cond = TransformerUtil.transformExpression(c.cond, emf);
 		}
 		super.visit(s);
 	}

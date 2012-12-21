@@ -1,6 +1,8 @@
 package transformers;
 
 import declaration.ResolvedDeclaration;
+import expression.CastExpression;
+import statements.Statement;
 import toplevel.FunctionDefinition;
 import toplevel.FunctionParameter;
 
@@ -25,5 +27,37 @@ public class TypeBlockModifier extends EmptyBlockModifier {
 		i.type=TransformerUtil.transformType(i.type, tmf);
 		super.visit(i);
 	}
+	
+	@Override
+	public void visit(Statement i) {
+		TransformerUtil.transformStatement(i, new StatementModifierFactory() {
+			
+			@Override
+			public StatementModifier create() {
+				return new ExpressionStatementModifier(new ExpressionModifierFactory() {
+					
+					@Override
+					public ExpressionModifier create() {
+						return new TypeExpressionModifier(tmf);
+					}
+				});
+			}
+		});
+	}
 
+}
+
+class TypeExpressionModifier extends EmptyExpressionModifier {
+	TypeModifierFactory mod;
+	public TypeExpressionModifier(TypeModifierFactory fac) {
+		mod=fac;
+	}
+	
+	@Override
+	public void visit(CastExpression e) {
+		TypeModifier tm = mod.create();
+		e.type.accept(tm);
+		e.type=tm.getResult();
+		super.visit(e);
+	}
 }

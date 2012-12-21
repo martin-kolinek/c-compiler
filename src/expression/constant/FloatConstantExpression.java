@@ -17,10 +17,12 @@ public class FloatConstantExpression implements ConstantExpression, ASTNode{
 		val=val.toUpperCase();
 		Pattern p = Pattern.compile("([^FL]+)(F|L)?");
 		Matcher m = p.matcher(val);
-		assert m.matches();
+		boolean match = m.matches();
+		assert match;
 		typ=PrimitiveType.DOUBLE;
 		if(m.groupCount()>2 && m.group(2)=="F")
 			typ=PrimitiveType.FLOAT;
+		assert m.groupCount()>=2;
 		value = Double.parseDouble(m.group(1));
 	}
 	
