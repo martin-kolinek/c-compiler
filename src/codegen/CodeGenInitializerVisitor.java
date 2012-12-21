@@ -18,12 +18,14 @@ public class CodeGenInitializerVisitor implements InitializerVisitor {
 		// TODO Auto-generated constructor stub
 		this.cg=cg;
 		this.i_typ=t;
+		this.a_typ=null;
 	}
 
 	public CodeGenInitializerVisitor(BlockCodeGenerator cg2, ArrayType t) {
 		// TODO Auto-generated constructor stub
 		this.a_typ=t;
 		this.cg=cg2;
+		this.i_typ=null;
 	}
 
 	@Override
@@ -38,8 +40,11 @@ public class CodeGenInitializerVisitor implements InitializerVisitor {
 		// TODO Auto-generated method stub
 		boolean neprvy=false;
 		//Type x=i_typ;
-		StructIteratorTypeVisitor stv = new StructIteratorTypeVisitor();
+		StructIteratorTypeVisitor stv =null;//TODO pre pole
+		if(a_typ == null){
+		stv = new StructIteratorTypeVisitor();
 		i_typ.accept(stv);
+		}
 		for(DesignatedInitializer  s: compoundInitializer.initializers ){//cyklus po jednotlivych initializeroch
 			if(neprvy) cg.str.write(",");
 			Type y=stv.iter();
@@ -54,11 +59,15 @@ public class CodeGenInitializerVisitor implements InitializerVisitor {
 				String Konst = cg.getExpressionRegister(e.exp);
 				cg.str.write(Konst);
 			}else if(s.initializer instanceof CompoundInitializer){
-				cg.str.write("{");
-				StructType x=(StructType) y;
-				CodeGenInitializerVisitor iv = new CodeGenInitializerVisitor(cg,x);
-				s.initializer.accept(iv);
-				cg.str.write("}");
+				if(a_typ == null){
+					cg.str.write("{");
+					StructType x=(StructType) y;
+					CodeGenInitializerVisitor iv = new CodeGenInitializerVisitor(cg,x);
+					s.initializer.accept(iv);
+					cg.str.write("}");
+				}else{
+					//TODO	
+				}
 			}
 			
 		neprvy=true;	
