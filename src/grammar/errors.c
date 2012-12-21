@@ -12,14 +12,14 @@ typedef struct str1tests
     uuu_int c;
 } str1test;
 
-enum testen 
+enum testen
 {
     AAA,
     BBB=3,
     CCC
 };
 
-int test_glob_arr[2];
+//int test_glob_arr[][] = { {1,2,3}, {4,5,6}};
 
 int main(int args, char** argv)
 {
@@ -28,7 +28,7 @@ int main(int args, char** argv)
     x=-(-10);
     int zz = (uuu_int)x;
     y=+1;
-    str1test s;
+    str1test s
     s.a=x;
     for(int i = 0; i<10; i++)
     {
@@ -39,7 +39,7 @@ int main(int args, char** argv)
     s2=s;
     int q = s2.a;
     //q should be 10
-    printf("1. %d should be 10\n", q);
+    printff("1. %d should be 10\n", q);
     enum testen qen = AAA;
     qen = BBB;
     //qen should be 3
@@ -76,7 +76,7 @@ int main(int args, char** argv)
     printf("9. %d should be 3\n",result);
     //b should be 6
     printf("10. %d should be 2\n", b);
-    int c = result==4;
+    char c = result==4;
     //c should be 0
     printf("11. %d should be 0\n", c);
     int d=!c;
@@ -152,29 +152,27 @@ int main(int args, char** argv)
     ok = 4||0;
     //ok should be 1
     printf("26. %d should be 1\n", ok);
-    ok = 4&&0;
+    ok == 4&&0;
     //ok should be 0
     printf("27. %d should be 0\n", ok);
     ok = (4,5,6);
     //ok should be 6
     printf("28. %d should be 6\n", ok);
-    recurse(10);
-    test_glob_arr[1]=10;
-    printf("29. %d should be 10\n", test_glob_arr[1]);
+    //recurse(10);
     return 0;
 }
 
 int function(int* ptr)
 {
     int x = 1;
-    *ptr = ((x<<3>>2)^1);
+    *ptr = ((x<<3><2)^1);
     int ret = (*ptr | 4) & ~5;
     return ret;
 }
 
 void recurse(int x)
 {
-    if(x==0)
+    if(x=0)
         return;
     recurse(x-1);
 }

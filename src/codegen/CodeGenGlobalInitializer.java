@@ -38,7 +38,7 @@ public class CodeGenGlobalInitializer extends EmptyInBlockVisitor {
 	
 	private String getGlobalInitializer(Type t, Initializer i, ASTNode pos) {
 		if(i==null)
-			return cg.getTypeString(t) + " zeroinitializer";
+			return cg.getProperTypeString(t) + " zeroinitializer";
 		if(i instanceof ExpressionInitializer) {
 			if(!TypeClass.isArithmethic(t))
 				throw new SemanticException("Expression initialization of non arithmethic type", pos);
@@ -56,7 +56,7 @@ public class CodeGenGlobalInitializer extends EmptyInBlockVisitor {
 	
 	private String getGlobalInitializerStruct(StructType st, CompoundInitializer init, ASTNode pos) {
 		StringBuilder ret = new StringBuilder();
-		ret.append(cg.getTypeString(st));
+		ret.append(cg.getProperTypeString(st));
 		ret.append(" ");
 		ret.append("{");
 		boolean first = true;
@@ -73,7 +73,7 @@ public class CodeGenGlobalInitializer extends EmptyInBlockVisitor {
 	
 	private String getGlobalInitializerArray(ArrayType at, CompoundInitializer init, ASTNode pos) {
 		StringBuilder ret = new StringBuilder();
-		ret.append(cg.getTypeString(at));
+		ret.append(cg.getProperTypeString(at));
 		ret.append(" ");
 		ret.append("[");
 		boolean first = true;

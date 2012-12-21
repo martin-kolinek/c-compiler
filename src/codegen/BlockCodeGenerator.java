@@ -123,11 +123,7 @@ public class BlockCodeGenerator {
 	
 	public String getIDAddress(String id) {
 		String addr = idAddresses.get(id);
-		if(isGlobalArray(id)) {
-			String tmp = getNextregister();
-			str.writeAssignment(tmp, "getelementptr", getGlobalArrayTypeString(id)+"*", addr, ",", "i32 0, i32 0");
-			addr = tmp;
-		}
+		
 		return addr;
 	}
 	
@@ -146,6 +142,10 @@ public class BlockCodeGenerator {
 	
 	public String getGlobalArrayTypeString(String id) {
 		return getProperTypeString(globArrays.get(idAddresses.get(id)));
+	}
+	
+	public String getGlobalArrayTypeStringPtr(String id) {
+		return getTypeString(globArrays.get(idAddresses.get(id)));
 	}
 	
 	public String getStringAddress(byte[] value) {

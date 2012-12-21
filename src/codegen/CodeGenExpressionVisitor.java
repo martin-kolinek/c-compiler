@@ -281,8 +281,19 @@ public class CodeGenExpressionVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visit(IDExpression e) {
-		Register = cg.getNextregister();
-		cg.str.writeAssignment(Register, "load", cg.getExpressionTypeStr(e)+"*", cg.getIDAddress(e.id));
+		
+		if(cg.isGlobalArray(e.id)) {
+			String tmp = cg.getNextregister();
+			cg.str.writeAssignment(tmp, "getelementptr", cg.getGlobalArrayTypeString(e.id)+"*", cg.getIDAddress(e.id), ",", "i32 0");
+			String tmp2 = cg.getNextregister();
+			cg.str.writeAssignment(tmp2, "bitcast", cg.getGlobalArrayTypeString(e.id)+"*", tmp, "to", cg.getExpressionTypeStr(e));
+			Register = tmp2;
+		}
+		else {
+			String addr = cg.getIDAddress(e.id);
+			Register = cg.getNextregister();
+			cg.str.writeAssignment(Register, "load", cg.getExpressionTypeStr(e)+"*", addr);
+		}
 	}
 
 	@Override
