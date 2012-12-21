@@ -3,7 +3,6 @@ package modifiers;
 import expression.Expression;
 import expression.constant.IntConstantExpression;
 import statements.BlockStatement;
-import statements.DowhileStatement;
 import statements.ForStatement;
 import statements.OneexpressionStatement;
 import statements.WhileStatement;
@@ -44,17 +43,4 @@ public class LoopModifier extends EmptyStatementModifier {
 		result = st;
 	}
 	
-	/*
-	 * Transformuje do aaa while(bbb);
-	 * na
-	 * aaa;
-	 * while(bbb) aaa;
-	 */
-	@Override
-	public void visit(DowhileStatement s) {
-		BlockStatement st = new BlockStatement();
-		st.inBlock.add(s.body);
-		st.inBlock.add(new WhileStatement(s.condition, s.body));
-		result = st;
-	}
 }

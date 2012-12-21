@@ -36,7 +36,7 @@ public class ExpressionStatementModifier extends EmptyStatementModifier {
 	
 	@Override
 	public void visit(DowhileStatement s) {
-		assert false; //povedzme ze forov sme sa uz zbavili
+		s.condition=TransformerUtil.transformExpression(s.condition, emf);
 		super.visit(s);
 	}
 	

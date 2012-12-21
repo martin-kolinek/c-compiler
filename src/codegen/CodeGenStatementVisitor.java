@@ -2,6 +2,7 @@ package codegen;
 
 import java.util.ArrayList;
 import exceptions.SemanticException;
+import expression.Expression;
 import expression.constant.IntConstantExpression;
 import statements.BlockStatement;
 import statements.BreakStatement;
@@ -54,11 +55,30 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 		wr.writeLine("br", "label", ContinueSkok);
 
 	}
+	
+	private void generateWhile(Expression cond, Statement body, boolean dowhile) {
+		//ziskame labely
+		String predCyklom = cg.getNextLabel();
+		String zaCyklom = cg.getNextLabel();
+		String zaPodmienkou = cg.getNextLabel();
+		if(dowhile)
+			wr.writeLine("br", "label", zaPodmienkou);
+		//zaciatok cyklu a podmienka
+		wr.writeLabel(predCyklom);
+		writeCondition(cg.getExpressionRegister(cond), cg.getExpressionTypeStr(cond), zaPodmienkou, zaCyklom);
+		//telo cyklu
+		wr.writeLabel(zaPodmienkou);
+		BlockCodeGenerator icg = new BlockCodeGenerator(cg, zaCyklom, predCyklom);
+		icg.generateStatement(body);
+		//skok na zaciatok
+		wr.writeLine("br", "label", predCyklom);
+		//label za cyklom
+		wr.writeLabel(zaCyklom);
+	}
 
 	@Override
 	public void visit(DowhileStatement s) {
-		assert false; //tieto by tu uz nemali byt
-
+		generateWhile(s.condition, s.body, true);
 	}
 
 	@Override
@@ -74,21 +94,7 @@ public class CodeGenStatementVisitor implements StatementVisitor {
 	
 	@Override
 	public void visit(WhileStatement s) {
-		//ziskame labely
-		String predCyklom = cg.getNextLabel();
-		String zaCyklom = cg.getNextLabel();
-		String zaPodmienkou = cg.getNextLabel();
-		//zaciatok cyklu a podmienka
-		wr.writeLabel(predCyklom);
-		writeCondition(cg.getExpressionRegister(s.condition), cg.getExpressionTypeStr(s.condition), zaPodmienkou, zaCyklom);
-		//telo cyklu
-		wr.writeLabel(zaPodmienkou);
-		BlockCodeGenerator icg = new BlockCodeGenerator(cg, zaCyklom, predCyklom);
-		icg.generateStatement(s.body);
-		//skok na zaciatok
-		wr.writeLine("br", "label", predCyklom);
-		//label za cyklom
-		wr.writeLabel(zaCyklom);
+		generateWhile(s.condition, s.body, false);
 	}
 
 	@Override
