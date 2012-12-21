@@ -64,7 +64,7 @@ public class Main {
 			GlobalErrorCounter.errors++;
 
 		OutputStreamWriter wr = null;
-		//try {
+		try {
 
 			//remove other loops than while
 			TransformerUtil.transformProgram(prog, new StatementModifierFactory() {
@@ -222,8 +222,7 @@ public class Main {
 			cg.finalize();
 			if(GlobalErrorCounter.errors==0)
 				System.out.println("Success");
-			wr.close();
-		/*}
+		}
 		catch(SemanticException ex) {
 			System.err.println(ex.getMessage(GlobalPositionTracker.pos));
 			GlobalErrorCounter.errors++;
@@ -231,7 +230,7 @@ public class Main {
 		finally {
 			if(wr!=null) 
 				wr.close();
-		}*/
+		}
 		System.exit(GlobalErrorCounter.errors);
 
 	}
